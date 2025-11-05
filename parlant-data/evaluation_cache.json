@@ -1,0 +1,19 @@
+{
+  "guideline_evaluations_3.0.3": [
+    {
+      "id": "2d64e367d73e836abe245377581a415e",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": "Find and provide details of appointments based on the user's query."
+      }
+    }
+  ],
+  "journey_evaluations_3.0.3": []
+}
