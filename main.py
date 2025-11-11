@@ -5,10 +5,27 @@ import parlant.sdk as p
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+# SQLAlchemy imports para conexão com Postgres
+from sqlalchemy import create_engine
+from sqlalchemy.exc import OperationalError
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+DATABASE_URL = "postgresql+psycopg2://postgres:postgres@localhost:54322/postgres"
+
+# Criação da engine SQLAlchemy
+engine = create_engine(DATABASE_URL, echo=True, future=True)
+
+# Teste simples de conexão
+def test_db_connection():
+    try:
+        with engine.connect() as conn:
+            logger.info("Conexão com o banco de dados estabelecida com sucesso!")
+    except OperationalError as e:
+        logger.error(f"Erro ao conectar ao banco de dados: {e}")
 
 class Appointment(BaseModel):
     time: str
@@ -51,4 +68,5 @@ async def main():
         raise
 
 if __name__ == "__main__":
+    test_db_connection()
     asyncio.run(main())
