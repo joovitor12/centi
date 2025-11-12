@@ -1,31 +1,18 @@
 import asyncio
 import logging
-from typing import List
+import os
 import parlant.sdk as p
 from pydantic import BaseModel
 from dotenv import load_dotenv
-
-# SQLAlchemy imports para conexão com Postgres
-from sqlalchemy import create_engine
-from sqlalchemy.exc import OperationalError
+from supabase import create_client, Client
 
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-DATABASE_URL = "postgresql+psycopg2://postgres:postgres@localhost:54322/postgres"
-
-# Criação da engine SQLAlchemy
-engine = create_engine(DATABASE_URL, echo=True, future=True)
-
-# Teste simples de conexão
-def test_db_connection():
-    try:
-        with engine.connect() as conn:
-            logger.info("Conexão com o banco de dados estabelecida com sucesso!")
-    except OperationalError as e:
-        logger.error(f"Erro ao conectar ao banco de dados: {e}")
+url: str = os.environ.get("SUPABASE_URL")
+key: str = os.environ.get("SUPABASE_KEY")
 
 class Appointment(BaseModel):
     time: str
@@ -38,15 +25,30 @@ async def main():
         try:
             logger.info(f"Query received: {query}")
             
-            # Simulação de dados - substituir por chamada real ao banco
-            appointments = [
-                Appointment(time="10 AM tomorrow", description="Meeting with the team"),
-                Appointment(time="2 PM today", description="Doctor appointment"),
-            ]
+            response = supabase.table("appointments").select("*").execute()
+            print("Supabase response:", response)
+            appointments = response.data
             
             return p.ToolResult(data=appointments)
         except Exception as e:
             logger.error(f"Error finding appointments: {e}")
+            return p.ToolResult(error=str(e))
+        
+    @p.tool
+    async def add_appointment(context: p.ToolContext, appointment: Appointment) -> p.ToolResult:
+        """Add a new appointment."""
+        try:
+            logger.info(f"Adding appointment: {appointment}")
+            
+            response = supabase.table("appointments").insert({
+                "time": appointment.time,
+                "description": appointment.description
+            }).execute()
+            print("Supabase insert response:", response)
+            
+            return p.ToolResult(data=response.data)
+        except Exception as e:
+            logger.error(f"Error adding appointment: {e}")
             return p.ToolResult(error=str(e))
     
     try:
@@ -60,6 +62,11 @@ async def main():
                 condition="When user asks about appointments, schedule, or calendar", 
                 tool=find_appointments
             )
+
+            await agent.attach_tool(
+                condition="When user wants to add a new appointment/reminder/task to their schedule", 
+                tool=add_appointment
+            )
             
             logger.info("Agent initialized successfully")
             
@@ -68,5 +75,7 @@ async def main():
         raise
 
 if __name__ == "__main__":
-    test_db_connection()
+    supabase: Client = create_client(url, key)
+    response = supabase.table("appointments").select("*").execute()
+    print("Appointments from Supabase:", response.data)
     asyncio.run(main())

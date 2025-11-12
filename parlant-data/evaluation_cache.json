@@ -13,6 +13,34 @@
         "agent_intention_condition": null,
         "internal_action": "Find and provide details of appointments based on the user's query."
       }
+    },
+    {
+      "id": "a4dd780f41f70141e57aadbb4a1ee7ea",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": "Add the new appointment to the user's schedule."
+      }
+    },
+    {
+      "id": "a986688633aacb7e4ed11ac8d4917d44",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies the appointment details.",
+          "agent_action": "The agent adds the specified appointment to the user's schedule."
+        },
+        "agent_intention_condition": null,
+        "internal_action": "Add the specified appointment to the user's schedule."
+      }
     }
   ],
   "journey_evaluations_3.0.3": []
