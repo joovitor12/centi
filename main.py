@@ -29,11 +29,9 @@ async def main():
                     data={"appointments": [], "message": "No appointments found"}
                 )
             
-            # Format appointments for better display
             formatted_appointments = []
             for apt in appointments:
                 try:
-                    # Try to parse and format the time
                     if apt.get('time'):
                         try:
                             parsed_time = datetime.fromisoformat(apt['time'])
