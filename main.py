@@ -114,6 +114,63 @@ async def main():
                 control={"lifespan": "response"}
             )
     
+    @p.tool
+    async def edit_appointment(
+        context: p.ToolContext, 
+        appointment_id: int,
+        new_description: str = None,
+        new_when: str = None
+    ) -> p.ToolResult:
+        """Edit an existing appointment.
+        
+        Args:
+            appointment_id: ID of the appointment to edit
+            new_description: New description (optional)
+            new_when: New time in format "YYYY-MM-DD HH:MM:SS" (optional)
+        """
+        try:
+            logger.info(f"Editing appointment ID {appointment_id}")
+            
+            update_data = {}
+            if new_description:
+                update_data["description"] = new_description
+            if new_when:
+                try:
+                    appointment_time = datetime.fromisoformat(new_when.replace('T', ' '))
+                    update_data["time"] = appointment_time.isoformat()
+                except ValueError:
+                    return p.ToolResult(
+                        data=f"Invalid datetime format: '{new_when}'. Please use 'YYYY-MM-DD HH:MM:SS' format.",
+                        control={"lifespan": "response"}
+                    )
+            
+            if not update_data:
+                return p.ToolResult(
+                    data="No updates provided.",
+                    control={"lifespan": "response"}
+                )
+            
+            response = supabase.table("appointments").update(update_data).eq("id", appointment_id).execute()
+            
+            if not response.data:
+                return p.ToolResult(
+                    data=f"No appointment found with ID {appointment_id}",
+                    control={"lifespan": "response"}
+                )
+            
+            return p.ToolResult(
+                data={
+                    "message": f"Appointment ID {appointment_id} updated successfully.",
+                    "appointment": response.data[0]
+                }
+            )
+        except Exception as e:
+            logger.error(f"Error editing appointment: {e}")
+            return p.ToolResult(
+                data=f"Failed to edit appointment: {str(e)}",
+                control={"lifespan": "response"}
+            )
+    
     try:
         async with p.Server() as server:
             agent = await server.create_agent(
@@ -144,6 +201,12 @@ Use add_appointment tool with description and the calculated when parameter. Tod
                 condition="User asks about their schedule, appointments, calendar, or what they have planned",
                 action="Search and display their appointments using find_appointments",
                 tools=[find_appointments]
+            )
+
+            await agent.create_guideline(
+                condition="User wants to change or update an existing appointment, meeting, reminder, or task, need to return all existing appointments first for the user to decide which to edit",
+                action="First use find_appointments to list all appointments, then use edit_appointment to make changes based on user input",
+                tools=[find_appointments, edit_appointment]
             )
             
             logger.info("Agent initialized successfully")

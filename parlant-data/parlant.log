@@ -271,3 +271,137 @@ parlant.core.tools.ToolExecutionError: Tool error (tool='add_appointment'): url=
 [2m2025-11-14T12:36:17.013656Z[0m [[33m[1mwarning  [0m] [1m[RURDmf1RdXN] HTTP Request: GET /sessions/f5IS1wOTLC/events cancelled after 1.441 seconds[0m
 [2m2025-11-14T12:36:17.014659Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
 [2m2025-11-14T12:36:17.015656Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-16T03:08:22.255329Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-16T03:08:22.255329Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-16T03:08:22.258329Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-16T03:08:23.353329Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-16T03:08:31.168287Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-16T03:08:31.169291Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-16T03:08:31.169291Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-16T03:08:31.169291Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-16T03:08:31.169291Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-16T03:09:25.166192Z[0m [[32m[1minfo     [0m] [1m[RZ6Lp5U0jXw::process] Processing context for session PsgzBU10a2 finished in 37.278 seconds[0m
+[2m2025-11-16T03:09:38.706054Z[0m [[31m[1merror    [0m] [1m[RPd6Rxkasze::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-16T03:09:38.718269Z[0m [[31m[1merror    [0m] [1m[RPd6Rxkasze::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-16T03:09:38.719269Z[0m [[31m[1merror    [0m] [1m[RPd6Rxkasze::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 26373, Requested 3788. Please try again in 322ms. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-16T03:10:27.381914Z[0m [[31m[1merror    [0m] [1m[RPd6Rxkasze::process][ToolCaller][Evaluation(built-in:edit_appointment)][OpenAISchematicGenerator][LLM Request (SingleToolBatchSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-16T03:10:27.381914Z[0m [[31m[1merror    [0m] [1m[RPd6Rxkasze::process][ToolCaller][Evaluation(built-in:edit_appointment)][OpenAISchematicGenerator][LLM Request (SingleToolBatchSchema)] LLM Request (SingleToolBatchSchema) failed[0m
+[2m2025-11-16T03:10:27.382914Z[0m [[31m[1merror    [0m] [1m[RPd6Rxkasze::process][ToolCaller][Evaluation(built-in:edit_appointment)][OpenAISchematicGenerator][LLM Request (SingleToolBatchSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29662, Requested 6655. Please try again in 12.634s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-16T03:10:55.532456Z[0m [[32m[1minfo     [0m] [1m[RPd6Rxkasze::process] Processing context for session PsgzBU10a2 finished in 83.773 seconds[0m
+[2m2025-11-16T03:12:07.283396Z[0m [[32m[1minfo     [0m] [1m[RNvsbntW6tT::process] Processing context for session PsgzBU10a2 finished in 6.199 seconds[0m
+[2m2025-11-16T03:13:46.030858Z[0m [[32m[1minfo     [0m] [1m[RSWw4E8rfMR::process] Processing context for session PsgzBU10a2 finished in 5.474 seconds[0m
+[2m2025-11-16T03:14:08.924329Z[0m [[32m[1minfo     [0m] [1m[RAXVXA5kBYU::process] Processing context for session PsgzBU10a2 finished in 13.435 seconds[0m
+[2m2025-11-16T03:14:28.257621Z[0m [[31m[1merror    [0m] [1m[R9R9dkgW0Ii::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponsePreambleSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-16T03:14:28.258620Z[0m [[31m[1merror    [0m] [1m[R9R9dkgW0Ii::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponsePreambleSchema)] LLM Request (CannedResponsePreambleSchema) failed[0m
+[2m2025-11-16T03:14:28.259622Z[0m [[31m[1merror    [0m] [1m[R9R9dkgW0Ii::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponsePreambleSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 30000, Requested 1429. Please try again in 2.858s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-16T03:14:32.060360Z[0m [[31m[1merror    [0m] [1m[R9R9dkgW0Ii::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-16T03:14:32.060360Z[0m [[31m[1merror    [0m] [1m[R9R9dkgW0Ii::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-16T03:14:32.060360Z[0m [[31m[1merror    [0m] [1m[R9R9dkgW0Ii::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 30000, Requested 4235. Please try again in 8.47s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-16T03:14:55.748246Z[0m [[32m[1minfo     [0m] [1m[R9R9dkgW0Ii::process] Processing context for session PsgzBU10a2 finished in 35.721 seconds[0m
+[2m2025-11-16T03:15:30.883560Z[0m [[33m[1mwarning  [0m] [1m[RexppaPTUQp] HTTP Request: GET /sessions/PsgzBU10a2/events cancelled after 34.84 seconds[0m
+[2m2025-11-16T03:15:30.884560Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-16T03:15:30.885560Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
