@@ -405,3 +405,183 @@ Recommended actions:
 [2m2025-11-16T03:15:30.883560Z[0m [[33m[1mwarning  [0m] [1m[RexppaPTUQp] HTTP Request: GET /sessions/PsgzBU10a2/events cancelled after 34.84 seconds[0m
 [2m2025-11-16T03:15:30.884560Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
 [2m2025-11-16T03:15:30.885560Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T00:12:44.660489Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T00:12:44.661493Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T00:12:44.663496Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T00:12:45.774016Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T00:12:55.395294Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T00:12:55.396293Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T00:12:55.396293Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T00:12:55.396293Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T00:12:55.397293Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:28:03.589261Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T01:28:03.589261Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T01:28:03.591261Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T01:28:03.990921Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T01:28:13.362664Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T01:28:13.363661Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T01:28:13.363661Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T01:28:13.363661Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T01:28:13.363661Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:30:35.332745Z[0m [[32m[1minfo     [0m] [1m[ReCSU0cKTLb::process] Processing context for session U4Vb3VYTrA finished in 46.175 seconds[0m
+[2m2025-11-18T01:31:52.014169Z[0m [[32m[1minfo     [0m] [1m[RHeh0RjEdiG::process] Processing context for session U4Vb3VYTrA finished in 62.554 seconds[0m
+[2m2025-11-18T01:34:09.999014Z[0m [[33m[1mwarning  [0m] [1m[RDVBF3LsP0Q] HTTP Request: GET /sessions/U4Vb3VYTrA/events cancelled after 43.155 seconds[0m
+[2m2025-11-18T01:34:10.000015Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T01:34:10.001014Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T01:34:16.025696Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T01:34:16.025696Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T01:34:16.028696Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T01:34:16.404496Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T01:34:23.717351Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T01:34:23.718352Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T01:34:23.718352Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T01:34:23.718352Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T01:34:23.719353Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:34:23.764351Z[0m [[32m[1minfo     [0m] [1m[RYITTpZKIhw] Session not found (id='U4Vb3VYTrA')[0m
+[2m2025-11-18T01:35:11.794856Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T01:35:11.796856Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T01:35:17.713234Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T01:35:17.713234Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T01:35:17.716234Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T01:35:18.086272Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T01:35:24.837429Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T01:35:24.837429Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T01:35:24.838435Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T01:35:24.838435Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T01:35:24.838435Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:36:17.759039Z[0m [[32m[1minfo     [0m] [1m[RvFJlg12xGB::process] Processing context for session 4B7TSl1W4c finished in 31.792 seconds[0m
+[2m2025-11-18T01:36:45.809870Z[0m [[32m[1minfo     [0m] [1m[Rv0AUe4aMT1::process] Processing context for session 4B7TSl1W4c finished in 10.71 seconds[0m
+[2m2025-11-18T01:41:23.481786Z[0m [[33m[1mwarning  [0m] [1m[RDJd0Cx0qxt] HTTP Request: GET /sessions/4B7TSl1W4c/events cancelled after 37.359 seconds[0m
+[2m2025-11-18T01:41:23.482788Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T01:41:23.483786Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T01:41:29.791617Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T01:41:29.791617Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T01:41:29.793617Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T01:41:30.194305Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T01:41:37.063256Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T01:41:37.063256Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T01:41:37.063256Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T01:41:37.064255Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T01:41:37.064255Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:42:24.672491Z[0m [[32m[1minfo     [0m] [1m[RTOFtT10SrQ::process] Processing context for session Ynao7x19Ys finished in 41.788 seconds[0m
+[2m2025-11-18T01:42:49.313371Z[0m [[32m[1minfo     [0m] [1m[RcGT6DL8tfO::process] Processing context for session Ynao7x19Ys finished in 20.171 seconds[0m
+[2m2025-11-18T01:43:48.515334Z[0m [[32m[1minfo     [0m] [1m[RsdX6ff6slm::process] Processing context for session Ynao7x19Ys finished in 7.402 seconds[0m
+[2m2025-11-18T01:45:46.546559Z[0m [[33m[1mwarning  [0m] [1m[RbYEFOj7Jkv] HTTP Request: GET /sessions/Ynao7x19Ys/events cancelled after 57.757 seconds[0m
+[2m2025-11-18T01:45:46.547559Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T01:45:46.548559Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T01:46:12.388028Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T01:46:12.388028Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T01:46:12.391026Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T01:46:12.811431Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T01:46:20.165598Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T01:46:20.166598Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T01:46:20.166598Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T01:46:20.166598Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T01:46:20.167598Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:46:59.384799Z[0m [[32m[1minfo     [0m] [1m[RIuOqExfPUr::process] Processing context for session S9xXnNq3oN finished in 36.415 seconds[0m
+[2m2025-11-18T01:47:15.359188Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponsePreambleSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-18T01:47:15.375934Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponsePreambleSchema)] LLM Request (CannedResponsePreambleSchema) failed[0m
+[2m2025-11-18T01:47:15.376934Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponsePreambleSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29357, Requested 959. Please try again in 632ms. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-18T01:47:23.627263Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-18T01:47:23.628263Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-18T01:47:23.629262Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][GuidelineMatcher][GenericPreviouslyAppliedActionableGuidelineMatchingBatch][Batch of 1 guidelines][OpenAISchematicGenerator][LLM Request (GenericPreviouslyAppliedActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 26386, Requested 3766. Please try again in 304ms. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-18T01:47:46.270081Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][ToolCaller][Evaluation(built-in:edit_appointment)][OpenAISchematicGenerator][LLM Request (SingleToolBatchSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-18T01:47:46.271585Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][ToolCaller][Evaluation(built-in:edit_appointment)][OpenAISchematicGenerator][LLM Request (SingleToolBatchSchema)] LLM Request (SingleToolBatchSchema) failed[0m
+[2m2025-11-18T01:47:46.272589Z[0m [[31m[1merror    [0m] [1m[R2Zz3BwRGBd::process][ToolCaller][Evaluation(built-in:edit_appointment)][OpenAISchematicGenerator][LLM Request (SingleToolBatchSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29650, Requested 6974. Please try again in 13.248s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-18T01:48:45.685454Z[0m [[32m[1minfo     [0m] [1m[R2Zz3BwRGBd::process] Processing context for session S9xXnNq3oN finished in 96.765 seconds[0m
+[2m2025-11-18T01:49:50.537987Z[0m [[33m[1mwarning  [0m] [1m[RKsFzdmI9uJ] HTTP Request: GET /sessions/S9xXnNq3oN/events cancelled after 25.209 seconds[0m
+[2m2025-11-18T01:49:50.538988Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T01:49:50.539988Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T01:49:55.407423Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T01:49:55.407423Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T01:49:55.410423Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T01:49:55.777469Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T01:50:02.135251Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T01:50:02.136251Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T01:50:02.136251Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T01:50:02.136251Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T01:50:02.136251Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T01:50:02.183763Z[0m [[32m[1minfo     [0m] [1m[RtPAlsiHLRr] Session not found (id='S9xXnNq3oN')[0m
+[2m2025-11-18T01:51:29.395500Z[0m [[32m[1minfo     [0m] [1m[RMA9An8K4fh::process] Processing context for session 3VxtTeVozo finished in 46.947 seconds[0m
+[2m2025-11-18T01:52:59.063292Z[0m [[32m[1minfo     [0m] [1m[RNVT5FT5hHx::process] Processing context for session 3VxtTeVozo finished in 88.473 seconds[0m
+[2m2025-11-18T01:59:05.769482Z[0m [[33m[1mwarning  [0m] [1m[RWuhIRY9q7u] HTTP Request: GET /sessions/3VxtTeVozo/events cancelled after 28.536 seconds[0m
+[2m2025-11-18T01:59:05.770483Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T01:59:05.771483Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
