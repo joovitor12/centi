@@ -114,12 +114,21 @@ The AI assistant automatically converts natural language to precise timestamps:
 ```
 centi/
 ├── main.py              # Main application entry point
-├── models.py            # Database models
-├── test_time_parsing.py # Time parsing tests
+├── app/                 # Application package
+│   ├── config/          # Configuration and settings
+│   │   └── settings.py  # Environment variables and settings
+│   ├── services/        # External services
+│   │   └── supabase_service.py      # Supabase database service
+│   ├── tools/           # Parlant tools
+│   │   └── appointments.py  # Appointment management tools
+│   └── agent/           # Agent configuration
+│       └── guidelines.py # Agent guidelines
 ├── alembic/             # Database migrations
 ├── parlant-data/        # Parlant cache and embeddings
 └── README.md
 ```
+
+See `app/README.md` for detailed architecture documentation.
 
 ## 📈 Roadmap
 
