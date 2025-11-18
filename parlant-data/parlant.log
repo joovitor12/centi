@@ -662,3 +662,24 @@ Recommended actions:
 [2m2025-11-18T02:08:58.156298Z[0m [[33m[1mwarning  [0m] [1m[Rd3NxPEr4i4] HTTP Request: GET /sessions/KM9K0Y0kZY/events cancelled after 57.635 seconds[0m
 [2m2025-11-18T02:08:58.157304Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
 [2m2025-11-18T02:08:58.158301Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T02:17:22.601041Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T02:17:22.601041Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T02:17:22.603040Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T02:17:22.991005Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T02:17:24.137332Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (1)[0m
+[2m2025-11-18T02:17:24.138331Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-18T02:17:24.138331Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Waiting for task 'websocket-logger' to finish[0m
+[2m2025-11-18T02:18:55.978291Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-18T02:18:55.978291Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-18T02:18:55.980794Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-18T02:18:56.352700Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-18T02:19:03.062331Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-18T02:19:03.062331Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-18T02:19:03.062331Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-18T02:19:03.063334Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-18T02:19:03.063334Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-18T02:19:03.204496Z[0m [[32m[1minfo     [0m] [1m[Rqgnfn2yg5C] Session not found (id='KM9K0Y0kZY')[0m
+[2m2025-11-18T02:19:45.164000Z[0m [[32m[1minfo     [0m] [1m[RIGf0hbVPV7::process] Processing context for session KRQtIJ0V7d finished in 25.315 seconds[0m
+[2m2025-11-18T02:21:07.791376Z[0m [[33m[1mwarning  [0m] [1m[RI22Zym7Hyr] HTTP Request: GET /sessions/KRQtIJ0V7d/events cancelled after 26.48 seconds[0m
+[2m2025-11-18T02:21:07.792378Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-18T02:21:07.793377Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m

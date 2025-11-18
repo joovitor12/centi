@@ -1,23 +1,31 @@
 """Agent guidelines configuration."""
+
 from datetime import datetime
 import parlant.sdk as p
 
 
 async def setup_guidelines(agent: p.Agent, tools: list) -> None:
     """Setup agent guidelines.
-    
+
     Args:
         agent: Parlant agent instance
         tools: List of tool functions to use in guidelines
+        Expected order: [find_appointments, add_appointment, delete_appointment, edit_appointment]
     """
-    # Extract tools by name for easier access
-    tool_map = {tool.__name__: tool for tool in tools}
-    
-    add_appointment = tool_map.get("add_appointment")
-    find_appointments = tool_map.get("find_appointments")
-    edit_appointment = tool_map.get("edit_appointment")
-    delete_appointment = tool_map.get("delete_appointment")
-    
+    # Tools are returned in order from create_appointment_tools:
+    # [find_appointments, add_appointment, delete_appointment, edit_appointment]
+    if len(tools) >= 4:
+        find_appointments = tools[0]
+        add_appointment = tools[1]
+        delete_appointment = tools[2]
+        edit_appointment = tools[3]
+    else:
+        # Fallback: try to find by name if order is different
+        find_appointments = tools[0] if len(tools) > 0 else None
+        add_appointment = tools[1] if len(tools) > 1 else None
+        delete_appointment = tools[2] if len(tools) > 2 else None
+        edit_appointment = tools[3] if len(tools) > 3 else None
+
     # Guideline: Adding appointments
     if add_appointment:
         await agent.create_guideline(
@@ -73,4 +81,3 @@ Use add_appointment tool with description and the calculated when parameter. Tod
 5. Call delete_appointment with: appointment_id (the database ID)""",
             tools=[find_appointments, delete_appointment],
         )
-
