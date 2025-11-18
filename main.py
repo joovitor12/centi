@@ -133,6 +133,68 @@ async def main():
             )
 
     @p.tool
+    async def delete_appointment(
+        context: p.ToolContext,
+        appointment_id: int,
+    ) -> p.ToolResult:
+    
+        """Delete an existing appointment.
+        IMPORTANT: Use the 'id' field from the appointment data (from find_appointments), NOT the position/index in the list.
+        For example, if find_appointments returns appointments with ids [4, 5, 6, 7, 8], and the user says "appointment 5",
+        use appointment_id=5 (the actual database ID), not 5 as an index.
+
+        Args:
+            appointment_id: The database ID of the appointment to delete (from the 'id' field in find_appointments results). REQUIRED.
+        """
+        try:
+            logger.info(f"Deleting appointment ID: {appointment_id}")
+
+            # First, verify the appointment exists
+            check_response = (
+                supabase.table("appointments")
+                .select("*")
+                .eq("id", appointment_id)
+                .execute()
+            )
+
+            if not check_response.data:
+                logger.warning(f"Appointment ID {appointment_id} not found")
+                return p.ToolResult(
+                    data=f"No appointment found with ID {appointment_id}",
+                    control={"lifespan": "response"},
+                )
+
+            # Delete the appointment
+            response = (
+                supabase.table("appointments")
+                .delete()
+                .eq("id", appointment_id)
+                .execute()
+            )
+
+            # Verify deletion was successful
+            if not response.data:
+                logger.warning(
+                    f"Deletion may have failed - no data returned for ID {appointment_id}"
+                )
+                return p.ToolResult(
+                    data=f"Failed to delete appointment ID {appointment_id}",
+                    control={"lifespan": "response"},
+                )
+
+            logger.info(f"Successfully deleted appointment ID {appointment_id}")
+            return p.ToolResult(
+                data=f"Appointment ID {appointment_id} deleted successfully.",
+                control={"lifespan": "response"},
+            )
+        except Exception as e:
+            logger.error(f"Error deleting appointment: {e}", exc_info=True)
+            return p.ToolResult(
+                data=f"Failed to delete appointment: {str(e)}",
+                control={"lifespan": "response"},
+            )
+
+    @p.tool
     async def edit_appointment(
         context: p.ToolContext,
         appointment_id: int,
@@ -278,6 +340,17 @@ Use add_appointment tool with description and the calculated when parameter. Tod
 6. Call edit_appointment with: appointment_id (the database ID), new_description (if changed), and new_when (if changed, in format "YYYY-MM-DD HH:MM:SS")
 7. DO NOT just say you updated it - you MUST actually call the edit_appointment tool function""",
                 tools=[find_appointments, edit_appointment],
+            )
+
+            await agent.create_guideline(
+                condition="User wants to delete an appointment, meeting, reminder, or task",
+                action="""When user wants to delete an appointment:
+1. First use find_appointments to list all appointments
+2. When the user specifies which appointment to delete (by ID number, description, or time), you MUST call the delete_appointment tool
+3. CRITICALLY IMPORTANT: Use the 'id' field from the appointment data returned by find_appointments, NOT the position/index in the list
+4. For example, if find_appointments returns appointments with ids [4, 5, 6, 7, 8] and the user says "ID 8" or "appointment 8", use appointment_id=8 (the database ID)
+5. Call delete_appointment with: appointment_id (the database ID)""",
+                tools=[find_appointments, delete_appointment],
             )
 
             logger.info("Agent initialized successfully")

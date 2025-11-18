@@ -279,6 +279,34 @@
         "agent_intention_condition": null,
         "internal_action": null
       }
+    },
+    {
+      "id": "df69d3da864f25e8f00adaf476adba47",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The user specifies which appointment to delete (by ID number, description, or time)",
+          "agent_action": "The agent uses find_appointments to list all appointments and calls the delete_appointment tool using the 'id' field from the appointment data returned by find_appointments"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "c16cba6a984fbc51f09206e4a69faf74",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
     }
   ],
   "journey_evaluations_3.0.3": []
