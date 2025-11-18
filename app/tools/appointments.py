@@ -9,11 +9,15 @@ from app.services.supabase_service import SupabaseService
 logger = logging.getLogger(__name__)
 
 
-def create_appointment_tools(supabase_service: SupabaseService):
+def create_appointment_tools(
+    supabase_service: SupabaseService,
+    google_calendar_service=None,
+):
     """Create appointment management tools.
 
     Args:
         supabase_service: SupabaseService instance
+        google_calendar_service: Optional GoogleCalendarService instance for calendar sync
 
     Returns:
         List of tool functions
@@ -107,6 +111,28 @@ def create_appointment_tools(supabase_service: SupabaseService):
             appointment = supabase_service.create_appointment(
                 description=description, time=appointment_time.isoformat()
             )
+
+            # Sync to Google Calendar if service is available
+            if google_calendar_service:
+                try:
+                    calendar_event_id = google_calendar_service.create_event(
+                        description=description,
+                        start_time=appointment_time,
+                    )
+                    if calendar_event_id:
+                        logger.info(
+                            f"Appointment synced to Google Calendar: {calendar_event_id}"
+                        )
+                    else:
+                        logger.warning(
+                            "Failed to sync appointment to Google Calendar, but appointment was saved to database"
+                        )
+                except Exception as e:
+                    # Log error but don't fail the appointment creation
+                    logger.warning(
+                        f"Error syncing appointment to Google Calendar: {e}. "
+                        "Appointment was saved to database."
+                    )
 
             # Format user-friendly response
             formatted_time = appointment_time.strftime("%B %d, %Y at %I:%M %p")

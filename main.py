@@ -7,6 +7,7 @@ from supabase import create_client, Client
 
 from app.config.settings import settings
 from app.services.supabase_service import SupabaseService
+from app.services.google_calendar_service import GoogleCalendarService
 from app.tools.appointments import create_appointment_tools
 from app.agent.guidelines import setup_guidelines
 
@@ -21,9 +22,12 @@ async def main():
 
     # Initialize services
     supabase_service = SupabaseService()
+    google_calendar_service = GoogleCalendarService()
 
     # Create tools
-    appointment_tools = create_appointment_tools(supabase_service)
+    appointment_tools = create_appointment_tools(
+        supabase_service, google_calendar_service
+    )
 
     try:
         async with p.Server() as server:
