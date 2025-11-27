@@ -256,6 +256,7 @@ def create_recurring_appointment_tools(
         recurring_appointment_id: int,
         description: Optional[str] = None,
         start_time: Optional[str] = None,
+        end_time: Optional[str] = None,
         recurrence_pattern: Optional[str] = None,
         recurrence_interval: Optional[int] = None,
         recurrence_byday: Optional[str] = None,
@@ -265,6 +266,17 @@ def create_recurring_appointment_tools(
         """Edit a recurring appointment.
 
         Updates both the template in database and the recurring event in Google Calendar.
+        
+        Args:
+            recurring_appointment_id: ID of the recurring appointment to edit
+            description: New description (optional)
+            start_time: New start time in format "YYYY-MM-DD HH:MM:SS" (optional)
+            end_time: New end time in format "YYYY-MM-DD HH:MM:SS" (optional). Used for event duration.
+            recurrence_pattern: New recurrence pattern (optional)
+            recurrence_interval: New recurrence interval (optional)
+            recurrence_byday: New days of week for weekly patterns (optional)
+            recurrence_bymonthday: New day of month for monthly patterns (optional)
+            end_date: When recurrence should stop (optional)
         """
         try:
             logger.info(f"Editing recurring appointment ID {recurring_appointment_id}")
@@ -289,6 +301,10 @@ def create_recurring_appointment_tools(
                     if start_time:
                         start_datetime = datetime.fromisoformat(
                             start_time.replace("T", " ")
+                        )
+                    if end_time:
+                        end_datetime = datetime.fromisoformat(
+                            end_time.replace("T", " ")
                         )
 
                     updated = google_calendar_service.update_recurring_event(
@@ -318,6 +334,7 @@ def create_recurring_appointment_tools(
                 recurring_appointment_id=recurring_appointment_id,
                 description=description,
                 start_time=start_time,
+                end_time=end_time,
                 recurrence_pattern=recurrence_pattern,
                 recurrence_interval=recurrence_interval,
                 recurrence_byday=recurrence_byday,
