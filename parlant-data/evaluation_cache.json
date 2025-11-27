@@ -377,6 +377,118 @@
         "agent_intention_condition": null,
         "internal_action": null
       }
+    },
+    {
+      "id": "6996140cbef11974e14a35eb61211d91",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to delete by ID",
+          "agent_action": "The agent uses list_recurring_appointments to show recurring appointments and calls delete_recurring_appointment with the recurring_appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "7eebbb8e49ab695abbf463065f5bdba7",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to pause by ID",
+          "agent_action": "The agent uses list_recurring_appointments to show recurring appointments and calls pause_recurring_appointment with the recurring_appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "d775cf9d1b211e77eb855bfc153a8e2c",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "be75b4cbd1e6b82d6b59bddbd2614032",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "1f0b4101a17d00cd0fec46628b8621c7",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to edit (by ID) and provides the fields to update",
+          "agent_action": "The agent uses list_recurring_appointments to show all recurring appointments, extracts the fields to update, and calls edit_recurring_appointment with recurring_appointment_id and the fields to update"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "92273e4961c49c7339630ad9a7f4f4de",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to resume by ID",
+          "agent_action": "The agent uses list_recurring_appointments to show recurring appointments (including inactive ones) and calls resume_recurring_appointment with the recurring_appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "164de340231d92432522066b93923c1d",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the ID of the specific recurring appointment they want to see details for",
+          "agent_action": "The agent uses get_recurring_appointment with the provided recurring_appointment_id, or lists recurring appointments to show options if the user hasn't listed appointments yet, and then uses get_recurring_appointment with the ID the user specifies"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "486332e879ca1a510839db6859d581e4",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the description, start time, and recurrence pattern for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments using the provided information."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
     }
   ],
   "journey_evaluations_3.0.3": []

@@ -23,6 +23,12 @@ class Settings:
         "GOOGLE_CALENDAR_TIMEZONE", "America/Sao_Paulo"
     )
 
+    # Langfuse
+
+    LANGFUSE_SECRET_KEY: str = os.environ.get("LANGFUSE_SECRET_KEY", "")
+    LANGFUSE_PUBLIC_KEY: str = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
+    LANGFUSE_BASE_URL: str = os.environ.get("LANGFUSE_BASE_URL", "")
+
     @classmethod
     def validate(cls) -> None:
         """Validate that required settings are present."""

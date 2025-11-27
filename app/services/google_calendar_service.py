@@ -261,3 +261,310 @@ class GoogleCalendarService:
         except Exception as e:
             logger.error(f"Unexpected error deleting Google Calendar event: {e}")
             return False
+
+    # ============================================================
+    # Recurring Events Methods
+    # ============================================================
+
+    def _generate_rrule(
+        self,
+        recurrence_pattern: str,
+        recurrence_interval: int = 1,
+        recurrence_byday: Optional[str] = None,
+        recurrence_bymonthday: Optional[int] = None,
+        end_date: Optional[datetime] = None,
+        max_occurrences: Optional[int] = None,
+    ) -> str:
+        """Generate RRULE string for Google Calendar API.
+
+        Args:
+            recurrence_pattern: Pattern type ("daily", "weekly", "monthly", "yearly")
+            recurrence_interval: Interval (e.g., every 2 weeks = 2)
+            recurrence_byday: Days of week for weekly (e.g., "MO,WE,FR" or "MO")
+            recurrence_bymonthday: Day of month for monthly (e.g., 15)
+            end_date: When recurrence should stop
+            max_occurrences: Maximum number of occurrences
+
+        Returns:
+            RRULE string (e.g., "FREQ=WEEKLY;BYDAY=MO;INTERVAL=1")
+        """
+        pattern_upper = recurrence_pattern.upper()
+
+        # Validate pattern
+        if pattern_upper not in ["DAILY", "WEEKLY", "MONTHLY", "YEARLY"]:
+            raise ValueError(f"Invalid recurrence_pattern: {recurrence_pattern}")
+
+        # Build RRULE parts
+        rrule_parts = [f"FREQ={pattern_upper}"]
+
+        # Add interval if not 1
+        if recurrence_interval > 1:
+            rrule_parts.append(f"INTERVAL={recurrence_interval}")
+
+        # Add BYDAY for weekly patterns
+        if pattern_upper == "WEEKLY" and recurrence_byday:
+            rrule_parts.append(f"BYDAY={recurrence_byday}")
+        # Note: If no byday specified for weekly, it will be handled by caller
+
+        # Add BYMONTHDAY for monthly patterns
+        if pattern_upper == "MONTHLY" and recurrence_bymonthday:
+            rrule_parts.append(f"BYMONTHDAY={recurrence_bymonthday}")
+
+        # Add end condition
+        if max_occurrences:
+            rrule_parts.append(f"COUNT={max_occurrences}")
+        elif end_date:
+            # Format end_date as UTC in format YYYYMMDDTHHMMSSZ
+            if end_date.tzinfo is None:
+                end_date = self.timezone.localize(end_date)
+            else:
+                end_date = end_date.astimezone(self.timezone)
+            # Convert to UTC
+            end_date_utc = end_date.astimezone(pytz.UTC)
+            until_str = end_date_utc.strftime("%Y%m%dT%H%M%SZ")
+            rrule_parts.append(f"UNTIL={until_str}")
+
+        return ";".join(rrule_parts)
+
+    def create_recurring_event(
+        self,
+        description: str,
+        start_time: datetime,
+        recurrence_pattern: str,
+        recurrence_interval: int = 1,
+        recurrence_byday: Optional[str] = None,
+        recurrence_bymonthday: Optional[int] = None,
+        end_time: Optional[datetime] = None,
+        end_date: Optional[datetime] = None,
+        max_occurrences: Optional[int] = None,
+    ) -> Optional[str]:
+        """Create a recurring event with RRULE.
+
+        Args:
+            description: Event description/summary
+            start_time: Event start time as datetime object
+            recurrence_pattern: Pattern type ("daily", "weekly", "monthly", "yearly")
+            recurrence_interval: Interval (e.g., every 2 weeks = 2)
+            recurrence_byday: Days of week for weekly (e.g., "MO,WE,FR" or "MO")
+            recurrence_bymonthday: Day of month for monthly (e.g., 15)
+            end_time: Event end time (optional, defaults to start_time + 1 hour)
+            end_date: When recurrence should stop (optional)
+            max_occurrences: Maximum number of occurrences (optional)
+
+        Returns:
+            Event ID if successful, None otherwise
+        """
+        if not self.service:
+            logger.warning(
+                "Google Calendar service not initialized. Skipping recurring event creation."
+            )
+            return None
+
+        try:
+            # Default end_time to 1 hour after start_time if not provided
+            if end_time is None:
+                end_time = start_time + timedelta(hours=1)
+
+            # Format times in RFC3339 format for Google Calendar API
+            if start_time.tzinfo is None:
+                start_time = self.timezone.localize(start_time)
+            else:
+                start_time = start_time.astimezone(self.timezone)
+
+            if end_time.tzinfo is None:
+                end_time = self.timezone.localize(end_time)
+            else:
+                end_time = end_time.astimezone(self.timezone)
+
+            # If weekly pattern and no byday specified, extract day from start_time
+            if recurrence_pattern.lower() == "weekly" and not recurrence_byday:
+                # Get weekday (Monday = 0, Sunday = 6) and map to RRULE format
+                weekday = start_time.weekday()
+                weekday_map = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+                recurrence_byday = weekday_map[weekday]
+
+            # Generate RRULE
+            rrule = self._generate_rrule(
+                recurrence_pattern=recurrence_pattern,
+                recurrence_interval=recurrence_interval,
+                recurrence_byday=recurrence_byday,
+                recurrence_bymonthday=recurrence_bymonthday,
+                end_date=end_date,
+                max_occurrences=max_occurrences,
+            )
+
+            # Format as RFC3339
+            start_time_str = start_time.isoformat()
+            end_time_str = end_time.isoformat()
+
+            event = {
+                "summary": description,
+                "start": {
+                    "dateTime": start_time_str,
+                    "timeZone": self.timezone_str,
+                },
+                "end": {
+                    "dateTime": end_time_str,
+                    "timeZone": self.timezone_str,
+                },
+                "recurrence": [f"RRULE:{rrule}"],
+            }
+
+            event = (
+                self.service.events()
+                .insert(calendarId=self.calendar_id, body=event)
+                .execute()
+            )
+
+            logger.info(
+                f"Google Calendar recurring event created: {event.get('htmlLink')} (ID: {event.get('id')}, RRULE: {rrule})"
+            )
+            return event.get("id")
+
+        except HttpError as e:
+            logger.error(f"Error creating Google Calendar recurring event: {e}")
+            return None
+        except Exception as e:
+            logger.error(
+                f"Unexpected error creating Google Calendar recurring event: {e}"
+            )
+            return None
+
+    def update_recurring_event(
+        self,
+        event_id: str,
+        description: Optional[str] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+        recurrence_pattern: Optional[str] = None,
+        recurrence_interval: Optional[int] = None,
+        recurrence_byday: Optional[str] = None,
+        recurrence_bymonthday: Optional[int] = None,
+        end_date: Optional[datetime] = None,
+    ) -> bool:
+        """Update a recurring event.
+
+        Note: If recurrence rules change significantly, this method will attempt to update.
+        For major changes, you may need to delete and recreate the event.
+
+        Args:
+            event_id: Google Calendar recurring event ID
+            description: New event description (optional)
+            start_time: New start time (optional)
+            end_time: New end time (optional)
+            recurrence_pattern: New pattern type (optional)
+            recurrence_interval: New interval (optional)
+            recurrence_byday: New days of week (optional)
+            recurrence_bymonthday: New day of month (optional)
+            end_date: New end date (optional)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.service:
+            logger.warning(
+                "Google Calendar service not initialized. Skipping recurring event update."
+            )
+            return False
+
+        try:
+            # Get the existing event
+            event = (
+                self.service.events()
+                .get(calendarId=self.calendar_id, eventId=event_id)
+                .execute()
+            )
+
+            # Update basic fields
+            if description:
+                event["summary"] = description
+
+            if start_time is not None:
+                if start_time.tzinfo is None:
+                    start_time = self.timezone.localize(start_time)
+                else:
+                    start_time = start_time.astimezone(self.timezone)
+                event["start"] = {
+                    "dateTime": start_time.isoformat(),
+                    "timeZone": self.timezone_str,
+                }
+
+            if end_time is not None:
+                if end_time.tzinfo is None:
+                    end_time = self.timezone.localize(end_time)
+                else:
+                    end_time = end_time.astimezone(self.timezone)
+                event["end"] = {
+                    "dateTime": end_time.isoformat(),
+                    "timeZone": self.timezone_str,
+                }
+
+            # Update recurrence rules if provided
+            if any(
+                [
+                    recurrence_pattern,
+                    recurrence_interval is not None,
+                    recurrence_byday,
+                    recurrence_bymonthday is not None,
+                    end_date,
+                ]
+            ):
+                # Generate new RRULE
+                if recurrence_pattern:
+                    # If weekly and no byday, extract from start_time
+                    if recurrence_pattern.lower() == "weekly" and not recurrence_byday:
+                        if start_time:
+                            weekday_map = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+                            weekday = start_time.weekday()
+                            recurrence_byday = weekday_map[weekday]
+                        else:
+                            # Use existing start time from event
+                            existing_start = datetime.fromisoformat(
+                                event["start"]["dateTime"]
+                            )
+                            weekday_map = ["MO", "TU", "WE", "TH", "FR", "SA", "SU"]
+                            weekday = existing_start.weekday()
+                            recurrence_byday = weekday_map[weekday]
+
+                    rrule = self._generate_rrule(
+                        recurrence_pattern=recurrence_pattern,
+                        recurrence_interval=recurrence_interval or 1,
+                        recurrence_byday=recurrence_byday,
+                        recurrence_bymonthday=recurrence_bymonthday,
+                        end_date=end_date,
+                        max_occurrences=None,  # Don't update count on update
+                    )
+                    event["recurrence"] = [f"RRULE:{rrule}"]
+
+            # Update the event
+            updated_event = (
+                self.service.events()
+                .update(calendarId=self.calendar_id, eventId=event_id, body=event)
+                .execute()
+            )
+
+            logger.info(f"Google Calendar recurring event updated: {event_id}")
+            return True
+
+        except HttpError as e:
+            logger.error(
+                f"Error updating Google Calendar recurring event {event_id}: {e}"
+            )
+            return False
+        except Exception as e:
+            logger.error(
+                f"Unexpected error updating Google Calendar recurring event: {e}"
+            )
+            return False
+
+    def delete_recurring_event(self, event_id: str) -> bool:
+        """Delete a recurring event (removes all future occurrences).
+
+        Args:
+            event_id: Google Calendar recurring event ID
+
+        Returns:
+            True if successful, False otherwise
+        """
+        # Reuse the existing delete_event method which works for recurring events too
+        return self.delete_event(event_id)

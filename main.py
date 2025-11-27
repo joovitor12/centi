@@ -9,6 +9,7 @@ from app.config.settings import settings
 from app.services.supabase_service import SupabaseService
 from app.services.google_calendar_service import GoogleCalendarService
 from app.tools.appointments import create_appointment_tools
+from app.tools.recurring_appointments import create_recurring_appointment_tools
 from app.agent.guidelines import setup_guidelines
 
 logging.basicConfig(level=logging.INFO)
@@ -28,6 +29,9 @@ async def main():
     appointment_tools = create_appointment_tools(
         supabase_service, google_calendar_service
     )
+    recurring_appointment_tools = create_recurring_appointment_tools(
+        supabase_service, google_calendar_service
+    )
 
     try:
         async with p.Server() as server:
@@ -37,8 +41,10 @@ async def main():
                 description="You are a professional assistant like Jarvis from Ironman.",
             )
 
-            # Setup guidelines
-            await setup_guidelines(agent, appointment_tools)
+            # Setup guidelines (tools are auto-discovered through guidelines)
+            await setup_guidelines(
+                agent, appointment_tools, recurring_appointment_tools
+            )
 
             logger.info("Agent initialized successfully")
 

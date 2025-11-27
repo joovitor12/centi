@@ -6,7 +6,9 @@ A professional AI assistant powered by [Parlant](https://parlant.ai/) that helps
 
 - **Natural Language Scheduling**: Schedule appointments using phrases like "remind me to call mom in 2 hours" or "meeting tomorrow at 3pm"
 - **Intelligent Time Parsing**: Automatically converts relative time expressions to precise timestamps
-- **Smart Calendar Management**: View, add, and manage your appointments seamlessly
+- **Recurring Appointments**: Create repeating appointments (daily, weekly, monthly) with automatic Google Calendar sync
+- **Smart Calendar Management**: View, add, edit, and manage your appointments seamlessly
+- **Google Calendar Integration**: Automatic bidirectional sync with Google Calendar
 - **Conversational Interface**: Interact naturally with your AI assistant like Jarvis from Iron Man
 
 ## 🚀 Quick Start
@@ -16,6 +18,7 @@ A professional AI assistant powered by [Parlant](https://parlant.ai/) that helps
 - Python 3.10+
 - OpenAI API key
 - Supabase account and project
+- Google Cloud project with Calendar API enabled (optional, for Google Calendar sync)
 
 ### Installation
 
@@ -40,6 +43,9 @@ Edit `.env` with your credentials:
 OPENAI_API_KEY=your_openai_api_key
 SUPABASE_URL=your_supabase_url
 SUPABASE_KEY=your_supabase_anon_key
+GOOGLE_CREDENTIALS_PATH=.credentials/credentials.json
+GOOGLE_CALENDAR_ID=your-email@gmail.com
+GOOGLE_CALENDAR_TIMEZONE=America/Sao_Paulo
 ```
 
 4. Run the application:
@@ -67,6 +73,18 @@ Centi: ✅ 'take out the trash' scheduled for November 14, 2025 at 03:30 PM
 ```
 User: "What do I have scheduled today?"
 Centi: Here are your appointments for today...
+```
+
+**Create a recurring appointment:**
+```
+User: "Remind me to exercise every Monday, Wednesday, and Friday at 7am"
+Centi: ✅ Recurring appointment 'exercise' created. First occurrence: December 02, 2025 at 07:00 AM
+```
+
+**Create a daily reminder:**
+```
+User: "Daily reminder to take vitamins at 8am"
+Centi: ✅ Recurring appointment 'take vitamins' created. First occurrence: November 27, 2025 at 08:00 AM
 ```
 
 ## 🏗️ Architecture
@@ -107,6 +125,16 @@ The AI assistant automatically converts natural language to precise timestamps:
 - "tomorrow at 4:30pm" → `2025-11-15 16:30:00`
 - "next Monday at 9am" → `2025-11-18 09:00:00`
 
+### Recurring Appointment Examples
+
+The assistant automatically detects and creates recurring appointments:
+
+- "every day" / "daily" → Creates daily recurring appointment
+- "every Monday" / "Mondays" → Creates weekly recurring appointment on Mondays
+- "every Monday and Wednesday" → Creates weekly recurring appointment on both days
+- "every month" / "monthly" → Creates monthly recurring appointment
+- "every 15th of the month" → Creates monthly recurring appointment on the 15th
+
 ## 🛠️ Development
 
 ### Project Structure
@@ -136,6 +164,6 @@ See `app/README.md` for detailed architecture documentation.
 - [x] Intelligent time parsing
 - [x] Calendar management
 - [x] Google Calendar integration
-- [ ] Recurring appointments
+- [x] Recurring appointments
 - [ ] Email notifications
 - [ ] Multi-timezone support
