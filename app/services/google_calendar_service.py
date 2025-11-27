@@ -151,3 +151,113 @@ class GoogleCalendarService:
         except Exception as e:
             logger.error(f"Unexpected error creating Google Calendar event: {e}")
             return None
+
+    def update_event(
+        self,
+        event_id: str,
+        description: Optional[str] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+    ) -> bool:
+        """Update an existing calendar event.
+
+        Args:
+            event_id: Google Calendar event ID
+            description: New event description/summary (optional)
+            start_time: New event start time (optional)
+            end_time: New event end time (optional)
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.service:
+            logger.warning(
+                "Google Calendar service not initialized. Skipping event update."
+            )
+            return False
+
+        try:
+            # First, get the existing event
+            event = (
+                self.service.events()
+                .get(calendarId=self.calendar_id, eventId=event_id)
+                .execute()
+            )
+
+            # Update fields if provided
+            if description:
+                event["summary"] = description
+
+            if start_time is not None:
+                # Format timezone-aware datetime
+                if start_time.tzinfo is None:
+                    start_time = self.timezone.localize(start_time)
+                else:
+                    start_time = start_time.astimezone(self.timezone)
+                event["start"] = {
+                    "dateTime": start_time.isoformat(),
+                    "timeZone": self.timezone_str,
+                }
+
+            if end_time is not None:
+                # Format timezone-aware datetime
+                if end_time.tzinfo is None:
+                    end_time = self.timezone.localize(end_time)
+                else:
+                    end_time = end_time.astimezone(self.timezone)
+                event["end"] = {
+                    "dateTime": end_time.isoformat(),
+                    "timeZone": self.timezone_str,
+                }
+
+            # Update the event
+            updated_event = (
+                self.service.events()
+                .update(calendarId=self.calendar_id, eventId=event_id, body=event)
+                .execute()
+            )
+
+            logger.info(f"Google Calendar event updated: {event_id}")
+            return True
+
+        except HttpError as e:
+            logger.error(f"Error updating Google Calendar event {event_id}: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error updating Google Calendar event: {e}")
+            return False
+
+    def delete_event(self, event_id: str) -> bool:
+        """Delete a calendar event.
+
+        Args:
+            event_id: Google Calendar event ID
+
+        Returns:
+            True if successful, False otherwise
+        """
+        if not self.service:
+            logger.warning(
+                "Google Calendar service not initialized. Skipping event deletion."
+            )
+            return False
+
+        try:
+            self.service.events().delete(
+                calendarId=self.calendar_id, eventId=event_id
+            ).execute()
+
+            logger.info(f"Google Calendar event deleted: {event_id}")
+            return True
+
+        except HttpError as e:
+            if e.resp.status == 404:
+                logger.warning(
+                    f"Google Calendar event {event_id} not found (may have been already deleted)"
+                )
+                return True  # Consider it successful if already deleted
+            logger.error(f"Error deleting Google Calendar event {event_id}: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error deleting Google Calendar event: {e}")
+            return False

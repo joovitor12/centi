@@ -42,14 +42,15 @@ class SupabaseService:
             logger.error(f"Error fetching appointment {appointment_id}: {e}")
             raise
     
-    def create_appointment(self, description: str, time: str) -> Dict[str, Any]:
+    def create_appointment(
+        self, description: str, time: str, google_calendar_event_id: Optional[str] = None
+    ) -> Dict[str, Any]:
         """Create a new appointment."""
         try:
-            response = (
-                self.client.table("appointments")
-                .insert({"time": time, "description": description})
-                .execute()
-            )
+            data = {"time": time, "description": description}
+            if google_calendar_event_id:
+                data["google_calendar_event_id"] = google_calendar_event_id
+            response = self.client.table("appointments").insert(data).execute()
             return response.data[0] if response.data else {}
         except Exception as e:
             logger.error(f"Error creating appointment: {e}")
