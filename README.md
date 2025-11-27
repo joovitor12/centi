@@ -135,7 +135,7 @@ See `app/README.md` for detailed architecture documentation.
 - [x] Natural language appointment scheduling
 - [x] Intelligent time parsing
 - [x] Calendar management
-- [ ] Google Calendar integration
+- [x] Google Calendar integration
 - [ ] Recurring appointments
 - [ ] Email notifications
 - [ ] Multi-timezone support
