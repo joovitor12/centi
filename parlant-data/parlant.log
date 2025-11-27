@@ -1864,3 +1864,602 @@ Recommended actions:
 [2m2025-11-27T00:44:24.368219Z[0m [[33m[1mwarning  [0m] [1m[RoHaicSPvI2] HTTP Request: GET /sessions/5W6Q1FeRpg/events cancelled after 33.91 seconds[0m
 [2m2025-11-27T00:44:24.369220Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
 [2m2025-11-27T00:44:24.370219Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-27T01:17:47.652690Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-27T01:17:47.653690Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-27T01:17:47.655690Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-27T01:17:47.989514Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-27T01:17:56.219130Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-27T01:17:56.219130Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-27T01:17:56.219130Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-27T01:17:56.219130Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-27T01:17:56.220129Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-27T01:18:21.650620Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines] Batch of 2 guidelines failed[0m
+[2m2025-11-27T01:18:21.651618Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 86, in process
+    prompt = self._build_prompt(shots=await self.shots())
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 293, in _build_prompt
+    "result_structure_text": self._format_of_guideline_check_json_description(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 316, in _format_of_guideline_check_json_description
+    return json.dumps(result, indent=4)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 201, in encode
+    chunks = list(chunks)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 325, in _iterencode_list
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 438, in _iterencode
+    o = _default(o)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+ TypeError: Object of type TextPromptClient is not JSON serializable
+[0m
+[2m2025-11-27T01:18:22.666479Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines] Batch of 2 guidelines failed[0m
+[2m2025-11-27T01:18:22.666983Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 86, in process
+    prompt = self._build_prompt(shots=await self.shots())
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 293, in _build_prompt
+    "result_structure_text": self._format_of_guideline_check_json_description(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 316, in _format_of_guideline_check_json_description
+    return json.dumps(result, indent=4)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 201, in encode
+    chunks = list(chunks)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 325, in _iterencode_list
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 438, in _iterencode
+    o = _default(o)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+ TypeError: Object of type TextPromptClient is not JSON serializable
+[0m
+[2m2025-11-27T01:18:24.682804Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines] Batch of 2 guidelines failed[0m
+[2m2025-11-27T01:18:24.683802Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 86, in process
+    prompt = self._build_prompt(shots=await self.shots())
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 293, in _build_prompt
+    "result_structure_text": self._format_of_guideline_check_json_description(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 316, in _format_of_guideline_check_json_description
+    return json.dumps(result, indent=4)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 201, in encode
+    chunks = list(chunks)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 325, in _iterencode_list
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 438, in _iterencode
+    o = _default(o)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+ TypeError: Object of type TextPromptClient is not JSON serializable
+[0m
+[2m2025-11-27T01:18:24.689306Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher] Processing batches failed[0m
+[2m2025-11-27T01:18:24.690313Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 277, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\guideline_matcher.py", line 251, in match_guidelines
+    batch_results = await async_utils.safe_gather(*batch_tasks)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\async_utils.py", line 148, in safe_gather
+    return await asyncio.gather(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 135, in wrapped_func
+    return await func(state, *args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 144, in wrapped_func
+    return await policy.apply(state, func, *args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 65, in apply
+    raise e
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 60, in apply
+    return await func(state, *args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 125, in wrapped_func
+    return await func(*args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\guideline_matcher.py", line 182, in _process_guideline_matching_batch_with_retry
+    return await batch.process()
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 86, in process
+    prompt = self._build_prompt(shots=await self.shots())
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 293, in _build_prompt
+    "result_structure_text": self._format_of_guideline_check_json_description(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 316, in _format_of_guideline_check_json_description
+    return json.dumps(result, indent=4)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 201, in encode
+    chunks = list(chunks)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 325, in _iterencode_list
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 438, in _iterencode
+    o = _default(o)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+ TypeError: Object of type TextPromptClient is not JSON serializable
+[0m
+[2m2025-11-27T01:18:29.523517Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher] Processing context for session s47cWHrmnJ failed[0m
+[2m2025-11-27T01:18:29.524516Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 277, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\engine.py", line 173, in process
+    await self._do_process(loaded_context)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\engine.py", line 272, in _do_process
+    iteration_result = await self._run_preparation_iteration(context, preamble_task)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\engine.py", line 452, in _run_preparation_iteration
+    result = await self._run_initial_preparation_iteration(context, preamble_task)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\engine.py", line 545, in _run_initial_preparation_iteration
+    await self._load_matched_guidelines_and_journeys(context)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\engine.py", line 1038, in _load_matched_guidelines_and_journeys
+    matching_result = await self._guideline_matcher.match_guidelines(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\guideline_matcher.py", line 251, in match_guidelines
+    batch_results = await async_utils.safe_gather(*batch_tasks)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\async_utils.py", line 148, in safe_gather
+    return await asyncio.gather(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 135, in wrapped_func
+    return await func(state, *args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 144, in wrapped_func
+    return await policy.apply(state, func, *args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 65, in apply
+    raise e
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 60, in apply
+    return await func(state, *args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\nlp\policies.py", line 125, in wrapped_func
+    return await func(*args, **kwargs)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\guideline_matcher.py", line 182, in _process_guideline_matching_batch_with_retry
+    return await batch.process()
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 86, in process
+    prompt = self._build_prompt(shots=await self.shots())
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 293, in _build_prompt
+    "result_structure_text": self._format_of_guideline_check_json_description(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\engines\alpha\guideline_matching\generic\guideline_actionable_batch.py", line 316, in _format_of_guideline_check_json_description
+    return json.dumps(result, indent=4)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\__init__.py", line 238, in dumps
+    **kw).encode(obj)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 201, in encode
+    chunks = list(chunks)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 431, in _iterencode
+    yield from _iterencode_dict(o, _current_indent_level)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 325, in _iterencode_list
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 405, in _iterencode_dict
+    yield from chunks
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 438, in _iterencode
+    o = _default(o)
+   File "C:\Users\joao\AppData\Roaming\uv\python\cpython-3.10.18-windows-x86_64-none\lib\json\encoder.py", line 179, in default
+    raise TypeError(f'Object of type {o.__class__.__name__} '
+ TypeError: Object of type TextPromptClient is not JSON serializable
+[0m
+[2m2025-11-27T01:18:29.527516Z[0m [[31m[1merror    [0m] [1m[RUtcFsMHQ0N::process][GuidelineMatcher] Processing error: ['Traceback (most recent call last):\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\engine.py", '
+ 'line 173, in process\n'
+ '    await self._do_process(loaded_context)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\engine.py", '
+ 'line 272, in _do_process\n'
+ '    iteration_result = await self._run_preparation_iteration(context, '
+ 'preamble_task)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\engine.py", '
+ 'line 452, in _run_preparation_iteration\n'
+ '    result = await self._run_initial_preparation_iteration(context, '
+ 'preamble_task)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\engine.py", '
+ 'line 545, in _run_initial_preparation_iteration\n'
+ '    await self._load_matched_guidelines_and_journeys(context)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\engine.py", '
+ 'line 1038, in _load_matched_guidelines_and_journeys\n'
+ '    matching_result = await self._guideline_matcher.match_guidelines(\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\guideline_matching\\guideline_matcher.py", '
+ 'line 251, in match_guidelines\n'
+ '    batch_results = await async_utils.safe_gather(*batch_tasks)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\async_utils.py", '
+ 'line 148, in safe_gather\n'
+ '    return await asyncio.gather(\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", '
+ 'line 135, in wrapped_func\n'
+ '    return await func(state, *args, **kwargs)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", '
+ 'line 144, in wrapped_func\n'
+ '    return await policy.apply(state, func, *args, **kwargs)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", '
+ 'line 65, in apply\n'
+ '    raise e\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", '
+ 'line 60, in apply\n'
+ '    return await func(state, *args, **kwargs)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", '
+ 'line 125, in wrapped_func\n'
+ '    return await func(*args, **kwargs)\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\guideline_matching\\guideline_matcher.py", '
+ 'line 182, in _process_guideline_matching_batch_with_retry\n'
+ '    return await batch.process()\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\guideline_matching\\generic\\guideline_actionable_batch.py", '
+ 'line 86, in process\n'
+ '    prompt = self._build_prompt(shots=await self.shots())\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\guideline_matching\\generic\\guideline_actionable_batch.py", '
+ 'line 293, in _build_prompt\n'
+ '    "result_structure_text": '
+ 'self._format_of_guideline_check_json_description(\n',
+ '  File '
+ '"C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\guideline_matching\\generic\\guideline_actionable_batch.py", '
+ 'line 316, in _format_of_guideline_check_json_description\n'
+ '    return json.dumps(result, indent=4)\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\__init__.py", '
+ 'line 238, in dumps\n'
+ '    **kw).encode(obj)\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 201, in encode\n'
+ '    chunks = list(chunks)\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 431, in _iterencode\n'
+ '    yield from _iterencode_dict(o, _current_indent_level)\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 405, in _iterencode_dict\n'
+ '    yield from chunks\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 325, in _iterencode_list\n'
+ '    yield from chunks\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 405, in _iterencode_dict\n'
+ '    yield from chunks\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 438, in _iterencode\n'
+ '    o = _default(o)\n',
+ '  File '
+ '"C:\\Users\\joao\\AppData\\Roaming\\uv\\python\\cpython-3.10.18-windows-x86_64-none\\lib\\json\\encoder.py", '
+ 'line 179, in default\n'
+ "    raise TypeError(f'Object of type {o.__class__.__name__} '\n",
+ 'TypeError: Object of type TextPromptClient is not JSON serializable\n'][0m
+[2m2025-11-27T01:23:29.402218Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-27T01:23:29.404218Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-27T01:23:29.634520Z[0m [[33m[1mwarning  [0m] [1m[RYAIPMrM6Db] HTTP Request: GET /sessions/s47cWHrmnJ/events cancelled after 59.87 seconds[0m
+[2m2025-11-27T01:23:37.910202Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-27T01:23:37.910202Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-27T01:23:37.912202Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-27T01:23:38.228237Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-27T01:23:45.033797Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-27T01:23:45.034797Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-27T01:23:45.034797Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-27T01:23:45.034797Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-27T01:23:45.034797Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-27T01:23:45.204509Z[0m [[32m[1minfo     [0m] [1m[R1NLBRzgOL2] Session not found (id='s47cWHrmnJ')[0m
+[2m2025-11-27T01:24:36.107104Z[0m [[32m[1minfo     [0m] [1m[RADHOJBjwnn::process] Processing context for session 07QW41hmnt finished in 18.946 seconds[0m
+[2m2025-11-27T01:25:44.361152Z[0m [[33m[1mwarning  [0m] [1m[RZ4o4E8cexG::process] Reached max tool call iterations (3)[0m
+[2m2025-11-27T01:25:52.676736Z[0m [[32m[1minfo     [0m] [1m[RZ4o4E8cexG::process] Processing context for session 07QW41hmnt finished in 56.122 seconds[0m
+[2m2025-11-27T01:28:05.614301Z[0m [[33m[1mwarning  [0m] [1m[R4Rbpb2fltT] HTTP Request: GET /sessions/07QW41hmnt/events cancelled after 15.779 seconds[0m
+[2m2025-11-27T01:28:05.615303Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-27T01:28:05.616301Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-27T01:28:15.386238Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-27T01:28:15.387238Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-27T01:28:15.389237Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-27T01:28:15.779571Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-27T01:28:24.215482Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-27T01:28:24.216483Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-27T01:28:24.216483Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-27T01:28:24.216483Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-27T01:28:24.217482Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-27T01:28:24.278299Z[0m [[32m[1minfo     [0m] [1m[RtCmKBnRiRE] Session not found (id='07QW41hmnt')[0m
+[2m2025-11-27T01:31:39.374945Z[0m [[32m[1minfo     [0m] [1m[R6wB7frfYGO::process] Processing context for session ewLuc7C8D5 finished in 16.75 seconds[0m
+[2m2025-11-27T01:32:43.503846Z[0m [[32m[1minfo     [0m] [1m[ROIfKLlAZx6::process] Processing context for session ewLuc7C8D5 finished in 42.741 seconds[0m
+[2m2025-11-27T01:37:21.117036Z[0m [[33m[1mwarning  [0m] [1m[RWUfte0wFNH] HTTP Request: GET /sessions/ewLuc7C8D5/events cancelled after 41.177 seconds[0m
+[2m2025-11-27T01:37:21.118037Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-27T01:37:21.119036Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-27T01:44:50.318265Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-27T01:44:50.319265Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-27T01:44:50.321265Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-27T01:44:50.627458Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-27T01:44:58.432814Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-27T01:44:58.432814Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-27T01:44:58.432814Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-27T01:44:58.433813Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-27T01:44:58.433813Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-27T01:44:58.697355Z[0m [[32m[1minfo     [0m] [1m[RbuC8OV0p6e] Session not found (id='ewLuc7C8D5')[0m
+[2m2025-11-27T01:47:02.801968Z[0m [[32m[1minfo     [0m] [1m[RkVK2yrEuwC] Session not found (id='ewLuc7C8D5')[0m
+[2m2025-11-27T01:47:22.701155Z[0m [[32m[1minfo     [0m] [1m[RGIZ22UHYMR::process] Processing context for session Omspj4clTZ finished in 16.648 seconds[0m
+[2m2025-11-27T01:47:30.393170Z[0m [[33m[1mwarning  [0m] [1m[R4ydknm4h3Q] HTTP Request: GET /sessions/Omspj4clTZ/events cancelled after 10.331 seconds[0m
+[2m2025-11-27T01:47:30.394170Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-27T01:47:30.395169Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-11-27T01:47:39.426476Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-11-27T01:47:39.427476Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-11-27T01:47:39.428475Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-11-27T01:47:39.802400Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-11-27T01:47:47.581498Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-11-27T01:47:47.581498Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-11-27T01:47:47.582495Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-11-27T01:47:47.582495Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-11-27T01:47:47.582495Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-11-27T01:47:47.782772Z[0m [[32m[1minfo     [0m] [1m[RDrIKz0e2Bw] Session not found (id='Omspj4clTZ')[0m
+[2m2025-11-27T01:48:28.279048Z[0m [[32m[1minfo     [0m] [1m[RcO6ClqUPBo::process] Processing context for session U1KW8Nsv9a finished in 28.159 seconds[0m
+[2m2025-11-27T01:48:32.888378Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:32.890378Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:32.891377Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29757, Requested 3212. Please try again in 5.938s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:33.091897Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:33.091897Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:33.093400Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29465, Requested 3305. Please try again in 5.54s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:33.533731Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:33.534737Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:33.535741Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29263, Requested 3562. Please try again in 5.65s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:33.699953Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:33.700954Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:33.700954Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29183, Requested 3619. Please try again in 5.604s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:38.083633Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:38.085147Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:38.085147Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 26981, Requested 3205. Please try again in 372ms. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:45.704155Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:45.705161Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:45.706165Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 30000, Requested 3562. Please try again in 7.124s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:51.642968Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:51.644472Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:51.644998Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 30000, Requested 3205. Please try again in 6.41s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:59.086962Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] OpenAI API rate limit exceeded. Possible reasons:
+1. Your account may have insufficient API credits.
+2. You may be using a free-tier account with limited request capacity.
+3. You might have exceeded the requests-per-minute limit for your account.
+
+Recommended actions:
+- Check your OpenAI account balance and billing status.
+- Review your API usage limits in OpenAI's dashboard.
+- For more details on rate limits and usage tiers, visit:
+  https://platform.openai.com/docs/guides/rate-limits/usage-tiers
+[0m
+[2m2025-11-27T01:48:59.087960Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] LLM Request (GenericActionableGuidelineMatchesSchema) failed[0m
+[2m2025-11-27T01:48:59.087960Z[0m [[31m[1merror    [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Traceback (most recent call last):
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 275, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\core\loggers.py", line 411, in operation
+    yield
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 137, in generate
+    return await self._do_generate(prompt, hints)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\parlant\adapters\nlp\openai_service.py", line 193, in _do_generate
+    response = await self._client.chat.completions.create(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\resources\chat\completions\completions.py", line 2585, in create
+    return await self._post(
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1794, in post
+    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)
+   File "C:\Users\joao\personal\centi\.venv\lib\site-packages\openai\_base_client.py", line 1594, in request
+    raise self._make_status_error_from_response(err.response) from None
+ openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29553, Requested 3562. Please try again in 6.23s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}
+[0m
+[2m2025-11-27T01:48:59.089960Z[0m [[33m[1mwarning  [0m] [1m[RGLJDzen1wb::process][GuidelineMatcher][GenericActionableGuidelineMatchingBatch][Batch of 2 guidelines][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)][OpenAISchematicGenerator][LLM Request (GenericActionableGuidelineMatchesSchema)] Attempt 0 failed: ['Traceback (most recent call last):\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\engines\\alpha\\guideline_matching\\generic\\guideline_actionable_batch.py", line 98, in process\n    inference = await self._schematic_generator.generate(\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 135, in wrapped_func\n    return await func(state, *args, **kwargs)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 144, in wrapped_func\n    return await policy.apply(state, func, *args, **kwargs)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 65, in apply\n    raise e\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 60, in apply\n    return await func(state, *args, **kwargs)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 144, in wrapped_func\n    return await policy.apply(state, func, *args, **kwargs)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 60, in apply\n    return await func(state, *args, **kwargs)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\core\\nlp\\policies.py", line 125, in wrapped_func\n    return await func(*args, **kwargs)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\adapters\\nlp\\openai_service.py", line 137, in generate\n    return await self._do_generate(prompt, hints)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\parlant\\adapters\\nlp\\openai_service.py", line 193, in _do_generate\n    response = await self._client.chat.completions.create(\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\openai\\resources\\chat\\completions\\completions.py", line 2585, in create\n    return await self._post(\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\openai\\_base_client.py", line 1794, in post\n    return await self.request(cast_to, opts, stream=stream, stream_cls=stream_cls)\n', '  File "C:\\Users\\joao\\personal\\centi\\.venv\\lib\\site-packages\\openai\\_base_client.py", line 1594, in request\n    raise self._make_status_error_from_response(err.response) from None\n', "openai.RateLimitError: Error code: 429 - {'error': {'message': 'Rate limit reached for gpt-4o in organization org-1MdhJ5kYtA9T5aTE4g3Ra1z6 on tokens per min (TPM): Limit 30000, Used 29553, Requested 3562. Please try again in 6.23s. Visit https://platform.openai.com/account/rate-limits to learn more.', 'type': 'tokens', 'param': None, 'code': 'rate_limit_exceeded'}}\n"][0m
+[2m2025-11-27T01:49:43.544392Z[0m [[32m[1minfo     [0m] [1m[RGLJDzen1wb::process] Processing context for session U1KW8Nsv9a finished in 74.735 seconds[0m
+[2m2025-11-27T01:51:17.027884Z[0m [[33m[1mwarning  [0m] [1m[Rwywig2ZYU8] HTTP Request: GET /sessions/U1KW8Nsv9a/events cancelled after 36.834 seconds[0m
+[2m2025-11-27T01:51:17.028884Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-11-27T01:51:17.030883Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m

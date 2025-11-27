@@ -489,6 +489,132 @@
         "agent_intention_condition": null,
         "internal_action": null
       }
+    },
+    {
+      "id": "20c418f9b66b286c215e5ecc5e570b8d",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "0ecea77ceae603cf145e5811fcd7db88",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the description, start time, and recurrence pattern for the appointment",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments using the provided information"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "77320ddc29a023a83aecb9ca421962df",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "114f61d24ffbd2ea3f07277ca2d164e9",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the description, start time, and recurrence pattern for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments using the provided information."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "c7e7ac3a07f4505dfc7d1db84ae2b182",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the description, start time, and recurrence pattern for the appointment",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments using the provided information"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "39de46fc8b3cafee2f4d900538f6da73",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "96fbb5c4973fe58dcebfe6242f159285",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the description, start time, and recurrence pattern for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments using the provided information."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "1f2bf9b4600a53ff81f4a03f8e5849ab",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "9581e3fe4920b37a5d8c0a2587dadff2",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the description, start time, and recurrence pattern for the appointment",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments using the provided information"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
     }
   ],
   "journey_evaluations_3.0.3": []

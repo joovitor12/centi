@@ -1,6 +1,8 @@
 """Agent guidelines configuration."""
 
 from datetime import datetime
+from .prompts.add_appointment.condition import prompt as add_appointment_condition
+from .prompts.add_appointment.action import prompt as add_appointment_action
 import parlant.sdk as p
 
 
@@ -32,24 +34,15 @@ async def setup_guidelines(
 
     # Guideline: Adding appointments (NON-RECURRING only)
     if add_appointment:
+        current_datetime = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # Compile the action prompt with the current datetime variable
+        # The Langfuse prompt will automatically substitute {{datetime_today}}
+        compiled_action = add_appointment_action.compile(
+            datetime_today=current_datetime
+        )
         await agent.create_guideline(
-            condition="User wants to schedule, add, or create an appointment, meeting, reminder, or task, and does NOT mention recurring, repeating, daily, weekly, monthly, or 'every' patterns",
-            action=f"""You must calculate the exact datetime and provide it in the correct format.
-
-IMPORTANT: This is for SINGLE appointments only. If user mentions "every", "daily", "weekly", "monthly", "repeat", or "recurring", use create_recurring_appointment instead.
-
-EXAMPLES:
-- If user says "in 5 hours" and current time is 09:24, calculate: 09:24 + 5 hours = 14:24, then format as "2025-11-14 14:24:00"
-- If user says "tomorrow at 4:30pm", format as "2025-11-15 16:30:00" 
-- If user says "today at 2pm", format as "2025-11-14 14:00:00"
-
-CRITICAL: 
-- NEVER use placeholder text like "calculated_datetime_based_on_current_time_plus_5_hours"
-- ALWAYS provide an actual datetime string like "2025-11-14 14:24:00"
-- Format must be exactly "YYYY-MM-DD HH:MM:SS"
-- DO NOT use this tool if user mentions recurring patterns
-
-Use add_appointment tool with description and the calculated when parameter. Today datetime is {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}.""",
+            condition=add_appointment_condition.compile(),
+            action=compiled_action,
             tools=[add_appointment],
         )
 
