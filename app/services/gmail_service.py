@@ -239,6 +239,54 @@ class GmailService:
         all_recipients = participants["to"] + participants["cc"]
         return centi_email.lower() in [e.lower() for e in all_recipients]
 
+    def is_owner_in_thread(
+        self, thread_data: Dict[str, Any], owner_email: str
+    ) -> bool:
+        """Check if calendar owner is present in thread.
+        
+        Args:
+            thread_data: Full thread dictionary from get_thread_by_id()
+            owner_email: Calendar owner email address
+            
+        Returns:
+            True if owner is found in any message in the thread
+        """
+        if not thread_data:
+            return False
+        
+        owner_email_lower = owner_email.lower()
+        messages = thread_data.get("messages", [])
+        
+        for message in messages:
+            participants = self.extract_participants(message)
+            all_participants = (
+                participants["from"] + participants["to"] + participants["cc"]
+            )
+            
+            # Check if owner is in any participant list
+            if owner_email_lower in [e.lower() for e in all_participants]:
+                return True
+        
+        return False
+
+    def is_owner_in_email(self, email_data: Dict[str, Any], owner_email: str) -> bool:
+        """Check if calendar owner is in current email.
+        
+        Args:
+            email_data: Full email dictionary
+            owner_email: Calendar owner email address
+            
+        Returns:
+            True if owner is found in FROM, TO, or CC
+        """
+        participants = self.extract_participants(email_data)
+        all_participants = (
+            participants["from"] + participants["to"] + participants["cc"]
+        )
+        
+        owner_email_lower = owner_email.lower()
+        return owner_email_lower in [e.lower() for e in all_participants]
+
     def send_reply(
         self,
         thread_id: str,

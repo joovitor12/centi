@@ -23,8 +23,11 @@ class Settings:
         "GOOGLE_CALENDAR_TIMEZONE", "America/Sao_Paulo"
     )
 
-    # Langfuse
+    # Gmail
+    GMAIL_POLL_INTERVAL_SECONDS: int = os.environ.get("GMAIL_POLL_INTERVAL_SECONDS", 120)
+    CENTI_EMAIL_ADDRESS: str = os.environ.get("CENTI_EMAIL_ADDRESS", "")
 
+    # Langfuse
     LANGFUSE_SECRET_KEY: str = os.environ.get("LANGFUSE_SECRET_KEY", "")
     LANGFUSE_PUBLIC_KEY: str = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
     LANGFUSE_BASE_URL: str = os.environ.get("LANGFUSE_BASE_URL", "")

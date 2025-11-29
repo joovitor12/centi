@@ -16,7 +16,10 @@ from app.config.settings import settings
 logger = logging.getLogger(__name__)
 
 # If modifying these scopes, delete the file token.json.
-SCOPES = ["https://www.googleapis.com/auth/calendar"]
+COMBINED_SCOPES = [
+    "https://www.googleapis.com/auth/calendar",
+    "https://www.googleapis.com/auth/gmail.modify",
+]
 
 
 class GoogleCalendarService:
@@ -42,7 +45,7 @@ class GoogleCalendarService:
 
             # Load existing token if available
             if os.path.exists(token_path):
-                self.creds = Credentials.from_authorized_user_file(token_path, SCOPES)
+                self.creds = Credentials.from_authorized_user_file(token_path, COMBINED_SCOPES)
 
             # If there are no (valid) credentials available, let the user log in.
             if not self.creds or not self.creds.valid:
@@ -57,7 +60,7 @@ class GoogleCalendarService:
                         return
 
                     flow = InstalledAppFlow.from_client_secrets_file(
-                        credentials_path, SCOPES
+                        credentials_path, COMBINED_SCOPES
                     )
                     self.creds = flow.run_local_server(port=0)
 
@@ -530,7 +533,7 @@ class GoogleCalendarService:
                         recurrence_byday=recurrence_byday,
                         recurrence_bymonthday=recurrence_bymonthday,
                         end_date=end_date,
-                        max_occurrences=None,  # Don't update count on update
+                        max_occurrences=None,
                     )
                     event["recurrence"] = [f"RRULE:{rrule}"]
 
