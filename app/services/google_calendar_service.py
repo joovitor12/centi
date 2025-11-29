@@ -211,11 +211,9 @@ class GoogleCalendarService:
                 }
 
             # Update the event
-            updated_event = (
-                self.service.events()
-                .update(calendarId=self.calendar_id, eventId=event_id, body=event)
-                .execute()
-            )
+            self.service.events().update(
+                calendarId=self.calendar_id, eventId=event_id, body=event
+            ).execute()
 
             logger.info(f"Google Calendar event updated: {event_id}")
             return True
@@ -537,11 +535,10 @@ class GoogleCalendarService:
                     event["recurrence"] = [f"RRULE:{rrule}"]
 
             # Update the event
-            updated_event = (
-                self.service.events()
-                .update(calendarId=self.calendar_id, eventId=event_id, body=event)
-                .execute()
-            )
+            self.service.events().update(
+                calendarId=self.calendar_id, eventId=event_id, body=event
+            ).execute()
+            
 
             logger.info(f"Google Calendar recurring event updated: {event_id}")
             return True
