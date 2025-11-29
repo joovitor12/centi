@@ -3,7 +3,7 @@
 import logging
 import os
 from datetime import datetime, timedelta
-from typing import Optional
+from typing import Any, Dict, List, Optional
 import pytz
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
@@ -568,3 +568,258 @@ class GoogleCalendarService:
         """
         # Reuse the existing delete_event method which works for recurring events too
         return self.delete_event(event_id)
+    
+    def freebusy_query(
+        self,
+        participant_emails: List[str],
+        start_date: datetime,
+        end_date: datetime,
+        duration_minutes: int = 30,
+        timezone_str: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Query freebusy information for multiple participants.
+        
+        Uses Google Calendar Freebusy API to check availability of multiple calendars.
+        Requires that calendars are public or shared with the service account owner.
+        
+        Args:
+            participant_emails: List of email addresses to check availability for
+            start_date: Start of time range to query
+            end_date: End of time range to query
+            duration_minutes: Minimum duration for free slots (not used in query, but for reference)
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo", "US/Pacific").
+                        If None, uses self.timezone_str from settings
+            
+        Returns:
+            Dictionary with structure:
+            {
+                "calendars": {
+                    "email@example.com": {
+                        "busy": [
+                            {"start": "2025-11-20T10:00:00Z", "end": "2025-11-20T11:00:00Z"}
+                        ]
+                    }
+                },
+                "unavailable": ["email2@example.com"]  # Emails whose calendars couldn't be accessed
+            }
+        """
+        if not self.service:
+            logger.warning("Google Calendar service not initialized")
+            return {"calendars": {}, "unavailable": participant_emails}
+
+        try:
+            # Use provided timezone or fallback to default
+            tz = pytz.timezone(timezone_str) if timezone_str else self.timezone
+            
+            # Ensure datetimes are timezone-aware
+            if start_date.tzinfo is None:
+                start_date = tz.localize(start_date)
+            else:
+                start_date = start_date.astimezone(tz)
+                
+            if end_date.tzinfo is None:
+                end_date = tz.localize(end_date)
+            else:
+                end_date = end_date.astimezone(tz)
+
+            # Format as RFC3339 for API
+            time_min = start_date.isoformat()
+            time_max = end_date.isoformat()
+
+            # Prepare items (each email is a calendar to check)
+            items = [{"id": email} for email in participant_emails]
+
+            # Call freebusy API
+            body = {
+                "timeMin": time_min,
+                "timeMax": time_max,
+                "items": items,
+            }
+
+            freebusy_response = (
+                self.service.freebusy().query(body=body).execute()
+            )
+
+            calendars_result = freebusy_response.get("calendars", {})
+            unavailable = []
+
+            # Check which calendars were successfully queried
+            for email in participant_emails:
+                if email not in calendars_result:
+                    unavailable.append(email)
+                elif "errors" in calendars_result[email]:
+                    # Calendar exists but has errors (e.g., permission denied)
+                    unavailable.append(email)
+                    logger.warning(
+                        f"Error accessing calendar for {email}: {calendars_result[email].get('errors')}"
+                    )
+
+            result = {
+                "calendars": {
+                    email: calendars_result[email]
+                    for email in participant_emails
+                    if email not in unavailable
+                },
+                "unavailable": unavailable,
+            }
+
+            logger.info(
+                f"Freebusy query completed: {len(participant_emails) - len(unavailable)}/{len(participant_emails)} calendars accessible"
+            )
+
+            return result
+
+        except HttpError as e:
+            logger.error(f"Error querying freebusy: {e}")
+            return {"calendars": {}, "unavailable": participant_emails}
+        except Exception as e:
+            logger.error(f"Unexpected error in freebusy_query: {e}")
+            return {"calendars": {}, "unavailable": participant_emails}
+
+    def find_common_free_slots(
+        self,
+        participant_emails: List[str],
+        start_date: datetime,
+        end_date: datetime,
+        duration_minutes: int = 30,
+        num_suggestions: int = 3,
+        work_hours_start: int = 9,
+        work_hours_end: int = 17,
+        timezone_str: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Find common free time slots for multiple participants.
+        
+        Args:
+            participant_emails: List of email addresses to find common availability
+            start_date: Start of time range to search
+            end_date: End of time range to search
+            duration_minutes: Duration of meeting slots to find
+            num_suggestions: Number of suggestions to return
+            work_hours_start: Start of work day (24h format)
+            work_hours_end: End of work day (24h format)
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo", "US/Pacific").
+                        If None, uses self.timezone_str from settings
+            
+        Returns:
+            List of suggestions, each with:
+            {
+                "start": datetime,
+                "end": datetime,
+                "verified_participants": [emails],
+                "unverified_participants": [emails]
+            }
+        """
+        if not self.service:
+            logger.warning("Google Calendar service not initialized")
+            return []
+
+        # Use provided timezone or fallback to default
+        tz = pytz.timezone(timezone_str) if timezone_str else self.timezone
+
+        # Query freebusy (pass timezone down)
+        freebusy_result = self.freebusy_query(
+            participant_emails, start_date, end_date, duration_minutes, timezone_str
+        )
+
+        calendars_busy = freebusy_result.get("calendars", {})
+        unavailable = freebusy_result.get("unavailable", [])
+
+        # If no calendars are accessible, return empty
+        if not calendars_busy:
+            logger.warning(
+                "No calendars accessible for freebusy query. Cannot find common slots."
+            )
+            return []
+
+        # Collect all busy periods from accessible calendars
+        all_busy_periods = []
+        for email, calendar_data in calendars_busy.items():
+            busy_periods = calendar_data.get("busy", [])
+            for period in busy_periods:
+                # Parse ISO format datetimes
+                busy_start = datetime.fromisoformat(
+                    period["start"].replace("Z", "+00:00")
+                )
+                busy_end = datetime.fromisoformat(
+                    period["end"].replace("Z", "+00:00")
+                )
+                # Convert to specified timezone
+                busy_start = busy_start.astimezone(tz)
+                busy_end = busy_end.astimezone(tz)
+                all_busy_periods.append((busy_start, busy_end))
+
+        # Sort busy periods by start time
+        all_busy_periods.sort(key=lambda x: x[0])
+
+        # Find free slots
+        suggestions = []
+        current_date = start_date.astimezone(tz)
+        end_date_local = end_date.astimezone(tz)
+        duration_delta = timedelta(minutes=duration_minutes)
+
+        # Iterate through each day
+        while current_date < end_date_local and len(suggestions) < num_suggestions:
+            day_start = current_date.replace(
+                hour=work_hours_start, minute=0, second=0, microsecond=0
+            )
+            day_end = current_date.replace(
+                hour=work_hours_end, minute=0, second=0, microsecond=0
+            )
+
+            # Skip if day_start is in the past or after end_date
+            if day_start < start_date.astimezone(tz):
+                day_start = start_date.astimezone(tz)
+            if day_end > end_date_local:
+                day_end = end_date_local
+            if day_start >= day_end:
+                current_date += timedelta(days=1)
+                continue
+
+            # Find busy periods that overlap with this day
+            day_busy_periods = [
+                (max(period_start, day_start), min(period_end, day_end))
+                for period_start, period_end in all_busy_periods
+                if period_start < day_end and period_end > day_start
+            ]
+
+            # Sort day busy periods
+            day_busy_periods.sort(key=lambda x: x[0])
+
+            # Find free slots in this day
+            slot_start = day_start
+            for busy_start, busy_end in day_busy_periods:
+                # Check if there's a free slot before this busy period
+                if slot_start + duration_delta <= busy_start:
+                    suggestions.append(
+                        {
+                            "start": slot_start,
+                            "end": slot_start + duration_delta,
+                            "verified_participants": list(calendars_busy.keys()),
+                            "unverified_participants": unavailable,
+                        }
+                    )
+                    if len(suggestions) >= num_suggestions:
+                        break
+
+                # Move slot_start to after this busy period
+                slot_start = max(slot_start, busy_end)
+
+            # Check if there's a free slot at the end of the day
+            if len(suggestions) < num_suggestions and slot_start + duration_delta <= day_end:
+                suggestions.append(
+                    {
+                        "start": slot_start,
+                        "end": slot_start + duration_delta,
+                        "verified_participants": list(calendars_busy.keys()),
+                        "unverified_participants": unavailable,
+                    }
+                )
+
+            # Move to next day
+            current_date += timedelta(days=1)
+
+        logger.info(
+            f"Found {len(suggestions)} common free slots for {len(participant_emails)} participants"
+        )
+
+        return suggestions
