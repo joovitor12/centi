@@ -46,7 +46,9 @@ class GoogleCalendarService:
 
             # Load existing token if available
             if os.path.exists(token_path):
-                self.creds = Credentials.from_authorized_user_file(token_path, COMBINED_SCOPES)
+                self.creds = Credentials.from_authorized_user_file(
+                    token_path, COMBINED_SCOPES
+                )
 
             # If there are no (valid) credentials available, let the user log in.
             if not self.creds or not self.creds.valid:
@@ -153,11 +155,16 @@ class GoogleCalendarService:
                 calendar_owner = self.calendar_id.lower()
                 for email in attendees:
                     email_lower = email.lower()
-                    if email_lower != calendar_owner and email_lower not in unique_attendees:
+                    if (
+                        email_lower != calendar_owner
+                        and email_lower not in unique_attendees
+                    ):
                         unique_attendees.append(email)
-                
+
                 if unique_attendees:
-                    event["attendees"] = [{"email": email} for email in unique_attendees]
+                    event["attendees"] = [
+                        {"email": email} for email in unique_attendees
+                    ]
                     # Send invitations
                     event["guestsCanModify"] = False
                     event["guestsCanInviteOthers"] = False
@@ -166,9 +173,7 @@ class GoogleCalendarService:
             event["conferenceData"] = {
                 "createRequest": {
                     "requestId": str(uuid.uuid4()),
-                    "conferenceSolutionKey": {
-                        "type": "hangoutsMeet"
-                    },
+                    "conferenceSolutionKey": {"type": "hangoutsMeet"},
                 },
             }
 
@@ -179,7 +184,7 @@ class GoogleCalendarService:
                     calendarId=self.calendar_id,
                     body=event,
                     sendUpdates="all",
-                    conferenceDataVersion=1
+                    conferenceDataVersion=1,
                 )
                 .execute()
             )
@@ -582,7 +587,6 @@ class GoogleCalendarService:
             self.service.events().update(
                 calendarId=self.calendar_id, eventId=event_id, body=event
             ).execute()
-            
 
             logger.info(f"Google Calendar recurring event updated: {event_id}")
             return True
@@ -609,7 +613,7 @@ class GoogleCalendarService:
         """
         # Reuse the existing delete_event method which works for recurring events too
         return self.delete_event(event_id)
-    
+
     def freebusy_query(
         self,
         participant_emails: List[str],
@@ -619,10 +623,10 @@ class GoogleCalendarService:
         timezone_str: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Query freebusy information for multiple participants.
-        
+
         Uses Google Calendar Freebusy API to check availability of multiple calendars.
         Requires that calendars are public or shared with the service account owner.
-        
+
         Args:
             participant_emails: List of email addresses to check availability for
             start_date: Start of time range to query
@@ -630,7 +634,7 @@ class GoogleCalendarService:
             duration_minutes: Minimum duration for free slots (not used in query, but for reference)
             timezone_str: Optional timezone string (e.g., "America/Sao_Paulo", "US/Pacific").
                         If None, uses self.timezone_str from settings
-            
+
         Returns:
             Dictionary with structure:
             {
@@ -651,13 +655,13 @@ class GoogleCalendarService:
         try:
             # Use provided timezone or fallback to default
             tz = pytz.timezone(timezone_str) if timezone_str else self.timezone
-            
+
             # Ensure datetimes are timezone-aware
             if start_date.tzinfo is None:
                 start_date = tz.localize(start_date)
             else:
                 start_date = start_date.astimezone(tz)
-                
+
             if end_date.tzinfo is None:
                 end_date = tz.localize(end_date)
             else:
@@ -677,9 +681,7 @@ class GoogleCalendarService:
                 "items": items,
             }
 
-            freebusy_response = (
-                self.service.freebusy().query(body=body).execute()
-            )
+            freebusy_response = self.service.freebusy().query(body=body).execute()
 
             calendars_result = freebusy_response.get("calendars", {})
             unavailable = []
@@ -729,7 +731,7 @@ class GoogleCalendarService:
         timezone_str: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Find common free time slots for multiple participants.
-        
+
         Args:
             participant_emails: List of email addresses to find common availability
             start_date: Start of time range to search
@@ -740,7 +742,7 @@ class GoogleCalendarService:
             work_hours_end: End of work day (24h format)
             timezone_str: Optional timezone string (e.g., "America/Sao_Paulo", "US/Pacific").
                         If None, uses self.timezone_str from settings
-            
+
         Returns:
             List of suggestions, each with:
             {
@@ -781,9 +783,7 @@ class GoogleCalendarService:
                 busy_start = datetime.fromisoformat(
                     period["start"].replace("Z", "+00:00")
                 )
-                busy_end = datetime.fromisoformat(
-                    period["end"].replace("Z", "+00:00")
-                )
+                busy_end = datetime.fromisoformat(period["end"].replace("Z", "+00:00"))
                 # Convert to specified timezone
                 busy_start = busy_start.astimezone(tz)
                 busy_end = busy_end.astimezone(tz)
@@ -797,13 +797,15 @@ class GoogleCalendarService:
         start_date_local = start_date.astimezone(tz)
         end_date_local = end_date.astimezone(tz)
         duration_delta = timedelta(minutes=duration_minutes)
-        
+
         # Ensure we never suggest times before the start_date (which should be current time or future)
         now_aware = datetime.now(tz)
         minimum_start = max(start_date_local, now_aware + timedelta(minutes=15))
 
         # Start from the day of start_date
-        current_date = start_date_local.replace(hour=0, minute=0, second=0, microsecond=0)
+        current_date = start_date_local.replace(
+            hour=0, minute=0, second=0, microsecond=0
+        )
 
         # Iterate through each day
         while current_date < end_date_local and len(suggestions) < num_suggestions:
@@ -822,7 +824,7 @@ class GoogleCalendarService:
                     minutes_to_add = 15 - (day_start.minute % 15)
                     day_start = day_start + timedelta(minutes=minutes_to_add)
                     day_start = day_start.replace(second=0, microsecond=0)
-            
+
             if day_end > end_date_local:
                 day_end = end_date_local
             if day_start >= day_end:
@@ -861,7 +863,10 @@ class GoogleCalendarService:
                 slot_start = max(slot_start, busy_end)
 
             # Check if there's a free slot at the end of the day
-            if len(suggestions) < num_suggestions and slot_start + duration_delta <= day_end:
+            if (
+                len(suggestions) < num_suggestions
+                and slot_start + duration_delta <= day_end
+            ):
                 # Double-check that the slot is in the future
                 if slot_start > minimum_start:
                     suggestions.append(
