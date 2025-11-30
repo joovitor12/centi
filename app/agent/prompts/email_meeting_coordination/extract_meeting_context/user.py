@@ -6,3 +6,4 @@ prompt = langfuse.get_prompt(
     "email_meeting_coordination/extract_meeting_context/user", label="production"
 )
 
+
