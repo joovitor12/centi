@@ -2,6 +2,7 @@
 
 import logging
 import os
+import uuid
 from datetime import datetime, timedelta
 from typing import Any, Dict, List, Optional
 import pytz
@@ -84,13 +85,17 @@ class GoogleCalendarService:
         description: str,
         start_time: datetime,
         end_time: Optional[datetime] = None,
+        summary: Optional[str] = None,
+        attendees: Optional[List[str]] = None,
     ) -> Optional[str]:
         """Create a calendar event.
 
         Args:
-            description: Event description/summary
+            description: Event description (body text)
             start_time: Event start time as datetime object
             end_time: Event end time as datetime object. If None, defaults to start_time + 1 hour
+            summary: Event title/summary. If None, uses description
+            attendees: List of email addresses to invite as attendees
 
         Returns:
             Event ID if successful, None otherwise
@@ -125,8 +130,12 @@ class GoogleCalendarService:
             start_time_str = start_time.isoformat()
             end_time_str = end_time.isoformat()
 
+            # Use summary if provided, otherwise use description as summary
+            event_summary = summary or description
+
             event = {
-                "summary": description,
+                "summary": event_summary,
+                "description": description,
                 "start": {
                     "dateTime": start_time_str,
                     "timeZone": self.timezone_str,
@@ -137,9 +146,41 @@ class GoogleCalendarService:
                 },
             }
 
+            # Add attendees if provided
+            if attendees:
+                # Remove duplicates and filter out the calendar owner to avoid self-invitation
+                unique_attendees = []
+                calendar_owner = self.calendar_id.lower()
+                for email in attendees:
+                    email_lower = email.lower()
+                    if email_lower != calendar_owner and email_lower not in unique_attendees:
+                        unique_attendees.append(email)
+                
+                if unique_attendees:
+                    event["attendees"] = [{"email": email} for email in unique_attendees]
+                    # Send invitations
+                    event["guestsCanModify"] = False
+                    event["guestsCanInviteOthers"] = False
+
+            # Add Google Meet conference
+            event["conferenceData"] = {
+                "createRequest": {
+                    "requestId": str(uuid.uuid4()),
+                    "conferenceSolutionKey": {
+                        "type": "hangoutsMeet"
+                    },
+                },
+            }
+
+            # Create event with conference (conferenceDataVersion=1 is required)
             event = (
                 self.service.events()
-                .insert(calendarId=self.calendar_id, body=event)
+                .insert(
+                    calendarId=self.calendar_id,
+                    body=event,
+                    sendUpdates="all",
+                    conferenceDataVersion=1
+                )
                 .execute()
             )
 
@@ -753,9 +794,16 @@ class GoogleCalendarService:
 
         # Find free slots
         suggestions = []
-        current_date = start_date.astimezone(tz)
+        start_date_local = start_date.astimezone(tz)
         end_date_local = end_date.astimezone(tz)
         duration_delta = timedelta(minutes=duration_minutes)
+        
+        # Ensure we never suggest times before the start_date (which should be current time or future)
+        now_aware = datetime.now(tz)
+        minimum_start = max(start_date_local, now_aware + timedelta(minutes=15))
+
+        # Start from the day of start_date
+        current_date = start_date_local.replace(hour=0, minute=0, second=0, microsecond=0)
 
         # Iterate through each day
         while current_date < end_date_local and len(suggestions) < num_suggestions:
@@ -766,9 +814,15 @@ class GoogleCalendarService:
                 hour=work_hours_end, minute=0, second=0, microsecond=0
             )
 
-            # Skip if day_start is in the past or after end_date
-            if day_start < start_date.astimezone(tz):
-                day_start = start_date.astimezone(tz)
+            # Ensure day_start is not before minimum_start (current time + buffer)
+            if day_start < minimum_start:
+                day_start = minimum_start
+                # Round up to nearest 15 minutes for cleaner suggestions
+                if day_start.minute % 15 != 0:
+                    minutes_to_add = 15 - (day_start.minute % 15)
+                    day_start = day_start + timedelta(minutes=minutes_to_add)
+                    day_start = day_start.replace(second=0, microsecond=0)
+            
             if day_end > end_date_local:
                 day_end = end_date_local
             if day_start >= day_end:
@@ -790,6 +844,26 @@ class GoogleCalendarService:
             for busy_start, busy_end in day_busy_periods:
                 # Check if there's a free slot before this busy period
                 if slot_start + duration_delta <= busy_start:
+                    # Double-check that the slot is in the future
+                    if slot_start > minimum_start:
+                        suggestions.append(
+                            {
+                                "start": slot_start,
+                                "end": slot_start + duration_delta,
+                                "verified_participants": list(calendars_busy.keys()),
+                                "unverified_participants": unavailable,
+                            }
+                        )
+                        if len(suggestions) >= num_suggestions:
+                            break
+
+                # Move slot_start to after this busy period
+                slot_start = max(slot_start, busy_end)
+
+            # Check if there's a free slot at the end of the day
+            if len(suggestions) < num_suggestions and slot_start + duration_delta <= day_end:
+                # Double-check that the slot is in the future
+                if slot_start > minimum_start:
                     suggestions.append(
                         {
                             "start": slot_start,
@@ -798,22 +872,6 @@ class GoogleCalendarService:
                             "unverified_participants": unavailable,
                         }
                     )
-                    if len(suggestions) >= num_suggestions:
-                        break
-
-                # Move slot_start to after this busy period
-                slot_start = max(slot_start, busy_end)
-
-            # Check if there's a free slot at the end of the day
-            if len(suggestions) < num_suggestions and slot_start + duration_delta <= day_end:
-                suggestions.append(
-                    {
-                        "start": slot_start,
-                        "end": slot_start + duration_delta,
-                        "verified_participants": list(calendars_busy.keys()),
-                        "unverified_participants": unavailable,
-                    }
-                )
 
             # Move to next day
             current_date += timedelta(days=1)

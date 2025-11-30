@@ -265,6 +265,7 @@ class SupabaseService:
         status: str = "pending",
         duration_minutes: int = 30,
         meeting_description: Optional[str] = None,
+        meeting_title: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a new email meeting thread record.
         
@@ -276,6 +277,7 @@ class SupabaseService:
             status: Initial status (default: 'pending')
             duration_minutes: Meeting duration in minutes
             meeting_description: Description of the meeting
+            meeting_title: Optional meeting title/name
             
         Returns:
             Created thread record
@@ -293,6 +295,8 @@ class SupabaseService:
                 data["subject"] = subject
             if meeting_description is not None:
                 data["meeting_description"] = meeting_description
+            if meeting_title is not None:
+                data["meeting_title"] = meeting_title
                 
             response = (
                 self.client.table("email_meeting_threads").insert(data).execute()
@@ -334,6 +338,7 @@ class SupabaseService:
         last_email_id: Optional[str] = None,
         last_processed_at: Optional[str] = None,
         meeting_description: Optional[str] = None,
+        meeting_title: Optional[str] = None,
         duration_minutes: Optional[int] = None,
     ) -> Dict[str, Any]:
         """Update an existing email meeting thread.
@@ -346,6 +351,7 @@ class SupabaseService:
             last_email_id: ID of last processed email in thread
             last_processed_at: Timestamp of last processing (ISO format string)
             meeting_description: Updated meeting description
+            meeting_title: Updated meeting title
             duration_minutes: Updated duration
             
         Returns:
@@ -366,6 +372,8 @@ class SupabaseService:
                 update_data["last_processed_at"] = last_processed_at
             if meeting_description is not None:
                 update_data["meeting_description"] = meeting_description
+            if meeting_title is not None:
+                update_data["meeting_title"] = meeting_title
             if duration_minutes is not None:
                 update_data["duration_minutes"] = duration_minutes
                 

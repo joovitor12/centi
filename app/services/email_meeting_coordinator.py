@@ -51,6 +51,10 @@ class MeetingContext(BaseModel):
     meeting_description: Optional[str] = Field(
         default=None, description="Brief description of the meeting"
     )
+    meeting_title: Optional[str] = Field(
+        default=None,
+        description="Specific title/name for the meeting if provided by user (e.g., 'Team Sync', 'Project Review'). If not provided, should be None.",
+    )
     days_ahead: int = Field(
         default=14, description="How many days ahead to search for availability"
     )
@@ -60,7 +64,7 @@ class MeetingResponse(BaseModel):
     """Processed meeting response from email."""
 
     accepted: bool = Field(
-        default=False, description="Whether a suggestion was accepted"
+        default=False, description="Whether a suggestion was accepted and the meeting should be confirmed"
     )
     selected_suggestion_index: Optional[int] = Field(
         default=None,
@@ -159,6 +163,7 @@ class EmailMeetingCoordinator:
                 "duration_minutes": 30,
                 "timezone_str": None,
                 "meeting_description": None,
+                "meeting_title": None,
                 "days_ahead": 14,
             }
 
@@ -190,6 +195,7 @@ class EmailMeetingCoordinator:
                 "duration_minutes": context.duration_minutes,
                 "timezone_str": context.timezone_str,
                 "meeting_description": context.meeting_description,
+                "meeting_title": context.meeting_title,
                 "days_ahead": context.days_ahead,
             }
         except Exception as e:
@@ -199,6 +205,7 @@ class EmailMeetingCoordinator:
                 "duration_minutes": 30,
                 "timezone_str": None,
                 "meeting_description": None,
+                "meeting_title": None,
                 "days_ahead": 14,
             }
 
@@ -246,18 +253,23 @@ class EmailMeetingCoordinator:
 
         Returns:
             List of suggestion dictionaries with start, end, verified_participants, etc.
+            All suggestions will be in the future (after current time).
         """
         if not participant_emails:
             logger.warning("No participants provided for time suggestions")
             return []
 
-        # Calculate date range
-        now = datetime.now(self.timezone)
-        start_date = now.replace(hour=0, minute=0, second=0, microsecond=0)
-        end_date = start_date + timedelta(days=days_ahead)
-
         # Use provided timezone or fallback to default
         tz_str = timezone_str or settings.GOOGLE_CALENDAR_TIMEZONE
+        tz = pytz.timezone(tz_str) if tz_str else self.timezone
+
+        # Calculate date range - start from NOW (not midnight) to ensure all suggestions are future
+        now = datetime.now(tz)
+        # Add 15 minutes buffer to current time to avoid suggesting times too soon
+        start_date = now + timedelta(minutes=15)
+        # Round down to nearest 15 minutes for cleaner suggestions
+        start_date = start_date.replace(minute=(start_date.minute // 15) * 15, second=0, microsecond=0)
+        end_date = now + timedelta(days=days_ahead)
 
         # Generate suggestions using calendar service
         suggestions = self.calendar_service.find_common_free_slots(
@@ -271,7 +283,19 @@ class EmailMeetingCoordinator:
             timezone_str=tz_str,
         )
 
-        return suggestions
+        # Filter out any suggestions that are in the past (safety check)
+        now_aware = datetime.now(tz)
+        future_suggestions = [
+            s for s in suggestions
+            if s["start"] > now_aware
+        ]
+
+        logger.info(
+            f"Filtered {len(suggestions) - len(future_suggestions)} past suggestions. "
+            f"Returning {len(future_suggestions)} future suggestions."
+        )
+
+        return future_suggestions
 
     def format_suggestion_email(
         self,
@@ -407,8 +431,9 @@ class EmailMeetingCoordinator:
 
         # Get suggested times for context
         suggested_times = thread_data.get("suggested_times", [])
+        
         suggestions_context = ""
-        if suggested_times:
+        if suggested_times and isinstance(suggested_times, list):
             suggestions_context = "Available suggestions:\n"
             for i, suggestion in enumerate(suggested_times, 1):
                 start = suggestion.get("start", {})
@@ -468,6 +493,7 @@ class EmailMeetingCoordinator:
         participant_emails: List[str],
         meeting_description: Optional[str] = None,
         owner_email: Optional[str] = None,
+        meeting_title: Optional[str] = None,
     ) -> Optional[str]:
         """Confirm meeting and create calendar event.
 
@@ -477,6 +503,7 @@ class EmailMeetingCoordinator:
             participant_emails: List of participant emails
             meeting_description: Meeting description
             owner_email: Owner email (for calendar creation)
+            meeting_title: Optional meeting title/name provided by user
 
         Returns:
             Google Calendar event ID if successful, None otherwise
@@ -484,19 +511,27 @@ class EmailMeetingCoordinator:
         start_time = selected_time["start"]
         end_time = selected_time["end"]
 
+        # Use meeting_title if provided, otherwise default to "Meeting"
+        event_summary = meeting_title.strip() if meeting_title and meeting_title.strip() else "Meeting"
+
         # Build event description with participants
         description_parts = []
         if meeting_description:
             description_parts.append(meeting_description)
-        description_parts.append("")
-        description_parts.append("Participants:")
-        description_parts.extend([f"- {email}" for email in participant_emails])
+        if len(participant_emails) > 1:
+            # Add participants list
+            if description_parts:
+                description_parts.append("")
+            description_parts.append("Participants:")
+            description_parts.extend([f"- {email}" for email in participant_emails])
 
-        # Create event in Google Calendar
+        # Create event in Google Calendar with attendees
         event_id = self.calendar_service.create_event(
-            description="\n".join(description_parts) or "Meeting",
+            description="\n".join(description_parts) if description_parts else "",
             start_time=start_time,
             end_time=end_time,
+            summary=event_summary,
+            attendees=participant_emails,
         )
 
         if event_id:
@@ -505,6 +540,71 @@ class EmailMeetingCoordinator:
             logger.error(f"Failed to create calendar event for thread {thread_id}")
 
         return event_id
+
+    def format_partial_acceptance_email(
+        self,
+        selected_time: Dict[str, Any],
+        meeting_description: Optional[str] = None,
+        participant_emails: Optional[List[str]] = None,
+        accepting_participant: Optional[str] = None,
+    ) -> str:
+        """Format email when a participant accepts but is waiting for others.
+
+        Args:
+            selected_time: Selected time suggestion
+            meeting_description: Optional meeting description
+            participant_emails: List of all participants
+            accepting_participant: Email of the participant who accepted
+
+        Returns:
+            Formatted email body
+        """
+        start_dt = selected_time["start"]
+        end_dt = selected_time["end"]
+
+        start_str = start_dt.strftime("%A, %B %d, %Y at %I:%M %p")
+        end_str = end_dt.strftime("%I:%M %p")
+
+        body_parts = [
+            "Hi everyone,",
+            "",
+            f"Great! I received confirmation for: {start_str} - {end_str}",
+            "",
+        ]
+
+        if meeting_description:
+            body_parts.append(f"Meeting: {meeting_description}")
+            body_parts.append("")
+
+        # Get remaining participants (excluding the one who already accepted)
+        remaining_participants = []
+        if participant_emails and accepting_participant:
+            remaining_participants = [
+                p for p in participant_emails
+                if p.lower() != accepting_participant.lower()
+            ]
+
+        if remaining_participants:
+            participant_list = ", ".join(remaining_participants)
+            body_parts.append(
+                f"Waiting for confirmation from: {participant_list}"
+            )
+            body_parts.append("")
+            body_parts.append(
+                "Please reply to confirm if this time works for you!"
+            )
+        else:
+            body_parts.append("Waiting for confirmation from the remaining participants.")
+            body_parts.append("")
+
+        body_parts.extend(
+            [
+                "Best regards,",
+                "Centi",
+            ]
+        )
+
+        return "\n".join(body_parts)
 
     def format_confirmation_email(
         self,

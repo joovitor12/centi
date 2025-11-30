@@ -269,6 +269,7 @@ class EmailWorker:
                 status="suggestions_sent" if suggestions else "pending",
                 duration_minutes=context.get("duration_minutes", 30),
                 meeting_description=context.get("meeting_description"),
+                meeting_title=context.get("meeting_title"),
             )
 
             # Update with suggested times if any
@@ -340,6 +341,38 @@ class EmailWorker:
             thread_data: Thread data from database
         """
         try:
+            # Security check: Only the calendar owner can confirm meetings
+            owner_email = settings.GOOGLE_CALENDAR_ID
+            if not owner_email:
+                logger.warning(
+                    "GOOGLE_CALENDAR_ID not configured. Cannot verify owner."
+                )
+                return
+
+            # Extract sender email
+            headers = email_data.get("payload", {}).get("headers", [])
+            from_email = next(
+                (
+                    h.get("value")
+                    for h in headers
+                    if h.get("name", "").lower() == "from"
+                ),
+                None,
+            )
+
+            # Extract email from "Name <email>" format if needed
+            if from_email and "<" in from_email:
+                from_email = from_email.split("<")[1].split(">")[0]
+
+            # Check if sender is the calendar owner
+            if from_email and from_email.lower() != owner_email.lower():
+                logger.info(
+                    f"Response from {from_email} ignored. Only calendar owner ({owner_email}) can confirm meetings."
+                )
+                # Mark as read and ignore
+                self.gmail_service.mark_as_read(email_id)
+                return
+
             status = thread_data.get("status", "pending")
 
             # If already confirmed, ignore
@@ -347,7 +380,9 @@ class EmailWorker:
                 logger.info(f"Thread {thread_id} already confirmed. Ignoring response.")
                 return
 
-            logger.info(f"Processing response for thread {thread_id}")
+            logger.info(
+                f"Processing response from calendar owner for thread {thread_id}"
+            )
 
             # Process the response
             response = await self.coordinator.process_meeting_response(
@@ -370,10 +405,13 @@ class EmailWorker:
                 logger.info(f"Meeting cancelled for thread {thread_id}")
                 return
 
-            # Handle acceptance
+            # Handle acceptance (full confirmation)
+            # Note: Only the calendar owner can confirm meetings, so we treat all acceptances as full confirmations
             if response.get("accepted"):
                 selected_index = response.get("selected_suggestion_index")
                 suggested_times = thread_data.get("suggested_times", [])
+                if not isinstance(suggested_times, list):
+                    suggested_times = []
 
                 if selected_index is not None and selected_index < len(suggested_times):
                     selected_suggestion = suggested_times[selected_index]
@@ -396,12 +434,16 @@ class EmailWorker:
                     owner_email = thread_data.get("owner_email")
                     meeting_description = thread_data.get("meeting_description")
 
+                    # Get meeting_title from thread_data (now stored directly in the database field)
+                    meeting_title = thread_data.get("meeting_title")
+
                     event_id = self.coordinator.confirm_meeting(
                         thread_id=thread_id,
                         selected_time=selected_time,
                         participant_emails=participant_emails,
                         meeting_description=meeting_description,
                         owner_email=owner_email,
+                        meeting_title=meeting_title,
                     )
 
                     if event_id:
