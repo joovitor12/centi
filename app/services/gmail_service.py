@@ -224,20 +224,89 @@ class GmailService:
         return emails
 
     def is_centi_mentioned(self, email_data: Dict[str, Any], centi_email: str) -> bool:
-        """Check if Centi was CC'd or mentioned in email.
+        """Check if Centi was CC'd in email.
+        
+        For privacy reasons, Centi only responds when CC'd (not when directly
+        addressed in TO field). This ensures Centi only observes conversations
+        where it's explicitly included as an observer.
         
         Args:
             email_data: Full email dictionary
             centi_email: Centi's email address
             
         Returns:
-            True if Centi is in TO or CC
+            True if Centi is in CC (not TO)
         """
         participants = self.extract_participants(email_data)
         
-        # Check if Centi is in TO or CC
-        all_recipients = participants["to"] + participants["cc"]
-        return centi_email.lower() in [e.lower() for e in all_recipients]
+        # Only check CC - Centi should only respond when CC'd, not when directly addressed
+        # This follows privacy best practices: only process emails where Centi is
+        # explicitly included as an observer in the thread
+        cc_recipients = participants.get("cc", [])
+        return centi_email.lower() in [e.lower() for e in cc_recipients]
+    
+    def is_centi_in_thread(self, thread_data: Dict[str, Any], centi_email: str) -> bool:
+        """Check if Centi was CC'd in any message within the thread.
+        
+        This is useful for verifying that Centi was originally CC'd in a thread,
+        even if a specific reply email doesn't show Centi in CC (Gmail threading).
+        
+        For privacy, we only check CC (not TO) to ensure Centi was originally
+        included as an observer, not directly addressed.
+        
+        Args:
+            thread_data: Full thread dictionary from get_thread_by_id()
+            centi_email: Centi's email address
+            
+        Returns:
+            True if Centi is CC'd in any message in the thread
+        """
+        if not thread_data:
+            return False
+        
+        centi_email_lower = centi_email.lower()
+        messages = thread_data.get("messages", [])
+        
+        for message in messages:
+            participants = self.extract_participants(message)
+            cc_recipients = participants.get("cc", [])
+            
+            # Check if Centi is in CC (not TO) - privacy requirement
+            # We only accept threads where Centi was originally CC'd
+            if centi_email_lower in [e.lower() for e in cc_recipients]:
+                return True
+        
+        return False
+    
+    def is_centi_mentioned_in_thread_anywhere(
+        self, thread_data: Dict[str, Any], centi_email: str
+    ) -> bool:
+        """Check if Centi is mentioned anywhere in the thread (TO or CC).
+        
+        This is used for existing threads to check if Centi is present in any email,
+        regardless of whether it's in TO or CC. Used when processing replies.
+        
+        Args:
+            thread_data: Full thread dictionary from get_thread_by_id()
+            centi_email: Centi's email address
+            
+        Returns:
+            True if Centi is in TO or CC in any message in the thread
+        """
+        if not thread_data:
+            return False
+        
+        centi_email_lower = centi_email.lower()
+        messages = thread_data.get("messages", [])
+        
+        for message in messages:
+            participants = self.extract_participants(message)
+            all_recipients = participants.get("to", []) + participants.get("cc", [])
+            
+            if centi_email_lower in [e.lower() for e in all_recipients]:
+                return True
+        
+        return False
 
     def is_owner_in_thread(
         self, thread_data: Dict[str, Any], owner_email: str

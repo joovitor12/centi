@@ -110,9 +110,48 @@ class EmailWorker:
                 logger.warning(f"Email {email_id} has no thread ID")
                 return
 
-            # Check if Centi is mentioned (TO or CC)
-            if not self.gmail_service.is_centi_mentioned(email_data, self.centi_email):
-                # Not for Centi, mark as read and skip
+            # Get thread data first to check if it's an existing thread
+            thread_data = self.supabase_service.get_email_meeting_thread_by_thread_id(
+                thread_id
+            )
+            
+            # Check if Centi is CC'd (only processes when CC'd for privacy)
+            # For existing threads: if Centi was originally CC'd, accept replies
+            # For new threads: check if Centi is CC'd in the current email
+            centi_in_thread = False
+            if thread_data:
+                # Existing thread - check if Centi was originally CC'd
+                # If so, we accept the reply regardless of TO/CC in current message
+                thread_data_full = self.gmail_service.get_thread_by_id(thread_id)
+                if thread_data_full:
+                    # Check if originally CC'd (privacy requirement)
+                    originally_ccd = self.gmail_service.is_centi_in_thread(
+                        thread_data_full, self.centi_email
+                    )
+                    if originally_ccd:
+                        # If originally CC'd, accept this reply even if Centi is in TO
+                        centi_in_thread = True
+                        logger.info(
+                            f"Thread {thread_id} is existing meeting thread. "
+                            "Centi was originally CC'd, processing reply."
+                        )
+                    else:
+                        logger.info(
+                            f"Thread {thread_id} exists but Centi was not originally CC'd. Skipping."
+                        )
+            else:
+                # New thread - check if Centi is CC'd in current email
+                centi_in_thread = self.gmail_service.is_centi_mentioned(
+                    email_data, self.centi_email
+                )
+                if not centi_in_thread:
+                    logger.info(
+                        f"New email {email_id} skipped: Centi not CC'd (privacy requirement)"
+                    )
+            
+            if not centi_in_thread:
+                # Not CC'd, mark as read and skip
+                # Centi only responds when explicitly CC'd, not when directly addressed
                 self.gmail_service.mark_as_read(email_id)
                 return
 
@@ -154,11 +193,6 @@ class EmailWorker:
                 logger.warning(f"Could not extract body from email {email_id}")
                 self.gmail_service.mark_as_read(email_id)
                 return
-
-            # Check if we already have a thread record
-            thread_data = self.supabase_service.get_email_meeting_thread_by_thread_id(
-                thread_id
-            )
 
             if thread_data:
                 # Existing thread - process as response
