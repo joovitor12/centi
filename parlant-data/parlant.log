@@ -5301,3 +5301,25 @@ Recommended actions:
 [2m2025-11-30T18:38:37.713066Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
 [2m2025-11-30T18:50:04.137155Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
 [2m2025-11-30T18:50:04.139155Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-01T23:58:15.087742Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-01T23:58:15.088743Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-01T23:58:15.090742Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-01T23:58:15.202748Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-01T23:58:32.781220Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-01T23:58:32.782220Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-01T23:58:32.782220Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-01T23:58:32.782220Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-01T23:58:32.782220Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-02T00:13:48.279888Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-02T00:13:48.281888Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-02T00:14:30.261217Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-02T00:14:30.262217Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-02T00:14:30.264217Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-02T00:14:30.279215Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-02T00:14:40.226375Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-02T00:14:40.226375Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-02T00:14:40.226375Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-02T00:14:40.227375Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-02T00:14:40.227375Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-02T00:24:51.268778Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-02T00:24:51.270778Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m

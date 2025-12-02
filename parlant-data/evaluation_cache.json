@@ -937,6 +937,62 @@
         "agent_intention_condition": null,
         "internal_action": null
       }
+    },
+    {
+      "id": "694c56c2619766276f043c8cbcd725b9",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "67fa249924f43f291037dbb28dcbc38c",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the details of the recurring pattern, start time, and duration.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "262639d23af13bb0782628660666c605",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "78d9e41c80e082ee94082eb227ea0530",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the details of the recurring pattern, start time, and duration.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
     }
   ],
   "journey_evaluations_3.0.3": []
