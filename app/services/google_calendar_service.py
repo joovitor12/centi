@@ -34,14 +34,53 @@ class GoogleCalendarService:
         self.timezone_str = settings.GOOGLE_CALENDAR_TIMEZONE
         self.timezone = pytz.timezone(settings.GOOGLE_CALENDAR_TIMEZONE)
 
-        # Only initialize if credentials path is provided
-        if settings.GOOGLE_CREDENTIALS_PATH:
+        # Initialize authentication if token path or credentials path is provided
+        if settings.GOOGLE_TOKEN_PATH or settings.GOOGLE_CREDENTIALS_PATH:
             self._authenticate()
 
     def _authenticate(self):
         """Authenticate with Google Calendar API using OAuth 2.0."""
         try:
+            # Priority 1: Use direct token path if provided (for org installations)
+            if settings.GOOGLE_TOKEN_PATH:
+                if os.path.exists(settings.GOOGLE_TOKEN_PATH):
+                    self.creds = Credentials.from_authorized_user_file(
+                        settings.GOOGLE_TOKEN_PATH, COMBINED_SCOPES
+                    )
+                    if self.creds and self.creds.valid:
+                        self.service = build("calendar", "v3", credentials=self.creds)
+                        logger.info(
+                            f"Google Calendar service initialized successfully using token from {settings.GOOGLE_TOKEN_PATH}"
+                        )
+                        return
+                    elif self.creds and self.creds.expired and self.creds.refresh_token:
+                        try:
+                            self.creds.refresh(Request())
+                            self.service = build("calendar", "v3", credentials=self.creds)
+                            logger.info(
+                                f"Google Calendar service initialized successfully after refreshing token from {settings.GOOGLE_TOKEN_PATH}"
+                            )
+                            return
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to refresh token from {settings.GOOGLE_TOKEN_PATH}: {e}"
+                            )
+                else:
+                    logger.warning(
+                        f"Token file not found at {settings.GOOGLE_TOKEN_PATH}. "
+                        "Falling back to OAuth flow."
+                    )
+
+            # Priority 2: Use existing token.json (generated automatically)
+            # Priority 3: Start OAuth flow
             credentials_path = settings.GOOGLE_CREDENTIALS_PATH
+            if not credentials_path:
+                logger.warning(
+                    "Neither GOOGLE_TOKEN_PATH nor GOOGLE_CREDENTIALS_PATH configured. "
+                    "Google Calendar integration will be disabled."
+                )
+                return
+
             token_path = os.path.join(os.path.dirname(credentials_path), "token.json")
 
             # Load existing token if available

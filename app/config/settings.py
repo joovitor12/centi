@@ -18,6 +18,7 @@ class Settings:
 
     # Google Calendar
     GOOGLE_CREDENTIALS_PATH: str = os.environ.get("GOOGLE_CREDENTIALS_PATH", "")
+    GOOGLE_TOKEN_PATH: str = os.environ.get("GOOGLE_TOKEN_PATH", "")
     GOOGLE_CALENDAR_ID: str = os.environ.get("GOOGLE_CALENDAR_ID", "primary")
     GOOGLE_CALENDAR_TIMEZONE: str = os.environ.get(
         "GOOGLE_CALENDAR_TIMEZONE", "America/Sao_Paulo"
