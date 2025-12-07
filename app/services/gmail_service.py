@@ -1,5 +1,6 @@
 """Gmail service for email monitoring and sending."""
 
+import json
 import logging
 import os
 import base64
@@ -40,7 +41,13 @@ class GmailService:
         self.service = None
         
         credentials_path = credentials_path or settings.GOOGLE_CREDENTIALS_PATH
-        if settings.GOOGLE_TOKEN_PATH or credentials_path:
+        if (
+            settings.GOOGLE_TOKEN_PATH
+            or settings.GOOGLE_TOKEN_JSON
+            or settings.GOOGLE_CREDENTIALS_PATH
+            or settings.GOOGLE_CREDENTIALS_JSON
+            or credentials_path
+        ):
             self._authenticate(credentials_path)
         else:
             logger.warning(
@@ -50,11 +57,70 @@ class GmailService:
     def _authenticate(self, credentials_path: Optional[str]):
         """Authenticate with Gmail API using OAuth 2.0.
         
+        Priority order:
+        1. GOOGLE_TOKEN_JSON (environment variable with JSON string)
+        2. GOOGLE_TOKEN_PATH (file path)
+        3. GOOGLE_CREDENTIALS_JSON (environment variable with JSON string) - for cloud deployments
+        4. GOOGLE_CREDENTIALS_PATH (file path) - with interactive OAuth flow
+        
         Args:
             credentials_path: Path to OAuth credentials JSON file (optional)
         """
         try:
-            # Priority 1: Use direct token path if provided (for org installations)
+            # Debug: Log which authentication method will be used
+            logger.info(
+                f"Gmail authentication check: GOOGLE_TOKEN_JSON={'set' if settings.GOOGLE_TOKEN_JSON else 'not set'}, "
+                f"GOOGLE_TOKEN_PATH={'set' if settings.GOOGLE_TOKEN_PATH else 'not set'}, "
+                f"GOOGLE_CREDENTIALS_JSON={'set' if settings.GOOGLE_CREDENTIALS_JSON else 'not set'}, "
+                f"GOOGLE_CREDENTIALS_PATH={'set' if settings.GOOGLE_CREDENTIALS_PATH else 'not set'}"
+            )
+            
+            # Priority 1: Use token from environment variable (JSON string)
+            if settings.GOOGLE_TOKEN_JSON:
+                try:
+                    token_data = json.loads(settings.GOOGLE_TOKEN_JSON)
+                    existing_creds = Credentials.from_authorized_user_info(
+                        token_data, COMBINED_SCOPES
+                    )
+                    if existing_creds.valid:
+                        if "gmail.modify" in existing_creds.scopes:
+                            self.creds = existing_creds
+                            self.service = build("gmail", "v1", credentials=self.creds)
+                            logger.info(
+                                "Gmail service initialized successfully using token from GOOGLE_TOKEN_JSON"
+                            )
+                            return
+                        else:
+                            logger.warning(
+                                "Token from GOOGLE_TOKEN_JSON missing Gmail scope. "
+                                "Falling back to other methods."
+                            )
+                    elif existing_creds.expired and existing_creds.refresh_token:
+                        try:
+                            existing_creds.refresh(Request())
+                            if "gmail.modify" in existing_creds.scopes:
+                                self.creds = existing_creds
+                                self.service = build("gmail", "v1", credentials=self.creds)
+                                logger.info(
+                                    "Gmail service initialized successfully after refreshing token from GOOGLE_TOKEN_JSON"
+                                )
+                                return
+                            else:
+                                logger.warning(
+                                    "Refreshed token from GOOGLE_TOKEN_JSON missing Gmail scope. "
+                                    "Falling back to other methods."
+                                )
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to refresh token from GOOGLE_TOKEN_JSON: {e}. "
+                                "Falling back to other methods."
+                            )
+                except json.JSONDecodeError as e:
+                    logger.warning(
+                        f"Invalid JSON in GOOGLE_TOKEN_JSON: {e}. Falling back to other methods."
+                    )
+
+            # Priority 2: Use direct token path if provided (for org installations)
             if settings.GOOGLE_TOKEN_PATH:
                 if os.path.exists(settings.GOOGLE_TOKEN_PATH):
                     existing_creds = Credentials.from_authorized_user_file(
@@ -99,11 +165,65 @@ class GmailService:
                         "Falling back to OAuth flow."
                     )
 
-            # Priority 2: Use existing token.json (generated automatically)
-            # Priority 3: Start OAuth flow
+            # Priority 3: Use credentials from environment variable (JSON string) - for cloud deployments
+            if settings.GOOGLE_CREDENTIALS_JSON:
+                try:
+                    credentials_data = json.loads(settings.GOOGLE_CREDENTIALS_JSON)
+                    # For cloud deployments, we expect a token JSON, not OAuth credentials
+                    # If it's a token, use it directly
+                    if "token" in credentials_data or "refresh_token" in credentials_data:
+                        existing_creds = Credentials.from_authorized_user_info(
+                            credentials_data, COMBINED_SCOPES
+                        )
+                        if existing_creds.valid:
+                            if "gmail.modify" in existing_creds.scopes:
+                                self.creds = existing_creds
+                                self.service = build("gmail", "v1", credentials=self.creds)
+                                logger.info(
+                                    "Gmail service initialized successfully using credentials from GOOGLE_CREDENTIALS_JSON"
+                                )
+                                return
+                            else:
+                                logger.warning(
+                                    "Credentials from GOOGLE_CREDENTIALS_JSON missing Gmail scope. "
+                                    "Falling back to other methods."
+                                )
+                        elif existing_creds.expired and existing_creds.refresh_token:
+                            try:
+                                existing_creds.refresh(Request())
+                                if "gmail.modify" in existing_creds.scopes:
+                                    self.creds = existing_creds
+                                    self.service = build("gmail", "v1", credentials=self.creds)
+                                    logger.info(
+                                        "Gmail service initialized successfully after refreshing credentials from GOOGLE_CREDENTIALS_JSON"
+                                    )
+                                    return
+                                else:
+                                    logger.warning(
+                                        "Refreshed credentials from GOOGLE_CREDENTIALS_JSON missing Gmail scope. "
+                                        "Falling back to other methods."
+                                    )
+                            except Exception as e:
+                                logger.warning(
+                                    f"Failed to refresh credentials from GOOGLE_CREDENTIALS_JSON: {e}. "
+                                    "Falling back to other methods."
+                                )
+                    else:
+                        logger.warning(
+                            "GOOGLE_CREDENTIALS_JSON should contain a token JSON, not OAuth credentials. "
+                            "Use GOOGLE_TOKEN_JSON instead."
+                        )
+                except json.JSONDecodeError as e:
+                    logger.warning(
+                        f"Invalid JSON in GOOGLE_CREDENTIALS_JSON: {e}. Falling back to other methods."
+                    )
+
+            # Priority 4: Use existing token.json (generated automatically)
+            # Priority 5: Start OAuth flow (only works locally)
             if not credentials_path:
                 logger.warning(
-                    "No credentials path provided and GOOGLE_TOKEN_PATH not found. "
+                    "No Google credentials configured (GOOGLE_TOKEN_JSON, GOOGLE_TOKEN_PATH, "
+                    "GOOGLE_CREDENTIALS_JSON, or GOOGLE_CREDENTIALS_PATH). "
                     "Gmail integration will be disabled."
                 )
                 return

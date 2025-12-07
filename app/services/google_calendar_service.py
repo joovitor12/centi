@@ -1,5 +1,6 @@
 """Google Calendar service for syncing appointments."""
 
+import json
 import logging
 import os
 import uuid
@@ -34,14 +35,64 @@ class GoogleCalendarService:
         self.timezone_str = settings.GOOGLE_CALENDAR_TIMEZONE
         self.timezone = pytz.timezone(settings.GOOGLE_CALENDAR_TIMEZONE)
 
-        # Initialize authentication if token path or credentials path is provided
-        if settings.GOOGLE_TOKEN_PATH or settings.GOOGLE_CREDENTIALS_PATH:
+        # Initialize authentication if token/credentials are provided (via env var, path, or JSON)
+        if (
+            settings.GOOGLE_TOKEN_PATH
+            or settings.GOOGLE_TOKEN_JSON
+            or settings.GOOGLE_CREDENTIALS_PATH
+            or settings.GOOGLE_CREDENTIALS_JSON
+        ):
             self._authenticate()
 
     def _authenticate(self):
-        """Authenticate with Google Calendar API using OAuth 2.0."""
+        """Authenticate with Google Calendar API using OAuth 2.0.
+        
+        Priority order:
+        1. GOOGLE_TOKEN_JSON (environment variable with JSON string)
+        2. GOOGLE_TOKEN_PATH (file path)
+        3. GOOGLE_CREDENTIALS_JSON (environment variable with JSON string) - for cloud deployments
+        4. GOOGLE_CREDENTIALS_PATH (file path) - with interactive OAuth flow
+        """
         try:
-            # Priority 1: Use direct token path if provided (for org installations)
+            # Debug: Log which authentication method will be used
+            logger.info(
+                f"Authentication check: GOOGLE_TOKEN_JSON={'set' if settings.GOOGLE_TOKEN_JSON else 'not set'}, "
+                f"GOOGLE_TOKEN_PATH={'set' if settings.GOOGLE_TOKEN_PATH else 'not set'}, "
+                f"GOOGLE_CREDENTIALS_JSON={'set' if settings.GOOGLE_CREDENTIALS_JSON else 'not set'}, "
+                f"GOOGLE_CREDENTIALS_PATH={'set' if settings.GOOGLE_CREDENTIALS_PATH else 'not set'}"
+            )
+            
+            # Priority 1: Use token from environment variable (JSON string)
+            if settings.GOOGLE_TOKEN_JSON:
+                try:
+                    token_data = json.loads(settings.GOOGLE_TOKEN_JSON)
+                    self.creds = Credentials.from_authorized_user_info(
+                        token_data, COMBINED_SCOPES
+                    )
+                    if self.creds and self.creds.valid:
+                        self.service = build("calendar", "v3", credentials=self.creds)
+                        logger.info(
+                            "Google Calendar service initialized successfully using token from GOOGLE_TOKEN_JSON"
+                        )
+                        return
+                    elif self.creds and self.creds.expired and self.creds.refresh_token:
+                        try:
+                            self.creds.refresh(Request())
+                            self.service = build("calendar", "v3", credentials=self.creds)
+                            logger.info(
+                                "Google Calendar service initialized successfully after refreshing token from GOOGLE_TOKEN_JSON"
+                            )
+                            return
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to refresh token from GOOGLE_TOKEN_JSON: {e}"
+                            )
+                except json.JSONDecodeError as e:
+                    logger.warning(
+                        f"Invalid JSON in GOOGLE_TOKEN_JSON: {e}. Falling back to other methods."
+                    )
+
+            # Priority 2: Use direct token path if provided (for org installations)
             if settings.GOOGLE_TOKEN_PATH:
                 if os.path.exists(settings.GOOGLE_TOKEN_PATH):
                     self.creds = Credentials.from_authorized_user_file(
@@ -71,12 +122,51 @@ class GoogleCalendarService:
                         "Falling back to OAuth flow."
                     )
 
-            # Priority 2: Use existing token.json (generated automatically)
-            # Priority 3: Start OAuth flow
+            # Priority 3: Use credentials from environment variable (JSON string) - for cloud deployments
+            if settings.GOOGLE_CREDENTIALS_JSON:
+                try:
+                    credentials_data = json.loads(settings.GOOGLE_CREDENTIALS_JSON)
+                    # For cloud deployments, we expect a token JSON, not OAuth credentials
+                    # If it's a token, use it directly
+                    if "token" in credentials_data or "refresh_token" in credentials_data:
+                        self.creds = Credentials.from_authorized_user_info(
+                            credentials_data, COMBINED_SCOPES
+                        )
+                        if self.creds and self.creds.valid:
+                            self.service = build("calendar", "v3", credentials=self.creds)
+                            logger.info(
+                                "Google Calendar service initialized successfully using credentials from GOOGLE_CREDENTIALS_JSON"
+                            )
+                            return
+                        elif self.creds and self.creds.expired and self.creds.refresh_token:
+                            try:
+                                self.creds.refresh(Request())
+                                self.service = build("calendar", "v3", credentials=self.creds)
+                                logger.info(
+                                    "Google Calendar service initialized successfully after refreshing credentials from GOOGLE_CREDENTIALS_JSON"
+                                )
+                                return
+                            except Exception as e:
+                                logger.warning(
+                                    f"Failed to refresh credentials from GOOGLE_CREDENTIALS_JSON: {e}"
+                                )
+                    else:
+                        logger.warning(
+                            "GOOGLE_CREDENTIALS_JSON should contain a token JSON, not OAuth credentials. "
+                            "Use GOOGLE_TOKEN_JSON instead."
+                        )
+                except json.JSONDecodeError as e:
+                    logger.warning(
+                        f"Invalid JSON in GOOGLE_CREDENTIALS_JSON: {e}. Falling back to other methods."
+                    )
+
+            # Priority 4: Use existing token.json (generated automatically)
+            # Priority 5: Start OAuth flow (only works locally)
             credentials_path = settings.GOOGLE_CREDENTIALS_PATH
             if not credentials_path:
                 logger.warning(
-                    "Neither GOOGLE_TOKEN_PATH nor GOOGLE_CREDENTIALS_PATH configured. "
+                    "No Google credentials configured (GOOGLE_TOKEN_JSON, GOOGLE_TOKEN_PATH, "
+                    "GOOGLE_CREDENTIALS_JSON, or GOOGLE_CREDENTIALS_PATH). "
                     "Google Calendar integration will be disabled."
                 )
                 return
@@ -101,6 +191,7 @@ class GoogleCalendarService:
                         )
                         return
 
+                    # Interactive OAuth flow (only works locally, not in cloud deployments)
                     flow = InstalledAppFlow.from_client_secrets_file(
                         credentials_path, COMBINED_SCOPES
                     )

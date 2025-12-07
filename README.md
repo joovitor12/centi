@@ -98,16 +98,31 @@ For installing Centi as an app in an organization, you can provide a pre-generat
 ### Authentication Priority
 
 The system uses the following priority order for authentication:
-1. **GOOGLE_TOKEN_PATH** (if provided) → Uses the pre-generated token directly
-2. **token.json** (auto-generated) → Uses token from previous OAuth flow
-3. **GOOGLE_CREDENTIALS_PATH** → Starts interactive OAuth flow
-4. None → Disables Google integration
+1. **GOOGLE_TOKEN_JSON** (environment variable) → Token JSON as string (recommended for cloud deployments)
+2. **GOOGLE_TOKEN_PATH** (file path) → Uses the pre-generated token directly
+3. **GOOGLE_CREDENTIALS_JSON** (environment variable) → Credentials JSON as string
+4. **GOOGLE_CREDENTIALS_PATH** (file path) → Starts interactive OAuth flow (only works locally)
+5. None → Disables Google integration
 
 ### Security Notes
 
 - **Token files are sensitive**: Treat them as secrets and never commit them to version control
 - **Scoped access**: Centi uses its own mailbox (`CENTI_EMAIL_ADDRESS`) and only has calendar access for the specified owner
 - **Privacy**: Centi only processes emails when explicitly CC'd into threads (first message requires CC, subsequent replies accept TO or CC)
+
+### Cloud Deployment (Render, etc.)
+
+For cloud deployments where you can't use local files, you can provide credentials via environment variables:
+
+```env
+# Instead of GOOGLE_TOKEN_PATH, use GOOGLE_TOKEN_JSON with the full token JSON as a string
+GOOGLE_TOKEN_JSON={"token":"ya29.a0...","refresh_token":"1//0g...",...}
+
+# Same for credentials (though GOOGLE_TOKEN_JSON is recommended)
+GOOGLE_CREDENTIALS_JSON={"token":"...","refresh_token":"...",...}
+```
+
+**Full deployment guide**: See [`docs/deploy_render.md`](docs/deploy_render.md) for detailed instructions on deploying to Render and other cloud platforms.
 
 ## 💬 Usage Examples
 
