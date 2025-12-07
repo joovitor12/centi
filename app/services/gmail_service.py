@@ -79,22 +79,46 @@ class GmailService:
             if settings.GOOGLE_TOKEN_JSON:
                 try:
                     token_data = json.loads(settings.GOOGLE_TOKEN_JSON)
-                    existing_creds = Credentials.from_authorized_user_info(
-                        token_data, COMBINED_SCOPES
+                    
+                    # Check scopes in the original JSON first
+                    token_scopes = token_data.get("scopes", [])
+                    has_gmail_scope = any("gmail.modify" in scope for scope in token_scopes)
+                    
+                    logger.info(
+                        f"Token JSON scopes: {token_scopes}, "
+                        f"Has gmail.modify: {has_gmail_scope}"
                     )
-                    if existing_creds.valid:
-                        if "gmail.modify" in existing_creds.scopes:
+                    
+                    if not has_gmail_scope:
+                        logger.warning(
+                            "Token from GOOGLE_TOKEN_JSON missing Gmail scope in JSON. "
+                            "Falling back to other methods."
+                        )
+                    else:
+                        existing_creds = Credentials.from_authorized_user_info(
+                            token_data, COMBINED_SCOPES
+                        )
+                        if existing_creds.valid:
                             self.creds = existing_creds
                             self.service = build("gmail", "v1", credentials=self.creds)
                             logger.info(
                                 "Gmail service initialized successfully using token from GOOGLE_TOKEN_JSON"
                             )
                             return
-                        else:
-                            logger.warning(
-                                "Token from GOOGLE_TOKEN_JSON missing Gmail scope. "
-                                "Falling back to other methods."
-                            )
+                        elif existing_creds.expired and existing_creds.refresh_token:
+                            try:
+                                existing_creds.refresh(Request())
+                                self.creds = existing_creds
+                                self.service = build("gmail", "v1", credentials=self.creds)
+                                logger.info(
+                                    "Gmail service initialized successfully after refreshing token from GOOGLE_TOKEN_JSON"
+                                )
+                                return
+                            except Exception as e:
+                                logger.warning(
+                                    f"Failed to refresh token from GOOGLE_TOKEN_JSON: {e}. "
+                                    "Falling back to other methods."
+                                )
                     elif existing_creds.expired and existing_creds.refresh_token:
                         try:
                             existing_creds.refresh(Request())
