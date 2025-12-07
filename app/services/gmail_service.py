@@ -119,26 +119,6 @@ class GmailService:
                                     f"Failed to refresh token from GOOGLE_TOKEN_JSON: {e}. "
                                     "Falling back to other methods."
                                 )
-                    elif existing_creds.expired and existing_creds.refresh_token:
-                        try:
-                            existing_creds.refresh(Request())
-                            if "gmail.modify" in existing_creds.scopes:
-                                self.creds = existing_creds
-                                self.service = build("gmail", "v1", credentials=self.creds)
-                                logger.info(
-                                    "Gmail service initialized successfully after refreshing token from GOOGLE_TOKEN_JSON"
-                                )
-                                return
-                            else:
-                                logger.warning(
-                                    "Refreshed token from GOOGLE_TOKEN_JSON missing Gmail scope. "
-                                    "Falling back to other methods."
-                                )
-                        except Exception as e:
-                            logger.warning(
-                                f"Failed to refresh token from GOOGLE_TOKEN_JSON: {e}. "
-                                "Falling back to other methods."
-                            )
                 except json.JSONDecodeError as e:
                     logger.warning(
                         f"Invalid JSON in GOOGLE_TOKEN_JSON: {e}. Falling back to other methods."
