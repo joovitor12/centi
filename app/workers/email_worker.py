@@ -409,11 +409,11 @@ class EmailWorker:
             thread_data: Thread data from database
         """
         try:
-            # Security check: Only the calendar owner can confirm meetings
-            owner_email = settings.GOOGLE_CALENDAR_ID
+            # owner_email is already identified in process_email() from registered users
+            # We just need to verify the sender is the same user
             if not owner_email:
                 logger.warning(
-                    "GOOGLE_CALENDAR_ID not configured. Cannot verify owner."
+                    "No owner email provided. Cannot verify sender."
                 )
                 return
 
@@ -432,10 +432,10 @@ class EmailWorker:
             if from_email and "<" in from_email:
                 from_email = from_email.split("<")[1].split(">")[0]
 
-            # Check if sender is the calendar owner
+            # Check if sender matches the identified owner (registered user)
             if from_email and from_email.lower() != owner_email.lower():
                 logger.info(
-                    f"Response from {from_email} ignored. Only calendar owner ({owner_email}) can confirm meetings."
+                    f"Response from {from_email} ignored. Only the registered user ({owner_email}) can confirm meetings."
                 )
                 # Mark as read and ignore
                 self.gmail_service.mark_as_read(email_id)
