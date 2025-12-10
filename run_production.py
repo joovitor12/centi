@@ -36,8 +36,8 @@ async def root():
         "services": {
             "oauth": "/auth/google",
             "callback": "/auth/google/callback",
-            "parlant": "running"
-        }
+            "parlant": "running",
+        },
     }
 
 
@@ -47,12 +47,13 @@ def run_fastapi_server():
         # Get port from environment (Render provides PORT env var)
         port = int(os.environ.get("PORT", 8000))
         logger.info(f"Starting FastAPI OAuth server on port {port}")
+        logger.info(f"FastAPI app routes: {[route.path for route in api_app.routes]}")
         uvicorn.run(
             api_app,
             host="0.0.0.0",
             port=port,
             log_level="info",
-            access_log=False  # Reduce logging noise
+            access_log=True,  # Enable access log for debugging
         )
     except Exception as e:
         logger.error(f"Failed to start FastAPI server: {e}", exc_info=True)
@@ -138,14 +139,16 @@ async def main():
     # Start FastAPI server in background thread
     fastapi_thread = threading.Thread(target=run_fastapi_server, daemon=True)
     fastapi_thread.start()
-    
+
     # Give FastAPI a moment to start
     await asyncio.sleep(1)
-    
+
+    port = int(os.environ.get("PORT", 8000))
     logger.info("Both services started:")
-    logger.info("  - FastAPI OAuth server: http://0.0.0.0:8000")
+    logger.info(f"  - FastAPI OAuth server: http://0.0.0.0:{port}")
     logger.info("  - Parlant agent: running")
-    
+    logger.info(f"  - Available routes: {[route.path for route in api_app.routes]}")
+
     # Run Parlant in main async context
     await run_parlant_app()
 
@@ -157,4 +160,3 @@ if __name__ == "__main__":
     print("Appointments from Supabase:", response.data)
 
     asyncio.run(main())
-
