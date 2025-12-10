@@ -9,7 +9,6 @@ from typing import Any, Dict, List, Optional
 import pytz
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -179,27 +178,32 @@ class GoogleCalendarService:
                     token_path, COMBINED_SCOPES
                 )
 
-            # If there are no (valid) credentials available, let the user log in.
+            # If there are no (valid) credentials available, disable the service
+            # OAuth flow is now handled by FastAPI endpoints (/auth/google)
             if not self.creds or not self.creds.valid:
                 if self.creds and self.creds.expired and self.creds.refresh_token:
-                    self.creds.refresh(Request())
-                else:
-                    if not os.path.exists(credentials_path):
+                    try:
+                        self.creds.refresh(Request())
+                        self.service = build("calendar", "v3", credentials=self.creds)
+                        logger.info(
+                            "Google Calendar service initialized successfully after refreshing token"
+                        )
+                        return
+                    except Exception as e:
                         logger.warning(
-                            f"Google Calendar credentials file not found at {credentials_path}. "
+                            f"Failed to refresh token: {e}. "
                             "Google Calendar integration will be disabled."
                         )
                         return
-
-                    # Interactive OAuth flow (only works locally, not in cloud deployments)
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        credentials_path, COMBINED_SCOPES
+                else:
+                    # No valid credentials available - disable service
+                    # Users should use the OAuth endpoint at /auth/google to authenticate
+                    logger.warning(
+                        f"No valid Google Calendar credentials found. "
+                        "Google Calendar integration will be disabled. "
+                        "To authenticate, use the OAuth endpoint at /auth/google"
                     )
-                    self.creds = flow.run_local_server(port=0)
-
-                # Save the credentials for the next run
-                with open(token_path, "w") as token:
-                    token.write(self.creds.to_json())
+                    return
 
             # Build the service
             self.service = build("calendar", "v3", credentials=self.creds)
@@ -849,6 +853,152 @@ class GoogleCalendarService:
             logger.error(f"Unexpected error in freebusy_query: {e}")
             return {"calendars": {}, "unavailable": participant_emails}
 
+    @staticmethod
+    def get_availability_slots(
+        user_token: Dict[str, Any],
+        participant_emails: List[str],
+        start_date: datetime,
+        end_date: datetime,
+        duration_minutes: int = 30,
+        timezone_str: Optional[str] = None,
+        supabase_service = None,
+        user_email: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Get availability slots for a user using their own token.
+        
+        This method creates a temporary service instance using the user's token
+        to query freebusy information. Used for multi-user scenarios where
+        each user has their own OAuth token.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            participant_emails: List of email addresses to check availability for
+            start_date: Start of time range to query
+            end_date: End of time range to query
+            duration_minutes: Minimum duration for free slots
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token (required if supabase_service is provided)
+            
+        Returns:
+            Dictionary with structure:
+            {
+                "calendars": {
+                    "email@example.com": {
+                        "busy": [
+                            {"start": "2025-11-20T10:00:00Z", "end": "2025-11-20T11:00:00Z"}
+                        ]
+                    }
+                },
+                "unavailable": ["email2@example.com"]
+            }
+        """
+        try:
+            # Create credentials from user token
+            # Scope for freebusy is calendar.freebusy
+            freebusy_scopes = ["https://www.googleapis.com/auth/calendar.freebusy"]
+            creds = Credentials.from_authorized_user_info(user_token, freebusy_scopes)
+            
+            # Refresh token if expired and save updated token back to database
+            token_was_refreshed = False
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    token_was_refreshed = True
+                    logger.info("Token refreshed successfully for calendar freebusy query")
+                    
+                    # Save refreshed token back to database if supabase_service is provided
+                    if supabase_service and user_email:
+                        try:
+                            # Convert credentials back to dict format for storage
+                            refreshed_token_dict = {
+                                "token": creds.token,
+                                "refresh_token": creds.refresh_token,
+                                "token_uri": creds.token_uri,
+                                "client_id": creds.client_id,
+                                "client_secret": creds.client_secret,
+                                "scopes": creds.scopes or user_token.get("scopes", []),
+                            }
+                            
+                            supabase_service.update_user_token(user_email, refreshed_token_dict)
+                            logger.info(f"Refreshed token saved to database for user {user_email}")
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to save refreshed token to database for {user_email}: {e}. "
+                                "Token was refreshed but not persisted."
+                            )
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return {"calendars": {}, "unavailable": participant_emails}
+            
+            # Build temporary service
+            service = build("calendar", "v3", credentials=creds)
+            
+            # Use provided timezone or default
+            tz = pytz.timezone(timezone_str) if timezone_str else pytz.timezone("America/Sao_Paulo")
+            
+            # Ensure datetimes are timezone-aware
+            if start_date.tzinfo is None:
+                start_date = tz.localize(start_date)
+            else:
+                start_date = start_date.astimezone(tz)
+                
+            if end_date.tzinfo is None:
+                end_date = tz.localize(end_date)
+            else:
+                end_date = end_date.astimezone(tz)
+            
+            # Format as RFC3339 for API
+            time_min = start_date.isoformat()
+            time_max = end_date.isoformat()
+            
+            # Prepare items (each email is a calendar to check)
+            items = [{"id": email} for email in participant_emails]
+            
+            # Call freebusy API
+            body = {
+                "timeMin": time_min,
+                "timeMax": time_max,
+                "items": items,
+            }
+            
+            freebusy_response = service.freebusy().query(body=body).execute()
+            
+            calendars_result = freebusy_response.get("calendars", {})
+            unavailable = []
+            
+            # Check which calendars were successfully queried
+            for email in participant_emails:
+                if email not in calendars_result:
+                    unavailable.append(email)
+                elif "errors" in calendars_result[email]:
+                    unavailable.append(email)
+                    logger.warning(
+                        f"Error accessing calendar for {email}: {calendars_result[email].get('errors')}"
+                    )
+            
+            result = {
+                "calendars": {
+                    email: calendars_result[email]
+                    for email in participant_emails
+                    if email not in unavailable
+                },
+                "unavailable": unavailable,
+            }
+            
+            logger.info(
+                f"Freebusy query completed for user: {len(participant_emails) - len(unavailable)}/{len(participant_emails)} calendars accessible"
+            )
+            
+            return result
+            
+        except HttpError as e:
+            logger.error(f"Error querying freebusy with user token: {e}")
+            return {"calendars": {}, "unavailable": participant_emails}
+        except Exception as e:
+            logger.error(f"Unexpected error in get_availability_slots: {e}")
+            return {"calendars": {}, "unavailable": participant_emails}
+
     def find_common_free_slots(
         self,
         participant_emails: List[str],
@@ -859,6 +1009,8 @@ class GoogleCalendarService:
         work_hours_start: int = 9,
         work_hours_end: int = 17,
         timezone_str: Optional[str] = None,
+        calendars_busy: Optional[Dict[str, Any]] = None,
+        unavailable: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """Find common free time slots for multiple participants.
 
@@ -872,6 +1024,10 @@ class GoogleCalendarService:
             work_hours_end: End of work day (24h format)
             timezone_str: Optional timezone string (e.g., "America/Sao_Paulo", "US/Pacific").
                         If None, uses self.timezone_str from settings
+            calendars_busy: Optional pre-computed busy periods from freebusy query.
+                          If provided, skips freebusy_query call (for multi-user scenarios).
+            unavailable: Optional list of participant emails whose calendars couldn't be accessed.
+                        Required if calendars_busy is provided.
 
         Returns:
             List of suggestions, each with:
@@ -882,20 +1038,25 @@ class GoogleCalendarService:
                 "unverified_participants": [emails]
             }
         """
-        if not self.service:
-            logger.warning("Google Calendar service not initialized")
-            return []
-
         # Use provided timezone or fallback to default
         tz = pytz.timezone(timezone_str) if timezone_str else self.timezone
 
-        # Query freebusy (pass timezone down)
-        freebusy_result = self.freebusy_query(
-            participant_emails, start_date, end_date, duration_minutes, timezone_str
-        )
-
-        calendars_busy = freebusy_result.get("calendars", {})
-        unavailable = freebusy_result.get("unavailable", [])
+        # Query freebusy if not provided (backward compatibility)
+        if calendars_busy is None:
+            if not self.service:
+                logger.warning("Google Calendar service not initialized")
+                return []
+            
+            # Query freebusy (pass timezone down)
+            freebusy_result = self.freebusy_query(
+                participant_emails, start_date, end_date, duration_minutes, timezone_str
+            )
+            calendars_busy = freebusy_result.get("calendars", {})
+            unavailable = freebusy_result.get("unavailable", [])
+        else:
+            # Use provided calendars_busy
+            if unavailable is None:
+                unavailable = []
 
         # If no calendars are accessible, return empty
         if not calendars_busy:

@@ -8,7 +8,6 @@ from email.mime.text import MIMEText
 from typing import Optional, List, Dict, Any
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 from app.config.settings import settings
@@ -30,29 +29,40 @@ COMBINED_SCOPES = [
 class GmailService:
     """Service for interacting with Gmail API."""
 
-    def __init__(self, credentials_path: Optional[str] = None):
+    def __init__(
+        self,
+        credentials_path: Optional[str] = None,
+        user_token: Optional[Dict[str, Any]] = None,
+    ):
         """Initialize Gmail client.
 
         Args:
             credentials_path: Path to OAuth credentials JSON file.
                              If None, uses settings.GOOGLE_CREDENTIALS_PATH
+            user_token: Optional user-specific OAuth token (dict) for multi-user support.
+                       If provided, uses this token instead of global credentials.
         """
         self.creds: Optional[Credentials] = None
         self.service = None
 
-        credentials_path = credentials_path or settings.GOOGLE_CREDENTIALS_PATH
-        if (
-            settings.GOOGLE_TOKEN_PATH
-            or settings.GOOGLE_TOKEN_JSON
-            or settings.GOOGLE_CREDENTIALS_PATH
-            or settings.GOOGLE_CREDENTIALS_JSON
-            or credentials_path
-        ):
-            self._authenticate(credentials_path)
+        # If user_token is provided, use it directly (multi-user mode)
+        if user_token:
+            self._authenticate_with_token(user_token)
         else:
-            logger.warning(
-                "No Google credentials path or token path provided. Gmail service will be disabled."
-            )
+            # Use global credentials/token (single-user or default mode)
+            credentials_path = credentials_path or settings.GOOGLE_CREDENTIALS_PATH
+            if (
+                settings.GOOGLE_TOKEN_PATH
+                or settings.GOOGLE_TOKEN_JSON
+                or settings.GOOGLE_CREDENTIALS_PATH
+                or settings.GOOGLE_CREDENTIALS_JSON
+                or credentials_path
+            ):
+                self._authenticate(credentials_path)
+            else:
+                logger.warning(
+                    "No Google credentials path or token path provided. Gmail service will be disabled."
+                )
 
     def _authenticate(self, credentials_path: Optional[str]):
         """Authenticate with Gmail API using OAuth 2.0.
@@ -249,21 +259,46 @@ class GmailService:
 
             # Try to load existing token
             if os.path.exists(token_path):
-                # Check if token has Gmail scope
-                existing_creds = Credentials.from_authorized_user_file(
-                    token_path, COMBINED_SCOPES
-                )
-                # If token exists but doesn't have Gmail scope, we need to re-authenticate
-                if existing_creds.valid:
-                    if "gmail.modify" in existing_creds.scopes:
-                        self.creds = existing_creds
+                # Check scopes in JSON file first (more reliable than creds.scopes)
+                try:
+                    with open(token_path, "r") as f:
+                        token_data = json.load(f)
+                    token_scopes = token_data.get("scopes", [])
+                    has_gmail_scope = any(
+                        "gmail.modify" in scope for scope in token_scopes
+                    )
+
+                    logger.info(
+                        f"Token file found. Scopes in file: {token_scopes}, "
+                        f"Has gmail.modify: {has_gmail_scope}"
+                    )
+
+                    if has_gmail_scope:
+                        # Load credentials from file
+                        existing_creds = Credentials.from_authorized_user_file(
+                            token_path, COMBINED_SCOPES
+                        )
+                        if existing_creds.valid:
+                            self.creds = existing_creds
+                        elif existing_creds.expired and existing_creds.refresh_token:
+                            try:
+                                existing_creds.refresh(Request())
+                                self.creds = existing_creds
+                            except Exception as e:
+                                logger.warning(f"Failed to refresh token: {e}")
+                                self.creds = None
+                        else:
+                            self.creds = existing_creds
                     else:
-                        logger.info(
-                            "Token exists but missing Gmail scope. Re-authenticating..."
+                        logger.warning(
+                            f"Token file exists but missing Gmail scope. "
+                            f"Token scopes: {token_scopes}. "
+                            "Gmail integration will be disabled."
                         )
                         self.creds = None
-                else:
-                    self.creds = existing_creds
+                except Exception as e:
+                    logger.warning(f"Error reading token file: {e}")
+                    self.creds = None
 
             # If no valid credentials, authenticate
             if not self.creds or not self.creds.valid:
@@ -290,15 +325,15 @@ class GmailService:
                         )
                         return
 
-                    # Use combined scopes to get both Calendar and Gmail access
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        credentials_path, COMBINED_SCOPES
+                    # No valid credentials available - disable service
+                    # OAuth flow is now handled by FastAPI endpoints (/auth/google)
+                    # Note: For Gmail to work, you need gmail.modify scope in the token
+                    logger.warning(
+                        "No valid Gmail credentials found. "
+                        "Gmail integration will be disabled. "
+                        "To authenticate, use the OAuth endpoint at /auth/google"
                     )
-                    self.creds = flow.run_local_server(port=0)
-
-                    # Save the credentials for the next run
-                    with open(token_path, "w") as token:
-                        token.write(self.creds.to_json())
+                    return
 
             # Build the Gmail service
             self.service = build("gmail", "v1", credentials=self.creds)
@@ -309,6 +344,50 @@ class GmailService:
                 f"Failed to initialize Gmail service: {e}. "
                 "Gmail integration will be disabled."
             )
+            self.service = None
+
+    def _authenticate_with_token(self, user_token: Dict[str, Any]):
+        """Authenticate with Gmail API using a user-specific token.
+
+        Used for multi-user scenarios where each user has their own OAuth token.
+
+        Args:
+            user_token: User's OAuth token JSON (dict)
+        """
+        try:
+            # Gmail requires gmail.modify scope
+            gmail_scopes = ["https://www.googleapis.com/auth/gmail.modify"]
+
+            # Check if token has Gmail scope
+            token_scopes = user_token.get("scopes", [])
+            has_gmail_scope = any("gmail.modify" in scope for scope in token_scopes)
+
+            if not has_gmail_scope:
+                logger.warning(
+                    f"User token missing Gmail scope. Token scopes: {token_scopes}. "
+                    "Gmail service will be disabled for this user."
+                )
+                self.service = None
+                return
+
+            # Create credentials from user token
+            self.creds = Credentials.from_authorized_user_info(user_token, gmail_scopes)
+
+            # Refresh token if expired
+            if self.creds.expired and self.creds.refresh_token:
+                try:
+                    self.creds.refresh(Request())
+                except Exception as e:
+                    logger.warning(f"Failed to refresh user token: {e}")
+                    self.service = None
+                    return
+
+            # Build Gmail service
+            self.service = build("gmail", "v1", credentials=self.creds)
+            logger.info("Gmail service initialized successfully with user token")
+
+        except Exception as e:
+            logger.error(f"Failed to authenticate Gmail service with user token: {e}")
             self.service = None
 
     def get_unread_emails(
