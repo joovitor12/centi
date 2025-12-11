@@ -241,6 +241,8 @@ class EmailMeetingCoordinator:
         days_ahead: int = 14,
         num_suggestions: int = 3,
         timezone_str: Optional[str] = None,
+        user_token: Optional[Dict[str, Any]] = None,
+        user_email: Optional[str] = None,
     ) -> List[Dict[str, Any]]:
         """Generate time suggestions for participants.
 
@@ -250,6 +252,10 @@ class EmailMeetingCoordinator:
             days_ahead: Number of days ahead to search
             num_suggestions: Number of suggestions to generate
             timezone_str: Optional timezone override
+            user_token: Optional user-specific OAuth token (dict) for multi-user support.
+                       If provided, uses this token to query freebusy information.
+            user_email: Optional user email address (required if user_token is provided
+                       to enable automatic token refresh persistence)
 
         Returns:
             List of suggestion dictionaries with start, end, verified_participants, etc.
@@ -272,16 +278,57 @@ class EmailMeetingCoordinator:
         end_date = now + timedelta(days=days_ahead)
 
         # Generate suggestions using calendar service
-        suggestions = self.calendar_service.find_common_free_slots(
-            participant_emails=participant_emails,
-            start_date=start_date,
-            end_date=end_date,
-            duration_minutes=duration_minutes,
-            num_suggestions=num_suggestions,
-            work_hours_start=9,
-            work_hours_end=17,
-            timezone_str=tz_str,
-        )
+        # If user_token is provided, use get_availability_slots (multi-user)
+        # Otherwise, use find_common_free_slots (single-user, backward compatible)
+        if user_token:
+            # Multi-user mode: use user's token to query freebusy
+            freebusy_result = self.calendar_service.get_availability_slots(
+                participant_emails=participant_emails,
+                start_date=start_date,
+                end_date=end_date,
+                duration_minutes=duration_minutes,
+                timezone_str=tz_str,
+                user_token=user_token,
+                supabase_service=self.supabase_service if user_email else None,
+                user_email=user_email,
+            )
+            
+            # Extract busy periods from freebusy result
+            calendars_busy = freebusy_result.get("calendars", {})
+            unavailable = freebusy_result.get("unavailable", [])
+            
+            if unavailable:
+                logger.warning(
+                    f"Could not access calendars for: {unavailable}. "
+                    "Suggestions may be incomplete."
+                )
+            
+            # Convert freebusy result to suggestions format
+            # Use find_common_free_slots with the busy periods
+            suggestions = self.calendar_service.find_common_free_slots(
+                participant_emails=participant_emails,
+                start_date=start_date,
+                end_date=end_date,
+                duration_minutes=duration_minutes,
+                num_suggestions=num_suggestions,
+                work_hours_start=9,
+                work_hours_end=17,
+                timezone_str=tz_str,
+                calendars_busy=calendars_busy,  # Pass pre-computed busy periods
+                unavailable=unavailable,  # Pass unavailable participants
+            )
+        else:
+            # Single-user mode: use existing global calendar service
+            suggestions = self.calendar_service.find_common_free_slots(
+                participant_emails=participant_emails,
+                start_date=start_date,
+                end_date=end_date,
+                duration_minutes=duration_minutes,
+                num_suggestions=num_suggestions,
+                work_hours_start=9,
+                work_hours_end=17,
+                timezone_str=tz_str,
+            )
 
         # Filter out any suggestions that are in the past (safety check)
         now_aware = datetime.now(tz)

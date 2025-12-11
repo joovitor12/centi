@@ -55,6 +55,75 @@ uv run python main.py
 
 5. Open the Sandbox UI: http://localhost:8800
 
+## 🏢 Organization Setup (Email Interactor)
+
+For installing Centi as an app in an organization, you can provide a pre-generated OAuth token instead of going through the interactive OAuth flow. This is useful for automated deployments and organizational installations.
+
+### Configuration for Organizations
+
+1. **Generate OAuth Token**: Use Google's OAuth 2.0 flow to generate a token with the required scopes:
+   - `https://www.googleapis.com/auth/calendar`
+   - `https://www.googleapis.com/auth/gmail.modify`
+
+2. **Create Token File**: Save the token as a JSON file in the standard Google OAuth format:
+   ```json
+   {
+     "token": "ya29.a0...",
+     "refresh_token": "1//0g...",
+     "token_uri": "https://oauth2.googleapis.com/token",
+     "client_id": "...",
+     "client_secret": "...",
+     "scopes": [
+       "https://www.googleapis.com/auth/calendar",
+       "https://www.googleapis.com/auth/gmail.modify"
+     ]
+   }
+   ```
+
+3. **Configure Environment Variables**: Add to your `.env` file:
+   ```env
+   # Email address for Centi agent (its own mailbox)
+   CENTI_EMAIL_ADDRESS=centi@yourorg.com
+   
+   # Path to pre-generated OAuth token file
+   GOOGLE_TOKEN_PATH=/path/to/token.json
+   
+   # Calendar owner email (the person whose calendar Centi will manage)
+   GOOGLE_CALENDAR_ID=owner@yourorg.com
+   
+   # Gmail polling interval (optional, defaults to 120 seconds)
+   GMAIL_POLL_INTERVAL_SECONDS=120
+   ```
+
+### Authentication Priority
+
+The system uses the following priority order for authentication:
+1. **GOOGLE_TOKEN_JSON** (environment variable) → Token JSON as string (recommended for cloud deployments)
+2. **GOOGLE_TOKEN_PATH** (file path) → Uses the pre-generated token directly
+3. **GOOGLE_CREDENTIALS_JSON** (environment variable) → Credentials JSON as string
+4. **GOOGLE_CREDENTIALS_PATH** (file path) → Starts interactive OAuth flow (only works locally)
+5. None → Disables Google integration
+
+### Security Notes
+
+- **Token files are sensitive**: Treat them as secrets and never commit them to version control
+- **Scoped access**: Centi uses its own mailbox (`CENTI_EMAIL_ADDRESS`) and only has calendar access for the specified owner
+- **Privacy**: Centi only processes emails when explicitly CC'd into threads (first message requires CC, subsequent replies accept TO or CC)
+
+### Cloud Deployment (Render, etc.)
+
+For cloud deployments where you can't use local files, you can provide credentials via environment variables:
+
+```env
+# Instead of GOOGLE_TOKEN_PATH, use GOOGLE_TOKEN_JSON with the full token JSON as a string
+GOOGLE_TOKEN_JSON={"token":"ya29.a0...","refresh_token":"1//0g...",...}
+
+# Same for credentials (though GOOGLE_TOKEN_JSON is recommended)
+GOOGLE_CREDENTIALS_JSON={"token":"...","refresh_token":"...",...}
+```
+
+**Full deployment guide**: See [`docs/deploy_render.md`](docs/deploy_render.md) for detailed instructions on deploying to Render and other cloud platforms.
+
 ## 💬 Usage Examples
 
 **Schedule an appointment:**

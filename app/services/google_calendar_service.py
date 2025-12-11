@@ -1,5 +1,6 @@
 """Google Calendar service for syncing appointments."""
 
+import json
 import logging
 import os
 import uuid
@@ -8,7 +9,6 @@ from typing import Any, Dict, List, Optional
 import pytz
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
-from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
 
@@ -34,14 +34,142 @@ class GoogleCalendarService:
         self.timezone_str = settings.GOOGLE_CALENDAR_TIMEZONE
         self.timezone = pytz.timezone(settings.GOOGLE_CALENDAR_TIMEZONE)
 
-        # Only initialize if credentials path is provided
-        if settings.GOOGLE_CREDENTIALS_PATH:
+        # Initialize authentication if token/credentials are provided (via env var, path, or JSON)
+        if (
+            settings.GOOGLE_TOKEN_PATH
+            or settings.GOOGLE_TOKEN_JSON
+            or settings.GOOGLE_CREDENTIALS_PATH
+            or settings.GOOGLE_CREDENTIALS_JSON
+        ):
             self._authenticate()
 
     def _authenticate(self):
-        """Authenticate with Google Calendar API using OAuth 2.0."""
+        """Authenticate with Google Calendar API using OAuth 2.0.
+        
+        Priority order:
+        1. GOOGLE_TOKEN_JSON (environment variable with JSON string)
+        2. GOOGLE_TOKEN_PATH (file path)
+        3. GOOGLE_CREDENTIALS_JSON (environment variable with JSON string) - for cloud deployments
+        4. GOOGLE_CREDENTIALS_PATH (file path) - with interactive OAuth flow
+        """
         try:
+            # Debug: Log which authentication method will be used
+            logger.info(
+                f"Authentication check: GOOGLE_TOKEN_JSON={'set' if settings.GOOGLE_TOKEN_JSON else 'not set'}, "
+                f"GOOGLE_TOKEN_PATH={'set' if settings.GOOGLE_TOKEN_PATH else 'not set'}, "
+                f"GOOGLE_CREDENTIALS_JSON={'set' if settings.GOOGLE_CREDENTIALS_JSON else 'not set'}, "
+                f"GOOGLE_CREDENTIALS_PATH={'set' if settings.GOOGLE_CREDENTIALS_PATH else 'not set'}"
+            )
+            
+            # Priority 1: Use token from environment variable (JSON string)
+            if settings.GOOGLE_TOKEN_JSON:
+                try:
+                    token_data = json.loads(settings.GOOGLE_TOKEN_JSON)
+                    self.creds = Credentials.from_authorized_user_info(
+                        token_data, COMBINED_SCOPES
+                    )
+                    if self.creds and self.creds.valid:
+                        self.service = build("calendar", "v3", credentials=self.creds)
+                        logger.info(
+                            "Google Calendar service initialized successfully using token from GOOGLE_TOKEN_JSON"
+                        )
+                        return
+                    elif self.creds and self.creds.expired and self.creds.refresh_token:
+                        try:
+                            self.creds.refresh(Request())
+                            self.service = build("calendar", "v3", credentials=self.creds)
+                            logger.info(
+                                "Google Calendar service initialized successfully after refreshing token from GOOGLE_TOKEN_JSON"
+                            )
+                            return
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to refresh token from GOOGLE_TOKEN_JSON: {e}"
+                            )
+                except json.JSONDecodeError as e:
+                    logger.warning(
+                        f"Invalid JSON in GOOGLE_TOKEN_JSON: {e}. Falling back to other methods."
+                    )
+
+            # Priority 2: Use direct token path if provided (for org installations)
+            if settings.GOOGLE_TOKEN_PATH:
+                if os.path.exists(settings.GOOGLE_TOKEN_PATH):
+                    self.creds = Credentials.from_authorized_user_file(
+                        settings.GOOGLE_TOKEN_PATH, COMBINED_SCOPES
+                    )
+                    if self.creds and self.creds.valid:
+                        self.service = build("calendar", "v3", credentials=self.creds)
+                        logger.info(
+                            f"Google Calendar service initialized successfully using token from {settings.GOOGLE_TOKEN_PATH}"
+                        )
+                        return
+                    elif self.creds and self.creds.expired and self.creds.refresh_token:
+                        try:
+                            self.creds.refresh(Request())
+                            self.service = build("calendar", "v3", credentials=self.creds)
+                            logger.info(
+                                f"Google Calendar service initialized successfully after refreshing token from {settings.GOOGLE_TOKEN_PATH}"
+                            )
+                            return
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to refresh token from {settings.GOOGLE_TOKEN_PATH}: {e}"
+                            )
+                else:
+                    logger.warning(
+                        f"Token file not found at {settings.GOOGLE_TOKEN_PATH}. "
+                        "Falling back to OAuth flow."
+                    )
+
+            # Priority 3: Use credentials from environment variable (JSON string) - for cloud deployments
+            if settings.GOOGLE_CREDENTIALS_JSON:
+                try:
+                    credentials_data = json.loads(settings.GOOGLE_CREDENTIALS_JSON)
+                    # For cloud deployments, we expect a token JSON, not OAuth credentials
+                    # If it's a token, use it directly
+                    if "token" in credentials_data or "refresh_token" in credentials_data:
+                        self.creds = Credentials.from_authorized_user_info(
+                            credentials_data, COMBINED_SCOPES
+                        )
+                        if self.creds and self.creds.valid:
+                            self.service = build("calendar", "v3", credentials=self.creds)
+                            logger.info(
+                                "Google Calendar service initialized successfully using credentials from GOOGLE_CREDENTIALS_JSON"
+                            )
+                            return
+                        elif self.creds and self.creds.expired and self.creds.refresh_token:
+                            try:
+                                self.creds.refresh(Request())
+                                self.service = build("calendar", "v3", credentials=self.creds)
+                                logger.info(
+                                    "Google Calendar service initialized successfully after refreshing credentials from GOOGLE_CREDENTIALS_JSON"
+                                )
+                                return
+                            except Exception as e:
+                                logger.warning(
+                                    f"Failed to refresh credentials from GOOGLE_CREDENTIALS_JSON: {e}"
+                                )
+                    else:
+                        logger.warning(
+                            "GOOGLE_CREDENTIALS_JSON should contain a token JSON, not OAuth credentials. "
+                            "Use GOOGLE_TOKEN_JSON instead."
+                        )
+                except json.JSONDecodeError as e:
+                    logger.warning(
+                        f"Invalid JSON in GOOGLE_CREDENTIALS_JSON: {e}. Falling back to other methods."
+                    )
+
+            # Priority 4: Use existing token.json (generated automatically)
+            # Priority 5: Start OAuth flow (only works locally)
             credentials_path = settings.GOOGLE_CREDENTIALS_PATH
+            if not credentials_path:
+                logger.warning(
+                    "No Google credentials configured (GOOGLE_TOKEN_JSON, GOOGLE_TOKEN_PATH, "
+                    "GOOGLE_CREDENTIALS_JSON, or GOOGLE_CREDENTIALS_PATH). "
+                    "Google Calendar integration will be disabled."
+                )
+                return
+
             token_path = os.path.join(os.path.dirname(credentials_path), "token.json")
 
             # Load existing token if available
@@ -50,26 +178,32 @@ class GoogleCalendarService:
                     token_path, COMBINED_SCOPES
                 )
 
-            # If there are no (valid) credentials available, let the user log in.
+            # If there are no (valid) credentials available, disable the service
+            # OAuth flow is now handled by FastAPI endpoints (/auth/google)
             if not self.creds or not self.creds.valid:
                 if self.creds and self.creds.expired and self.creds.refresh_token:
-                    self.creds.refresh(Request())
-                else:
-                    if not os.path.exists(credentials_path):
+                    try:
+                        self.creds.refresh(Request())
+                        self.service = build("calendar", "v3", credentials=self.creds)
+                        logger.info(
+                            "Google Calendar service initialized successfully after refreshing token"
+                        )
+                        return
+                    except Exception as e:
                         logger.warning(
-                            f"Google Calendar credentials file not found at {credentials_path}. "
+                            f"Failed to refresh token: {e}. "
                             "Google Calendar integration will be disabled."
                         )
                         return
-
-                    flow = InstalledAppFlow.from_client_secrets_file(
-                        credentials_path, COMBINED_SCOPES
+                else:
+                    # No valid credentials available - disable service
+                    # Users should use the OAuth endpoint at /auth/google to authenticate
+                    logger.warning(
+                        f"No valid Google Calendar credentials found. "
+                        "Google Calendar integration will be disabled. "
+                        "To authenticate, use the OAuth endpoint at /auth/google"
                     )
-                    self.creds = flow.run_local_server(port=0)
-
-                # Save the credentials for the next run
-                with open(token_path, "w") as token:
-                    token.write(self.creds.to_json())
+                    return
 
             # Build the service
             self.service = build("calendar", "v3", credentials=self.creds)
@@ -719,6 +853,152 @@ class GoogleCalendarService:
             logger.error(f"Unexpected error in freebusy_query: {e}")
             return {"calendars": {}, "unavailable": participant_emails}
 
+    @staticmethod
+    def get_availability_slots(
+        user_token: Dict[str, Any],
+        participant_emails: List[str],
+        start_date: datetime,
+        end_date: datetime,
+        duration_minutes: int = 30,
+        timezone_str: Optional[str] = None,
+        supabase_service = None,
+        user_email: Optional[str] = None,
+    ) -> Dict[str, Any]:
+        """Get availability slots for a user using their own token.
+        
+        This method creates a temporary service instance using the user's token
+        to query freebusy information. Used for multi-user scenarios where
+        each user has their own OAuth token.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            participant_emails: List of email addresses to check availability for
+            start_date: Start of time range to query
+            end_date: End of time range to query
+            duration_minutes: Minimum duration for free slots
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token (required if supabase_service is provided)
+            
+        Returns:
+            Dictionary with structure:
+            {
+                "calendars": {
+                    "email@example.com": {
+                        "busy": [
+                            {"start": "2025-11-20T10:00:00Z", "end": "2025-11-20T11:00:00Z"}
+                        ]
+                    }
+                },
+                "unavailable": ["email2@example.com"]
+            }
+        """
+        try:
+            # Create credentials from user token
+            # Scope for freebusy is calendar.freebusy
+            freebusy_scopes = ["https://www.googleapis.com/auth/calendar.freebusy"]
+            creds = Credentials.from_authorized_user_info(user_token, freebusy_scopes)
+            
+            # Refresh token if expired and save updated token back to database
+            token_was_refreshed = False
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    token_was_refreshed = True
+                    logger.info("Token refreshed successfully for calendar freebusy query")
+                    
+                    # Save refreshed token back to database if supabase_service is provided
+                    if supabase_service and user_email:
+                        try:
+                            # Convert credentials back to dict format for storage
+                            refreshed_token_dict = {
+                                "token": creds.token,
+                                "refresh_token": creds.refresh_token,
+                                "token_uri": creds.token_uri,
+                                "client_id": creds.client_id,
+                                "client_secret": creds.client_secret,
+                                "scopes": creds.scopes or user_token.get("scopes", []),
+                            }
+                            
+                            supabase_service.update_user_token(user_email, refreshed_token_dict)
+                            logger.info(f"Refreshed token saved to database for user {user_email}")
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to save refreshed token to database for {user_email}: {e}. "
+                                "Token was refreshed but not persisted."
+                            )
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return {"calendars": {}, "unavailable": participant_emails}
+            
+            # Build temporary service
+            service = build("calendar", "v3", credentials=creds)
+            
+            # Use provided timezone or default
+            tz = pytz.timezone(timezone_str) if timezone_str else pytz.timezone("America/Sao_Paulo")
+            
+            # Ensure datetimes are timezone-aware
+            if start_date.tzinfo is None:
+                start_date = tz.localize(start_date)
+            else:
+                start_date = start_date.astimezone(tz)
+                
+            if end_date.tzinfo is None:
+                end_date = tz.localize(end_date)
+            else:
+                end_date = end_date.astimezone(tz)
+            
+            # Format as RFC3339 for API
+            time_min = start_date.isoformat()
+            time_max = end_date.isoformat()
+            
+            # Prepare items (each email is a calendar to check)
+            items = [{"id": email} for email in participant_emails]
+            
+            # Call freebusy API
+            body = {
+                "timeMin": time_min,
+                "timeMax": time_max,
+                "items": items,
+            }
+            
+            freebusy_response = service.freebusy().query(body=body).execute()
+            
+            calendars_result = freebusy_response.get("calendars", {})
+            unavailable = []
+            
+            # Check which calendars were successfully queried
+            for email in participant_emails:
+                if email not in calendars_result:
+                    unavailable.append(email)
+                elif "errors" in calendars_result[email]:
+                    unavailable.append(email)
+                    logger.warning(
+                        f"Error accessing calendar for {email}: {calendars_result[email].get('errors')}"
+                    )
+            
+            result = {
+                "calendars": {
+                    email: calendars_result[email]
+                    for email in participant_emails
+                    if email not in unavailable
+                },
+                "unavailable": unavailable,
+            }
+            
+            logger.info(
+                f"Freebusy query completed for user: {len(participant_emails) - len(unavailable)}/{len(participant_emails)} calendars accessible"
+            )
+            
+            return result
+            
+        except HttpError as e:
+            logger.error(f"Error querying freebusy with user token: {e}")
+            return {"calendars": {}, "unavailable": participant_emails}
+        except Exception as e:
+            logger.error(f"Unexpected error in get_availability_slots: {e}")
+            return {"calendars": {}, "unavailable": participant_emails}
+
     def find_common_free_slots(
         self,
         participant_emails: List[str],
@@ -729,6 +1009,8 @@ class GoogleCalendarService:
         work_hours_start: int = 9,
         work_hours_end: int = 17,
         timezone_str: Optional[str] = None,
+        calendars_busy: Optional[Dict[str, Any]] = None,
+        unavailable: Optional[List[str]] = None,
     ) -> List[Dict[str, Any]]:
         """Find common free time slots for multiple participants.
 
@@ -742,6 +1024,10 @@ class GoogleCalendarService:
             work_hours_end: End of work day (24h format)
             timezone_str: Optional timezone string (e.g., "America/Sao_Paulo", "US/Pacific").
                         If None, uses self.timezone_str from settings
+            calendars_busy: Optional pre-computed busy periods from freebusy query.
+                          If provided, skips freebusy_query call (for multi-user scenarios).
+            unavailable: Optional list of participant emails whose calendars couldn't be accessed.
+                        Required if calendars_busy is provided.
 
         Returns:
             List of suggestions, each with:
@@ -752,20 +1038,25 @@ class GoogleCalendarService:
                 "unverified_participants": [emails]
             }
         """
-        if not self.service:
-            logger.warning("Google Calendar service not initialized")
-            return []
-
         # Use provided timezone or fallback to default
         tz = pytz.timezone(timezone_str) if timezone_str else self.timezone
 
-        # Query freebusy (pass timezone down)
-        freebusy_result = self.freebusy_query(
-            participant_emails, start_date, end_date, duration_minutes, timezone_str
-        )
-
-        calendars_busy = freebusy_result.get("calendars", {})
-        unavailable = freebusy_result.get("unavailable", [])
+        # Query freebusy if not provided (backward compatibility)
+        if calendars_busy is None:
+            if not self.service:
+                logger.warning("Google Calendar service not initialized")
+                return []
+            
+            # Query freebusy (pass timezone down)
+            freebusy_result = self.freebusy_query(
+                participant_emails, start_date, end_date, duration_minutes, timezone_str
+            )
+            calendars_busy = freebusy_result.get("calendars", {})
+            unavailable = freebusy_result.get("unavailable", [])
+        else:
+            # Use provided calendars_busy
+            if unavailable is None:
+                unavailable = []
 
         # If no calendars are accessible, return empty
         if not calendars_busy:

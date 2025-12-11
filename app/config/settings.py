@@ -18,10 +18,19 @@ class Settings:
 
     # Google Calendar
     GOOGLE_CREDENTIALS_PATH: str = os.environ.get("GOOGLE_CREDENTIALS_PATH", "")
+    GOOGLE_CREDENTIALS_JSON: str = os.environ.get("GOOGLE_CREDENTIALS_JSON", "")  # JSON string for cloud deployments
+    GOOGLE_TOKEN_PATH: str = os.environ.get("GOOGLE_TOKEN_PATH", "")
+    GOOGLE_TOKEN_JSON: str = os.environ.get("GOOGLE_TOKEN_JSON", "")  # JSON string for cloud deployments
     GOOGLE_CALENDAR_ID: str = os.environ.get("GOOGLE_CALENDAR_ID", "primary")
     GOOGLE_CALENDAR_TIMEZONE: str = os.environ.get(
         "GOOGLE_CALENDAR_TIMEZONE", "America/Sao_Paulo"
     )
+    
+    # OAuth for multi-user onboarding
+    GOOGLE_CLIENT_ID: str = os.environ.get("GOOGLE_CLIENT_ID", "")
+    GOOGLE_CLIENT_SECRET: str = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+    OAUTH_REDIRECT_URI: str = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
+    BASE_URL: str = os.environ.get("BASE_URL", "http://localhost:8000")
 
     # Gmail
     GMAIL_POLL_INTERVAL_SECONDS: int = os.environ.get("GMAIL_POLL_INTERVAL_SECONDS", 120)

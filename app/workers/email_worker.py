@@ -155,37 +155,63 @@ class EmailWorker:
                 self.gmail_service.mark_as_read(email_id)
                 return
 
-            # Security check: Only process if calendar owner is in thread
-            # This prevents unauthorized users from using Centi
-            owner_email = settings.GOOGLE_CALENDAR_ID
-            if owner_email:
-                # First check if owner is in current email
-                owner_in_email = self.gmail_service.is_owner_in_email(
-                    email_data, owner_email
-                )
-
-                # If not in current email, check entire thread
-                if not owner_in_email:
-                    thread_data_full = self.gmail_service.get_thread_by_id(thread_id)
-                    owner_in_thread = (
-                        self.gmail_service.is_owner_in_thread(
-                            thread_data_full, owner_email
-                        )
-                        if thread_data_full
-                        else False
-                    )
-
-                    if not owner_in_thread:
-                        logger.warning(
-                            f"Calendar owner {owner_email} not found in thread {thread_id}. "
-                            "Skipping for security - only calendar owner can use Centi."
-                        )
-                        self.gmail_service.mark_as_read(email_id)
-                        return
-                else:
+            # Multi-user: Identify which user is in the thread
+            # Extract all participant emails from the thread
+            participants = self.gmail_service.extract_participants(email_data)
+            all_participant_emails = set()
+            all_participant_emails.update(participants.get("from", []))
+            all_participant_emails.update(participants.get("to", []))
+            all_participant_emails.update(participants.get("cc", []))
+            
+            # Also check full thread to find all participants
+            thread_data_full = self.gmail_service.get_thread_by_id(thread_id)
+            if thread_data_full:
+                for message in thread_data_full.get("messages", []):
+                    msg_participants = self.gmail_service.extract_participants(message)
+                    all_participant_emails.update(msg_participants.get("from", []))
+                    all_participant_emails.update(msg_participants.get("to", []))
+                    all_participant_emails.update(msg_participants.get("cc", []))
+            
+            # Find which registered user is in the thread
+            owner_email = None
+            owner_user_data = None
+            
+            # Try to find a registered user in the thread
+            for email in all_participant_emails:
+                user_data = self.supabase_service.get_user_by_email(email.lower())
+                if user_data:
+                    owner_email = email.lower()
+                    owner_user_data = user_data
                     logger.info(
-                        f"Calendar owner {owner_email} verified in thread {thread_id}"
+                        f"Found registered user in thread {thread_id}: {owner_email}"
                     )
+                    break
+            
+            # Fallback to settings.GOOGLE_CALENDAR_ID for backward compatibility
+            if not owner_email:
+                owner_email = settings.GOOGLE_CALENDAR_ID
+                if owner_email:
+                    logger.info(
+                        f"Using fallback owner_email from settings: {owner_email}"
+                    )
+            
+            # Security check: Only process if a registered user is in thread
+            if not owner_email:
+                logger.warning(
+                    f"No registered user found in thread {thread_id}. Skipping."
+                )
+                self.gmail_service.mark_as_read(email_id)
+                return
+            
+            if not owner_user_data and owner_email:
+                # Try to fetch user data if we used fallback
+                owner_user_data = self.supabase_service.get_user_by_email(owner_email.lower())
+                if not owner_user_data:
+                    logger.warning(
+                        f"User {owner_email} not found in database. Skipping thread {thread_id}."
+                    )
+                    self.gmail_service.mark_as_read(email_id)
+                    return
 
             # Extract email body
             email_body = self._extract_email_body(email_data)
@@ -194,15 +220,20 @@ class EmailWorker:
                 self.gmail_service.mark_as_read(email_id)
                 return
 
+            # Get user token for calendar access
+            user_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
+            
             if thread_data:
                 # Existing thread - process as response
                 await self.handle_meeting_response(
-                    email_id, thread_id, email_data, email_body, thread_data
+                    email_id, thread_id, email_data, email_body, thread_data, 
+                    owner_email=owner_email, user_token=user_token
                 )
             else:
                 # New thread - check if it's a meeting request
                 await self.handle_new_meeting_request(
-                    email_id, thread_id, email_data, email_body
+                    email_id, thread_id, email_data, email_body, 
+                    owner_email=owner_email, user_token=user_token
                 )
 
             # Mark email as processed (read)
@@ -217,6 +248,8 @@ class EmailWorker:
         thread_id: str,
         email_data: Dict[str, Any],
         email_body: str,
+        owner_email: str,
+        user_token: Optional[Dict[str, Any]] = None,
     ):
         """Handle a new meeting request email.
 
@@ -253,9 +286,6 @@ class EmailWorker:
             # Get subject from email headers
             subject = self._extract_subject(email_data)
 
-            # Get owner email (from email address of Centi account)
-            owner_email = settings.GOOGLE_CALENDAR_ID
-
             # Add owner email to participants if not already included
             # This ensures the calendar owner is always included in availability checks
             if owner_email and owner_email.lower() not in [
@@ -264,12 +294,14 @@ class EmailWorker:
                 participant_emails.append(owner_email.lower())
                 logger.info(f"Added calendar owner {owner_email} to participants list")
 
-            # Generate time suggestions
+            # Generate time suggestions (use user token if available)
             suggestions = self.coordinator.generate_time_suggestions(
                 participant_emails=participant_emails,
                 duration_minutes=context.get("duration_minutes", 30),
                 days_ahead=context.get("days_ahead", 14),
                 timezone_str=context.get("timezone_str"),
+                user_token=user_token,
+                user_email=owner_email,
             )
 
             # Collect unverified participants
@@ -364,6 +396,8 @@ class EmailWorker:
         email_data: Dict[str, Any],
         email_body: str,
         thread_data: Dict[str, Any],
+        owner_email: str,
+        user_token: Optional[Dict[str, Any]] = None,
     ):
         """Handle a response to meeting suggestions.
 
@@ -375,11 +409,11 @@ class EmailWorker:
             thread_data: Thread data from database
         """
         try:
-            # Security check: Only the calendar owner can confirm meetings
-            owner_email = settings.GOOGLE_CALENDAR_ID
+            # owner_email is already identified in process_email() from registered users
+            # We just need to verify the sender is the same user
             if not owner_email:
                 logger.warning(
-                    "GOOGLE_CALENDAR_ID not configured. Cannot verify owner."
+                    "No owner email provided. Cannot verify sender."
                 )
                 return
 
@@ -398,10 +432,10 @@ class EmailWorker:
             if from_email and "<" in from_email:
                 from_email = from_email.split("<")[1].split(">")[0]
 
-            # Check if sender is the calendar owner
+            # Check if sender matches the identified owner (registered user)
             if from_email and from_email.lower() != owner_email.lower():
                 logger.info(
-                    f"Response from {from_email} ignored. Only calendar owner ({owner_email}) can confirm meetings."
+                    f"Response from {from_email} ignored. Only the registered user ({owner_email}) can confirm meetings."
                 )
                 # Mark as read and ignore
                 self.gmail_service.mark_as_read(email_id)
@@ -548,10 +582,12 @@ class EmailWorker:
                 participant_emails = thread_data.get("participant_emails", [])
                 duration_minutes = thread_data.get("duration_minutes", 30)
 
-                # Generate new suggestions
+                # Generate new suggestions (use user token if available)
                 suggestions = self.coordinator.generate_time_suggestions(
                     participant_emails=participant_emails,
                     duration_minutes=duration_minutes,
+                    user_token=user_token,
+                    user_email=owner_email,
                 )
 
                 # Update suggested times

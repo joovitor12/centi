@@ -415,3 +415,123 @@ class SupabaseService:
         except Exception as e:
             logger.error(f"Error fetching pending email threads: {e}")
             raise
+
+    # User management methods for multi-user OAuth support
+    
+    def create_user(
+        self,
+        user_email: str,
+        calendar_access_token: Dict[str, Any],
+        listen_address: str,
+    ) -> Dict[str, Any]:
+        """Create a new user with OAuth token.
+        
+        Args:
+            user_email: User's email address (from Google identity token)
+            calendar_access_token: OAuth token JSON (dict)
+            listen_address: Email address for the agent to monitor
+            
+        Returns:
+            Created user record
+        """
+        try:
+            data = {
+                "user_email": user_email.lower(),
+                "calendar_access_token": calendar_access_token,
+                "listen_address": listen_address.lower(),
+            }
+            response = self.client.table("users").insert(data).execute()
+            return response.data[0] if response.data else {}
+        except Exception as e:
+            logger.error(f"Error creating user {user_email}: {e}")
+            raise
+
+    def get_user_by_email(self, user_email: str) -> Optional[Dict[str, Any]]:
+        """Get user by email address.
+        
+        Args:
+            user_email: User's email address
+            
+        Returns:
+            User record if found, None otherwise
+        """
+        try:
+            response = (
+                self.client.table("users")
+                .select("*")
+                .eq("user_email", user_email.lower())
+                .execute()
+            )
+            return response.data[0] if response.data else None
+        except Exception as e:
+            logger.error(f"Error fetching user {user_email}: {e}")
+            raise
+
+    def update_user_token(
+        self, user_email: str, calendar_access_token: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        """Update user's calendar access token.
+        
+        Args:
+            user_email: User's email address
+            calendar_access_token: Updated OAuth token JSON (dict)
+            
+        Returns:
+            Updated user record
+        """
+        try:
+            from datetime import datetime
+            
+            update_data = {
+                "calendar_access_token": calendar_access_token,
+                "updated_at": datetime.now().isoformat(),
+            }
+            
+            response = (
+                self.client.table("users")
+                .update(update_data)
+                .eq("user_email", user_email.lower())
+                .execute()
+            )
+            return response.data[0] if response.data else {}
+        except Exception as e:
+            logger.error(f"Error updating user token {user_email}: {e}")
+            raise
+
+    def get_all_users(self) -> List[Dict[str, Any]]:
+        """Get all registered users.
+        
+        Returns:
+            List of all user records
+        """
+        try:
+            response = (
+                self.client.table("users")
+                .select("*")
+                .execute()
+            )
+            return response.data or []
+        except Exception as e:
+            logger.error(f"Error fetching all users: {e}")
+            raise
+
+    def get_user_by_listen_address(self, listen_address: str) -> Optional[Dict[str, Any]]:
+        """Get user by listen address (agent email).
+        
+        Args:
+            listen_address: Agent email address to monitor
+            
+        Returns:
+            User record if found, None otherwise
+        """
+        try:
+            response = (
+                self.client.table("users")
+                .select("*")
+                .eq("listen_address", listen_address.lower())
+                .execute()
+            )
+            return response.data[0] if response.data else None
+        except Exception as e:
+            logger.error(f"Error fetching user by listen_address {listen_address}: {e}")
+            raise

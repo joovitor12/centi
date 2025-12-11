@@ -12,5 +12,8 @@ wheels/
 
 # Google Calendar
 .credentials/
+token.json
+*.token.json
 
 scripts/
+docs/
