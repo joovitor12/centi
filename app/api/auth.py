@@ -65,6 +65,57 @@ async def logout(response: Response):
     return {"success": True, "message": "Logged out successfully"}
 
 
+@router.post("/api/auth/verify")
+async def verify_auth(email: str, request: Request, response: Response):
+    """Verify auth after OAuth callback and set cookie.
+    
+    This endpoint is called by the frontend after OAuth redirect
+    to set the session cookie on the backend domain.
+    
+    Args:
+        email: User email from OAuth callback
+        request: FastAPI request object
+        response: FastAPI response object
+        
+    Returns:
+        Success message
+    """
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required")
+    
+    # Verify user exists in database
+    user = supabase_service.get_user_by_email(email)
+    
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Set session cookie
+    import os
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    is_production = (
+        os.environ.get("ENVIRONMENT") == "production" or 
+        "onrender.com" in frontend_url
+    )
+    
+    response.set_cookie(
+        key="user_email",
+        value=email,
+        max_age=60 * 60 * 24 * 7,  # 7 days
+        httponly=False,  # Allow JS to read
+        secure=True,  # Always secure for cross-domain cookies
+        samesite="None",  # Required for cross-domain cookies
+        path="/",
+    )
+    
+    logger.info(f"Auth verified and cookie set for {email}")
+    
+    return {
+        "success": True,
+        "message": "Auth verified successfully",
+        "user_email": email,
+    }
+
+
 @router.get("/api/user/me")
 async def get_current_user(request: Request):
     """Get current authenticated user information.

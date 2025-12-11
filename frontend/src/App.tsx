@@ -13,41 +13,60 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
-        // Check if we just came from OAuth callback (check URL params or hash)
+        // Check if we just came from OAuth callback (check URL params)
         const urlParams = new URLSearchParams(window.location.search);
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const authSuccess = urlParams.get('auth_success');
+        const email = urlParams.get('email');
         
-        // Clear URL params/hash after reading (for security)
-        if (urlParams.toString() || hashParams.toString()) {
+        // If we have email from OAuth callback, store it and verify with backend
+        if (authSuccess === 'true' && email) {
+          // Clear URL params after reading (for security)
           window.history.replaceState({}, document.title, window.location.pathname);
-        }
-        
-        const status = await auth.checkAuth();
-        setAuthStatus(status);
-        
-        if (status.authenticated) {
-          const userData = await auth.getCurrentUser();
-          setUser(userData);
-        }
-      } catch (error) {
-        console.error('Auth check failed:', error);
-        // Retry after a short delay (cookie might need time to be set)
-        setTimeout(async () => {
+          
+          // Store email temporarily and verify with backend
+          // The backend will set the cookie on its domain
           try {
+            // Verify with backend - this will set the cookie on backend domain
+            const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+            await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(email)}`, {
+              method: 'POST',
+              credentials: 'include',
+              headers: {
+                'Content-Type': 'application/json',
+              },
+            });
+            
+            // Now check auth normally
+            const status = await auth.checkAuth();
+            setAuthStatus(status);
+            
+            if (status.authenticated) {
+              const userData = await auth.getCurrentUser();
+              setUser(userData);
+            }
+          } catch (verifyError) {
+            console.error('Verify failed:', verifyError);
+            // Fallback: try normal auth check
             const status = await auth.checkAuth();
             setAuthStatus(status);
             if (status.authenticated) {
               const userData = await auth.getCurrentUser();
               setUser(userData);
             }
-          } catch (retryError) {
-            console.error('Auth retry failed:', retryError);
-            setAuthStatus({ authenticated: false });
-          } finally {
-            setLoading(false);
           }
-        }, 500);
-        return; // Don't set loading to false yet, wait for retry
+        } else {
+          // Normal auth check
+          const status = await auth.checkAuth();
+          setAuthStatus(status);
+          
+          if (status.authenticated) {
+            const userData = await auth.getCurrentUser();
+            setUser(userData);
+          }
+        }
+      } catch (error) {
+        console.error('Auth check failed:', error);
+        setAuthStatus({ authenticated: false });
       } finally {
         setLoading(false);
       }
@@ -68,4 +87,5 @@ function App() {
 }
 
 export default App;
+
 

@@ -208,15 +208,19 @@ async def auth_google_callback(
 
         # Redirect to frontend after setting session cookie
         from fastapi.responses import RedirectResponse
+        import urllib.parse
 
         # Get frontend URL from settings
         frontend_url = settings.FRONTEND_URL
 
-        # Create redirect response
-        response = RedirectResponse(url=frontend_url, status_code=302)
+        # Pass user_email as query parameter so frontend can set it in localStorage/cookie
+        # This works around cross-domain cookie issues
+        frontend_url_with_params = f"{frontend_url}?auth_success=true&email={urllib.parse.quote(user_email)}"
 
-        # Set session cookie for frontend authentication
-        # In production, set secure=True, same_site='lax', http_only=False (so JS can access)
+        # Create redirect response
+        response = RedirectResponse(url=frontend_url_with_params, status_code=302)
+
+        # Also try to set cookie (may not work cross-domain, but doesn't hurt to try)
         import os
         # Check if running on Render (HTTPS) or local (HTTP)
         is_production = (
@@ -235,7 +239,7 @@ async def auth_google_callback(
             path="/",
         )
 
-        logger.info(f"OAuth successful for {user_email}, redirecting to {frontend_url}")
+        logger.info(f"OAuth successful for {user_email}, redirecting to {frontend_url_with_params}")
         return response
 
     except HTTPException:
