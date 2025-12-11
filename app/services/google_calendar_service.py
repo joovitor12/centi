@@ -854,6 +854,274 @@ class GoogleCalendarService:
             return {"calendars": {}, "unavailable": participant_emails}
 
     @staticmethod
+    def create_event_with_token(
+        user_token: Dict[str, Any],
+        description: str,
+        start_time: datetime,
+        end_time: Optional[datetime] = None,
+        summary: Optional[str] = None,
+        attendees: Optional[List[str]] = None,
+        timezone_str: Optional[str] = None,
+        supabase_service = None,
+        user_email: Optional[str] = None,
+    ) -> Optional[str]:
+        """Create a calendar event using a user's own token.
+        
+        This method creates a temporary service instance using the user's token
+        to create an event in their calendar. Used for multi-user scenarios where
+        each user has their own OAuth token.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            description: Event description (body text)
+            start_time: Event start time as datetime object
+            end_time: Event end time as datetime object. If None, defaults to start_time + 1 hour
+            summary: Event title/summary. If None, uses description
+            attendees: List of email addresses to invite as attendees
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token (required if supabase_service is provided)
+            
+        Returns:
+            Event ID if successful, None otherwise
+        """
+        try:
+            # Create credentials from user token
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+            
+            # Refresh token if expired and save updated token back to database
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    logger.info("Token refreshed successfully for calendar event creation")
+                    
+                    # Save refreshed token back to database if supabase_service is provided
+                    if supabase_service and user_email:
+                        try:
+                            refreshed_token_dict = {
+                                "token": creds.token,
+                                "refresh_token": creds.refresh_token,
+                                "token_uri": creds.token_uri,
+                                "client_id": creds.client_id,
+                                "client_secret": creds.client_secret,
+                                "scopes": creds.scopes or user_token.get("scopes", []),
+                            }
+                            
+                            supabase_service.update_user_token(user_email, refreshed_token_dict)
+                            logger.info(f"Refreshed token saved to database for user {user_email}")
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to save refreshed token to database for {user_email}: {e}. "
+                                "Token was refreshed but not persisted."
+                            )
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return None
+            
+            # Build temporary service
+            service = build("calendar", "v3", credentials=creds)
+            
+            # Use provided timezone or default
+            tz = pytz.timezone(timezone_str) if timezone_str else pytz.timezone("America/Sao_Paulo")
+            
+            # Default end_time to 1 hour after start_time if not provided
+            if end_time is None:
+                end_time = start_time + timedelta(hours=1)
+            
+            # Ensure datetimes are timezone-aware
+            if start_time.tzinfo is None:
+                start_time = tz.localize(start_time)
+            else:
+                start_time = start_time.astimezone(tz)
+                
+            if end_time.tzinfo is None:
+                end_time = tz.localize(end_time)
+            else:
+                end_time = end_time.astimezone(tz)
+            
+            # Format as RFC3339
+            start_time_str = start_time.isoformat()
+            end_time_str = end_time.isoformat()
+            
+            # Prepare event
+            event = {
+                "summary": summary or description,
+                "description": description,
+                "start": {
+                    "dateTime": start_time_str,
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                },
+                "end": {
+                    "dateTime": end_time_str,
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                },
+            }
+            
+            # Add attendees if provided
+            if attendees:
+                event["attendees"] = [{"email": email} for email in attendees]
+            
+            # Insert event into user's primary calendar
+            created_event = service.events().insert(calendarId="primary", body=event).execute()
+            
+            event_id = created_event.get("id")
+            logger.info(f"Created Google Calendar event {event_id} for user")
+            
+            return event_id
+            
+        except HttpError as e:
+            logger.error(f"Error creating Google Calendar event with user token: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error in create_event_with_token: {e}")
+            return None
+
+    @staticmethod
+    def update_event_with_token(
+        user_token: Dict[str, Any],
+        event_id: str,
+        description: Optional[str] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+        summary: Optional[str] = None,
+        timezone_str: Optional[str] = None,
+        supabase_service = None,
+        user_email: Optional[str] = None,
+    ) -> bool:
+        """Update a calendar event using a user's own token.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            event_id: Google Calendar event ID
+            description: New event description (optional)
+            start_time: New event start time (optional)
+            end_time: New event end time (optional)
+            summary: New event title/summary (optional)
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+            
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    if supabase_service and user_email:
+                        refreshed_token_dict = {
+                            "token": creds.token,
+                            "refresh_token": creds.refresh_token,
+                            "token_uri": creds.token_uri,
+                            "client_id": creds.client_id,
+                            "client_secret": creds.client_secret,
+                            "scopes": creds.scopes or user_token.get("scopes", []),
+                        }
+                        supabase_service.update_user_token(user_email, refreshed_token_dict)
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return False
+            
+            service = build("calendar", "v3", credentials=creds)
+            tz = pytz.timezone(timezone_str) if timezone_str else pytz.timezone("America/Sao_Paulo")
+            
+            # Get existing event
+            event = service.events().get(calendarId="primary", eventId=event_id).execute()
+            
+            # Update fields
+            if summary:
+                event["summary"] = summary
+            if description:
+                event["description"] = description
+            if start_time:
+                if start_time.tzinfo is None:
+                    start_time = tz.localize(start_time)
+                else:
+                    start_time = start_time.astimezone(tz)
+                event["start"] = {
+                    "dateTime": start_time.isoformat(),
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                }
+            if end_time:
+                if end_time.tzinfo is None:
+                    end_time = tz.localize(end_time)
+                else:
+                    end_time = end_time.astimezone(tz)
+                event["end"] = {
+                    "dateTime": end_time.isoformat(),
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                }
+            
+            service.events().update(calendarId="primary", eventId=event_id, body=event).execute()
+            logger.info(f"Updated Google Calendar event {event_id} for user")
+            return True
+            
+        except HttpError as e:
+            logger.error(f"Error updating Google Calendar event with user token: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error in update_event_with_token: {e}")
+            return False
+
+    @staticmethod
+    def delete_event_with_token(
+        user_token: Dict[str, Any],
+        event_id: str,
+        supabase_service = None,
+        user_email: Optional[str] = None,
+    ) -> bool:
+        """Delete a calendar event using a user's own token.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            event_id: Google Calendar event ID
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token
+            
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+            
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    if supabase_service and user_email:
+                        refreshed_token_dict = {
+                            "token": creds.token,
+                            "refresh_token": creds.refresh_token,
+                            "token_uri": creds.token_uri,
+                            "client_id": creds.client_id,
+                            "client_secret": creds.client_secret,
+                            "scopes": creds.scopes or user_token.get("scopes", []),
+                        }
+                        supabase_service.update_user_token(user_email, refreshed_token_dict)
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return False
+            
+            service = build("calendar", "v3", credentials=creds)
+            service.events().delete(calendarId="primary", eventId=event_id).execute()
+            logger.info(f"Deleted Google Calendar event {event_id} for user")
+            return True
+            
+        except HttpError as e:
+            if e.resp.status == 404:
+                logger.warning(f"Event {event_id} not found (may have been already deleted)")
+                return True
+            logger.error(f"Error deleting Google Calendar event with user token: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error in delete_event_with_token: {e}")
+            return False
+
+    @staticmethod
     def get_availability_slots(
         user_token: Dict[str, Any],
         participant_emails: List[str],

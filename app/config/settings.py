@@ -40,6 +40,10 @@ class Settings:
     LANGFUSE_SECRET_KEY: str = os.environ.get("LANGFUSE_SECRET_KEY", "")
     LANGFUSE_PUBLIC_KEY: str = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
     LANGFUSE_BASE_URL: str = os.environ.get("LANGFUSE_BASE_URL", "")
+    
+    # Parlant
+    PARLANT_SERVER_URL: str = os.environ.get("PARLANT_SERVER_URL", "http://localhost:8800")
+    PARLANT_AGENT_ID: str = os.environ.get("PARLANT_AGENT_ID", "")
 
     @classmethod
     def validate(cls) -> None:

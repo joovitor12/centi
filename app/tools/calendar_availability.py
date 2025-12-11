@@ -48,21 +48,16 @@ def create_calendar_availability_tools(
             ToolResult with availability information
         """
         try:
-            # Get customer from context
-            customer = p.Customer.from_context(context)
-            
-            if not customer:
-                return p.ToolResult(
-                    data="Error: Could not identify customer from context",
-                    control={"lifespan": "response"},
-                )
-            
-            # Get customer email
-            customer_email = customer.email if hasattr(customer, "email") else None
+            # Get customer email from context
+            customer_email = None
+            if hasattr(context, "customer") and context.customer:
+                customer_email = getattr(context.customer, "email", None)
+            elif hasattr(context, "session") and hasattr(context.session, "customer"):
+                customer_email = getattr(context.session.customer, "email", None)
             
             if not customer_email:
                 return p.ToolResult(
-                    data="Error: Customer email not available",
+                    data="Error: Could not identify customer email from context",
                     control={"lifespan": "response"},
                 )
             

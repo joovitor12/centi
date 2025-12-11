@@ -9,6 +9,66 @@ from app.services.supabase_service import SupabaseService
 logger = logging.getLogger(__name__)
 
 
+def get_customer_email_from_context(context: p.ToolContext, supabase_service: SupabaseService) -> Optional[str]:
+    """Helper function to extract customer email from Parlant ToolContext.
+    
+    Tries multiple methods to get the customer email from the context.
+    
+    Args:
+        context: Parlant ToolContext
+        supabase_service: SupabaseService instance for fallback lookup
+        
+    Returns:
+        Customer email if found, None otherwise
+    """
+    customer_email = None
+    
+    # Method 1: Use session_id to lookup user in database (most reliable)
+    if hasattr(context, "session_id"):
+        try:
+            session_id = str(context.session_id)
+            logger.info(f"Looking up user by session_id from context: {session_id}")
+            user = supabase_service.get_user_by_parlant_session(session_id)
+            if user:
+                customer_email = user.get("user_email")
+                logger.info(f"Found customer email via session_id lookup: {customer_email}")
+                return customer_email
+            else:
+                logger.warning(f"No user found in database for session_id: {session_id}")
+        except Exception as e:
+            logger.warning(f"Could not get email from session_id: {e}", exc_info=True)
+    
+    # Method 2: Use customer_id if available (might be customer ID, not email)
+    if not customer_email and hasattr(context, "customer_id"):
+        customer_id = context.customer_id
+        logger.info(f"Context has customer_id: {customer_id}")
+        # If customer_id looks like an email, use it
+        if isinstance(customer_id, str) and "@" in customer_id:
+            customer_email = customer_id
+            logger.info(f"Using customer_id as email (looks like email): {customer_email}")
+            return customer_email
+    
+    # Method 3: Fallback - try context.session if it exists
+    if not customer_email and hasattr(context, "session"):
+        if hasattr(context.session, "customer") and hasattr(context.session.customer, "email"):
+            customer_email = context.session.customer.email
+            logger.info(f"Found customer email via session.customer.email: {customer_email}")
+            return customer_email
+        elif hasattr(context.session, "customer_email"):
+            customer_email = context.session.customer_email
+            logger.info(f"Found customer email via session.customer_email: {customer_email}")
+            return customer_email
+    
+    if not customer_email:
+        logger.error(f"Could not find customer email. Context attributes: {[a for a in dir(context) if not a.startswith('_')]}")
+        if hasattr(context, "session_id"):
+            logger.error(f"session_id: {context.session_id}")
+        if hasattr(context, "customer_id"):
+            logger.error(f"customer_id: {context.customer_id}")
+    
+    return customer_email
+
+
 def create_appointment_tools(
     supabase_service: SupabaseService,
     google_calendar_service=None,
@@ -29,7 +89,19 @@ def create_appointment_tools(
         try:
             logger.info(f"Query received: {query}")
 
-            appointments = supabase_service.get_all_appointments()
+            # Get customer email from context
+            customer_email = get_customer_email_from_context(context, supabase_service)
+            
+            if not customer_email:
+                logger.error(f"Could not find customer email from context")
+                return p.ToolResult(
+                    data="Error: Could not identify customer email from context",
+                    control={"lifespan": "response"},
+                )
+            
+            logger.info(f"Finding appointments for user: {customer_email}")
+
+            appointments = supabase_service.get_all_appointments(user_email=customer_email)
 
             if not appointments:
                 return p.ToolResult(
@@ -92,6 +164,43 @@ def create_appointment_tools(
         try:
             logger.info(f"Adding appointment: description={description}, when={when}")
 
+            # Get customer email from context
+            customer_email = get_customer_email_from_context(context, supabase_service)
+            
+            if not customer_email:
+                # Extra debug info
+                logger.error(f"Could not find customer email from context")
+                logger.error(f"Context repr: {repr(context)[:500]}")
+                if hasattr(context, "session"):
+                    logger.error(f"Session repr: {repr(context.session)[:500]}")
+                return p.ToolResult(
+                    data="Error: Could not identify customer email from context",
+                    control={"lifespan": "response"},
+                )
+            
+            logger.info(f"Adding appointment for user: {customer_email}")
+
+            # Get user from database to retrieve token
+            user = supabase_service.get_user_by_email(customer_email)
+            if not user:
+                return p.ToolResult(
+                    data=f"Error: User {customer_email} not found. Please complete OAuth setup first.",
+                    control={"lifespan": "response"},
+                )
+            
+            # Get user's calendar token
+            calendar_token = user.get("calendar_access_token")
+            if not calendar_token:
+                return p.ToolResult(
+                    data=f"Error: Calendar access token not found for {customer_email}",
+                    control={"lifespan": "response"},
+                )
+            
+            # Parse token if it's a string
+            if isinstance(calendar_token, str):
+                import json
+                calendar_token = json.loads(calendar_token)
+
             try:
                 appointment_time = datetime.fromisoformat(when.replace("T", " "))
             except ValueError:
@@ -107,13 +216,26 @@ def create_appointment_tools(
                     control={"lifespan": "response"},
                 )
 
-            # Sync to Google Calendar first if service is available (to get event_id)
+            # Sync to Google Calendar using user's token (only if token has calendar scope)
             calendar_event_id = None
-            if google_calendar_service:
+            token_scopes = calendar_token.get("scopes", [])
+            # Check if token has calendar scope (not just freebusy)
+            # freebusy scope: https://www.googleapis.com/auth/calendar.freebusy (read-only)
+            # full calendar scope: https://www.googleapis.com/auth/calendar (read/write)
+            has_calendar_scope = any(
+                "calendar" in scope and "freebusy" not in scope
+                for scope in token_scopes
+            )
+            
+            if has_calendar_scope:
                 try:
-                    calendar_event_id = google_calendar_service.create_event(
+                    from app.services.google_calendar_service import GoogleCalendarService
+                    calendar_event_id = GoogleCalendarService.create_event_with_token(
+                        user_token=calendar_token,
                         description=description,
                         start_time=appointment_time,
+                        supabase_service=supabase_service,
+                        user_email=customer_email,
                     )
                     if calendar_event_id:
                         logger.info(
@@ -129,11 +251,17 @@ def create_appointment_tools(
                         f"Error syncing appointment to Google Calendar: {e}. "
                         "Appointment will be saved to database."
                     )
+            else:
+                logger.info(
+                    f"Token has only freebusy scope, skipping Google Calendar sync. "
+                    "Appointment will be saved to database only."
+                )
 
-            # Save to database (including google_calendar_event_id if available)
+            # Save to database (including google_calendar_event_id and user_email if available)
             appointment = supabase_service.create_appointment(
                 description=description,
                 time=appointment_time.isoformat(),
+                user_email=customer_email,
                 google_calendar_event_id=calendar_event_id,
             )
 
@@ -169,37 +297,71 @@ def create_appointment_tools(
         try:
             logger.info(f"Deleting appointment ID: {appointment_id}")
 
-            # First, verify the appointment exists
-            appointment = supabase_service.get_appointment_by_id(appointment_id)
+            # Get customer email from context
+            customer_email = get_customer_email_from_context(context, supabase_service)
+            
+            if not customer_email:
+                logger.error(f"Could not find customer email from context")
+                return p.ToolResult(
+                    data="Error: Could not identify customer email from context",
+                    control={"lifespan": "response"},
+                )
+            
+            logger.info(f"Deleting appointment for user: {customer_email}")
+
+            # First, verify the appointment exists and belongs to this user
+            appointment = supabase_service.get_appointment_by_id(appointment_id, user_email=customer_email)
 
             if not appointment:
-                logger.warning(f"Appointment ID {appointment_id} not found")
+                logger.warning(f"Appointment ID {appointment_id} not found for user {customer_email}")
                 return p.ToolResult(
                     data=f"No appointment found with ID {appointment_id}",
                     control={"lifespan": "response"},
                 )
 
-            # Delete from Google Calendar if event_id exists
+            # Delete from Google Calendar if event_id exists and token has calendar scope
             google_calendar_event_id = appointment.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    deleted = google_calendar_service.delete_event(
-                        google_calendar_event_id
-                    )
-                    if deleted:
-                        logger.info(
-                            f"Deleted Google Calendar event: {google_calendar_event_id}"
-                        )
+            if google_calendar_event_id:
+                user = supabase_service.get_user_by_email(customer_email)
+                calendar_token = None
+                if user:
+                    calendar_token = user.get("calendar_access_token")
+                    if isinstance(calendar_token, str):
+                        import json
+                        calendar_token = json.loads(calendar_token)
+                    
+                    # Check if token has calendar scope (not just freebusy)
+                    token_scopes = calendar_token.get("scopes", [])
+                    has_calendar_scope = any("calendar" in scope and "freebusy" not in scope for scope in token_scopes)
+                    
+                    if has_calendar_scope and calendar_token:
+                        try:
+                            from app.services.google_calendar_service import GoogleCalendarService
+                            deleted = GoogleCalendarService.delete_event_with_token(
+                                user_token=calendar_token,
+                                event_id=google_calendar_event_id,
+                                supabase_service=supabase_service,
+                                user_email=customer_email,
+                            )
+                            if deleted:
+                                logger.info(
+                                    f"Deleted Google Calendar event: {google_calendar_event_id}"
+                                )
+                            else:
+                                logger.warning(
+                                    f"Failed to delete Google Calendar event: {google_calendar_event_id}"
+                                )
+                        except Exception as e:
+                            # Log error but continue with database deletion
+                            logger.warning(
+                                f"Error deleting Google Calendar event: {e}. "
+                                "Proceeding with database deletion."
+                            )
                     else:
-                        logger.warning(
-                            f"Failed to delete Google Calendar event: {google_calendar_event_id}"
+                        logger.info(
+                            "Token has only freebusy scope, skipping Google Calendar deletion. "
+                            "Appointment will be deleted from database only."
                         )
-                except Exception as e:
-                    # Log error but continue with database deletion
-                    logger.warning(
-                        f"Error deleting Google Calendar event: {e}. "
-                        "Proceeding with database deletion."
-                    )
 
             # Delete the appointment from database
             success = supabase_service.delete_appointment(appointment_id)
@@ -248,11 +410,23 @@ def create_appointment_tools(
                 f"Editing appointment ID {appointment_id} with new_description={new_description}, new_when={new_when}"
             )
 
-            # First, verify the appointment exists
-            appointment = supabase_service.get_appointment_by_id(appointment_id)
+            # Get customer email from context
+            customer_email = get_customer_email_from_context(context, supabase_service)
+            
+            if not customer_email:
+                logger.error(f"Could not find customer email from context")
+                return p.ToolResult(
+                    data="Error: Could not identify customer email from context",
+                    control={"lifespan": "response"},
+                )
+            
+            logger.info(f"Editing appointment for user: {customer_email}")
+
+            # First, verify the appointment exists and belongs to this user
+            appointment = supabase_service.get_appointment_by_id(appointment_id, user_email=customer_email)
 
             if not appointment:
-                logger.warning(f"Appointment ID {appointment_id} not found")
+                logger.warning(f"Appointment ID {appointment_id} not found for user {customer_email}")
                 return p.ToolResult(
                     data=f"No appointment found with ID {appointment_id}",
                     control={"lifespan": "response"},
@@ -283,40 +457,62 @@ def create_appointment_tools(
                     data="No updates provided.", control={"lifespan": "response"}
                 )
 
-            # Update Google Calendar event if event_id exists
+            # Update Google Calendar event if event_id exists and token has calendar scope
             google_calendar_event_id = appointment.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    # Prepare update parameters for Google Calendar
-                    calendar_start_time = None
-                    calendar_end_time = None
+            if google_calendar_event_id:
+                user = supabase_service.get_user_by_email(customer_email)
+                calendar_token = None
+                if user:
+                    calendar_token = user.get("calendar_access_token")
+                    if isinstance(calendar_token, str):
+                        import json
+                        calendar_token = json.loads(calendar_token)
+                    
+                    # Check if token has calendar scope (not just freebusy)
+                    token_scopes = calendar_token.get("scopes", [])
+                    has_calendar_scope = any("calendar" in scope and "freebusy" not in scope for scope in token_scopes)
+                    
+                    if has_calendar_scope and calendar_token:
+                        try:
+                            # Prepare update parameters for Google Calendar
+                            calendar_start_time = None
+                            calendar_end_time = None
 
-                    if update_time:
-                        calendar_start_time = datetime.fromisoformat(
-                            update_time.replace("T", " ")
-                        )
-                        calendar_end_time = calendar_start_time + timedelta(hours=1)
+                            if update_time:
+                                calendar_start_time = datetime.fromisoformat(
+                                    update_time.replace("T", " ")
+                                )
+                                calendar_end_time = calendar_start_time + timedelta(hours=1)
 
-                    updated = google_calendar_service.update_event(
-                        event_id=google_calendar_event_id,
-                        description=update_description,
-                        start_time=calendar_start_time,
-                        end_time=calendar_end_time,
-                    )
-                    if updated:
-                        logger.info(
-                            f"Updated Google Calendar event: {google_calendar_event_id}"
-                        )
+                            from app.services.google_calendar_service import GoogleCalendarService
+                            updated = GoogleCalendarService.update_event_with_token(
+                                user_token=calendar_token,
+                                event_id=google_calendar_event_id,
+                                description=update_description,
+                                start_time=calendar_start_time,
+                                end_time=calendar_end_time,
+                                supabase_service=supabase_service,
+                                user_email=customer_email,
+                            )
+                            if updated:
+                                logger.info(
+                                    f"Updated Google Calendar event: {google_calendar_event_id}"
+                                )
+                            else:
+                                logger.warning(
+                                    f"Failed to update Google Calendar event: {google_calendar_event_id}"
+                                )
+                        except Exception as e:
+                            # Log error but continue with database update
+                            logger.warning(
+                                f"Error updating Google Calendar event: {e}. "
+                                "Proceeding with database update."
+                            )
                     else:
-                        logger.warning(
-                            f"Failed to update Google Calendar event: {google_calendar_event_id}"
+                        logger.info(
+                            "Token has only freebusy scope, skipping Google Calendar update. "
+                            "Appointment will be updated in database only."
                         )
-                except Exception as e:
-                    # Log error but continue with database update
-                    logger.warning(
-                        f"Error updating Google Calendar event: {e}. "
-                        "Proceeding with database update."
-                    )
 
             # Update the appointment in database
             updated_at = datetime.now().isoformat()

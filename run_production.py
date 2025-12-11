@@ -4,7 +4,8 @@ import asyncio
 import logging
 import os
 import threading
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 import parlant.sdk as p
 from supabase import create_client, Client
@@ -18,13 +19,65 @@ from app.tools.recurring_appointments import create_recurring_appointment_tools
 from app.agent.guidelines import setup_guidelines
 from app.workers.email_worker import EmailWorker
 from app.api.oauth import router as oauth_router
+from app.api.auth import router as auth_router
+from app.api.session import router as session_router
+from fastapi.staticfiles import StaticFiles
+from fastapi.responses import FileResponse
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 # Create FastAPI app for OAuth endpoints
-api_app = FastAPI(title="Centi OAuth API", version="1.0.0")
+api_app = FastAPI(title="Centi API", version="1.0.0")
+
+# Configure CORS to allow frontend requests
+api_app.add_middleware(
+    CORSMiddleware,
+    allow_origins=[
+        "http://localhost:3000",  # React dev server
+        "http://localhost:8000",  # Same origin as API
+        os.environ.get("FRONTEND_URL", "http://localhost:3000"),
+    ],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 api_app.include_router(oauth_router)
+api_app.include_router(auth_router)
+api_app.include_router(session_router)
+
+# Serve static files from frontend/build directory (if it exists)
+frontend_build_path = os.path.join(os.path.dirname(__file__), "frontend", "build")
+if os.path.exists(frontend_build_path):
+    api_app.mount(
+        "/static",
+        StaticFiles(directory=os.path.join(frontend_build_path, "static")),
+        name="static",
+    )
+
+    @api_app.get("/{full_path:path}")
+    async def serve_frontend(full_path: str):
+        """Serve React frontend for all non-API routes."""
+        # Don't serve API routes
+        if full_path.startswith(("api/", "auth/", "docs", "openapi.json", "redoc")):
+            raise HTTPException(status_code=404, detail="Not found")
+
+        # If the path exists as a file, serve it
+        file_path = os.path.join(frontend_build_path, full_path)
+        if os.path.exists(file_path) and os.path.isfile(file_path):
+            return FileResponse(file_path)
+
+        # Otherwise serve index.html for React routes
+        index_path = os.path.join(frontend_build_path, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+        else:
+            raise HTTPException(status_code=404, detail="Frontend not built")
+else:
+    logger.warning(
+        f"Frontend build directory not found at {frontend_build_path}. Frontend will not be served."
+    )
 
 
 @api_app.get("/")
@@ -105,6 +158,54 @@ async def run_parlant_app():
                 name="Centi",
                 description="You are a professional assistant like Jarvis from Ironman.",
             )
+
+            # Get and log agent ID
+            # First check if it's already in settings (.env)
+            agent_id = settings.PARLANT_AGENT_ID
+            
+            if agent_id:
+                logger.info(f"Using agent ID from settings: {agent_id}")
+            else:
+                # Try to get from agent object
+                agent_id = getattr(agent, "id", None) or getattr(agent, "_id", None)
+                if agent_id:
+                    logger.info(f"Found agent ID from agent object: {agent_id}")
+                    settings.PARLANT_AGENT_ID = str(agent_id)
+                else:
+                    # Try to get from agent attributes (for debugging)
+                    agent_attrs = dir(agent)
+                    id_attrs = [a for a in agent_attrs if 'id' in a.lower()]
+                    logger.debug(f"Agent attributes with 'id': {id_attrs}")
+                    
+                    # Try to get agent ID via API
+                    try:
+                        import httpx
+
+                        async with httpx.AsyncClient() as client:
+                            response = await client.get(
+                                f"{settings.PARLANT_SERVER_URL}/agents",
+                                timeout=5.0,
+                            )
+                            if response.status_code == 200:
+                                agents = response.json()
+                                if isinstance(agents, list) and len(agents) > 0:
+                                    agent_id = agents[0].get("id") or agents[0].get(
+                                        "agent_id"
+                                    )
+                                    if agent_id:
+                                        logger.info(f"Found agent ID from API: {agent_id}")
+                                        settings.PARLANT_AGENT_ID = str(agent_id)
+                    except Exception as e:
+                        logger.warning(f"Could not fetch agent ID from API: {e}")
+            
+            # Final verification
+            if not settings.PARLANT_AGENT_ID:
+                logger.error(
+                    "⚠️  Agent ID not found! Please set PARLANT_AGENT_ID in .env file. "
+                    "Example: PARLANT_AGENT_ID=0DLeR4E7PM"
+                )
+            else:
+                logger.info(f"✅ Agent ID configured: {settings.PARLANT_AGENT_ID}")
 
             # Setup guidelines (tools are auto-discovered through guidelines)
             await setup_guidelines(
