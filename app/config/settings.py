@@ -31,6 +31,7 @@ class Settings:
     GOOGLE_CLIENT_SECRET: str = os.environ.get("GOOGLE_CLIENT_SECRET", "")
     OAUTH_REDIRECT_URI: str = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
     BASE_URL: str = os.environ.get("BASE_URL", "http://localhost:8000")
+    FRONTEND_URL: str = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 
     # Gmail
     GMAIL_POLL_INTERVAL_SECONDS: int = os.environ.get("GMAIL_POLL_INTERVAL_SECONDS", 120)

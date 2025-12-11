@@ -208,17 +208,22 @@ async def auth_google_callback(
 
         # Redirect to frontend after setting session cookie
         from fastapi.responses import RedirectResponse
-        import os
 
-        # Get frontend URL from environment or default to localhost:3000
-        frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+        # Get frontend URL from settings
+        frontend_url = settings.FRONTEND_URL
 
         # Create redirect response
         response = RedirectResponse(url=frontend_url, status_code=302)
 
         # Set session cookie for frontend authentication
         # In production, set secure=True, same_site='lax', http_only=False (so JS can access)
-        is_production = os.environ.get("ENVIRONMENT") == "production"
+        import os
+        # Check if running on Render (HTTPS) or local (HTTP)
+        is_production = (
+            os.environ.get("ENVIRONMENT") == "production" or 
+            "onrender.com" in frontend_url or
+            "onrender.com" in settings.BASE_URL
+        )
 
         response.set_cookie(
             key="user_email",

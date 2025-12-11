@@ -37,6 +37,7 @@ api_app.add_middleware(
         "http://localhost:3000",  # React dev server
         "http://localhost:8000",  # Same origin as API
         os.environ.get("FRONTEND_URL", "http://localhost:3000"),
+        "https://centi-frontend.onrender.com",  # Render static site
     ],
     allow_credentials=True,
     allow_methods=["*"],
