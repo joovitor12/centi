@@ -226,7 +226,7 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
             Welcome to Centi!
           </h2>
           <p style={{ margin: '0 0 1.5rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-            Centi helps you schedule meetings via email. To get started, check out click the chat button in the bottom right corner if you have questions.
+            Centi helps you schedule meetings via email. To get started, check out the Email Interactor Guide below or click the chat button in the bottom right corner if you have questions.
           </p>
           <button
             onClick={() => setShowGuide(true)}
