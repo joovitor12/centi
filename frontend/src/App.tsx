@@ -13,6 +13,15 @@ function App() {
   useEffect(() => {
     const checkAuth = async () => {
       try {
+        // Check if we just came from OAuth callback (check URL params or hash)
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        
+        // Clear URL params/hash after reading (for security)
+        if (urlParams.toString() || hashParams.toString()) {
+          window.history.replaceState({}, document.title, window.location.pathname);
+        }
+        
         const status = await auth.checkAuth();
         setAuthStatus(status);
         
@@ -22,7 +31,23 @@ function App() {
         }
       } catch (error) {
         console.error('Auth check failed:', error);
-        setAuthStatus({ authenticated: false });
+        // Retry after a short delay (cookie might need time to be set)
+        setTimeout(async () => {
+          try {
+            const status = await auth.checkAuth();
+            setAuthStatus(status);
+            if (status.authenticated) {
+              const userData = await auth.getCurrentUser();
+              setUser(userData);
+            }
+          } catch (retryError) {
+            console.error('Auth retry failed:', retryError);
+            setAuthStatus({ authenticated: false });
+          } finally {
+            setLoading(false);
+          }
+        }, 500);
+        return; // Don't set loading to false yet, wait for retry
       } finally {
         setLoading(false);
       }

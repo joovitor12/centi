@@ -230,8 +230,8 @@ async def auth_google_callback(
             value=user_email,
             max_age=60 * 60 * 24 * 7,  # 7 days
             httponly=False,  # Allow JS to read (needed for frontend auth check)
-            secure=is_production,  # Only send over HTTPS in production
-            samesite="lax",
+            secure=True,  # Always secure for cross-domain cookies
+            samesite="None",  # Required for cross-domain cookies (must be None with Secure)
             path="/",
         )
 
