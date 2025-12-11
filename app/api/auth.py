@@ -53,14 +53,30 @@ async def check_auth(request: Request):
 
 
 @router.post("/api/auth/logout")
-async def logout(response: Response):
+async def logout(request: Request, response: Response):
     """Logout user by clearing session cookie.
     
     Returns:
         Success message
     """
-    # Clear session cookie
-    response.delete_cookie("user_email", path="/")
+    import os
+    # Clear session cookie with same attributes used when setting it
+    # Must match: secure=True, samesite="None" for cross-domain cookies
+    frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
+    is_production = (
+        os.environ.get("ENVIRONMENT") == "production" or 
+        "onrender.com" in frontend_url
+    )
+    
+    # Delete cookie with same attributes as when it was set
+    response.delete_cookie(
+        key="user_email",
+        path="/",
+        secure=True,  # Must match the secure flag used when setting
+        samesite="None",  # Must match the samesite used when setting
+    )
+    
+    logger.info("User logged out, cookie cleared")
     
     return {"success": True, "message": "Logged out successfully"}
 

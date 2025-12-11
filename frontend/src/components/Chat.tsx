@@ -161,8 +161,27 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
           <ThemeToggle />
           <button
             onClick={async () => {
-              await auth.logout();
-              window.location.reload();
+              try {
+                await auth.logout();
+                // Clear any localStorage items related to auth
+                // Clear all localStorage keys that start with 'centi_'
+                Object.keys(localStorage).forEach(key => {
+                  if (key.startsWith('centi_')) {
+                    localStorage.removeItem(key);
+                  }
+                });
+                // Force reload to clear any cached state
+                window.location.href = '/';
+              } catch (error) {
+                console.error('Logout error:', error);
+                // Even if logout fails, try to clear local storage and reload
+                Object.keys(localStorage).forEach(key => {
+                  if (key.startsWith('centi_')) {
+                    localStorage.removeItem(key);
+                  }
+                });
+                window.location.href = '/';
+              }
             }}
             style={{
               padding: '0.5rem 1rem',
