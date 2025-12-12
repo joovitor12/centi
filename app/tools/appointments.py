@@ -5,6 +5,7 @@ from datetime import datetime, timedelta
 from typing import Optional
 import parlant.sdk as p
 from app.services.supabase_service import SupabaseService
+from app.services.langfuse_service import track_parlant_tool
 
 logger = logging.getLogger(__name__)
 
@@ -84,6 +85,7 @@ def create_appointment_tools(
     """
 
     @p.tool
+    @track_parlant_tool
     async def find_appointments(context: p.ToolContext, query: str) -> p.ToolResult:
         """Find appointments based on query. Can search by description or time period."""
         try:
@@ -152,6 +154,7 @@ def create_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def add_appointment(
         context: p.ToolContext, description: str, when: str
     ) -> p.ToolResult:
@@ -282,6 +285,7 @@ def create_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def delete_appointment(
         context: p.ToolContext,
         appointment_id: int,
@@ -388,6 +392,7 @@ def create_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def edit_appointment(
         context: p.ToolContext,
         appointment_id: int,

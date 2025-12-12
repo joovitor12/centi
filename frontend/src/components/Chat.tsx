@@ -1,10 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback, useRef } from 'react';
 import ParlantChatbox from 'parlant-chat-react';
 import { auth } from '../services/auth';
 import { Session } from '../types';
 import { Loading } from './Loading';
 import { EmailInteractorGuide } from './EmailInteractorGuide';
 import { ThemeToggle } from './ThemeToggle';
+import { AppointmentsList, AppointmentsListRef } from './AppointmentsList';
+import { PeriodicAppointmentsRefresh } from './PeriodicAppointmentsRefresh';
 
 interface ChatProps {
   userEmail: string;
@@ -14,11 +16,27 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const appointmentsListRef = useRef<AppointmentsListRef>(null);
   const [showGuide, setShowGuide] = useState(() => {
     // Show guide if user hasn't seen it before (stored in localStorage)
     const hasSeenGuide = localStorage.getItem('centi_has_seen_email_guide');
     return !hasSeenGuide;
   });
+
+  // Stable callback for appointment changes - MUST be before any early returns
+  const handleAppointmentChange = useCallback(async () => {
+    console.log('handleAppointmentChange called, refreshing appointments list...');
+    if (appointmentsListRef.current) {
+      try {
+        await appointmentsListRef.current.refresh();
+        console.log('Appointments list refreshed successfully');
+      } catch (error) {
+        console.error('Error refreshing appointments list:', error);
+      }
+    } else {
+      console.warn('appointmentsListRef.current is null');
+    }
+  }, []);
   useEffect(() => {
     const loadSession = async () => {
       try {
@@ -208,48 +226,64 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
       <div style={{
         flex: 1,
         display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        justifyContent: 'center',
-        padding: '2rem',
-        textAlign: 'center',
+        overflow: 'auto',
       }}>
+        {/* Welcome Section */}
         <div style={{
-          maxWidth: '600px',
-          backgroundColor: 'var(--bg-primary)',
-          padding: '3rem',
-          borderRadius: '12px',
-          boxShadow: `0 4px 6px var(--shadow)`,
+          flex: '0 0 400px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: '2rem',
+          textAlign: 'center',
+          borderRight: '1px solid var(--border-color)',
         }}>
-          <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📧</div>
-          <h2 style={{ margin: '0 0 1rem', color: 'var(--text-primary)', fontSize: '1.8rem' }}>
-            Welcome to Centi!
-          </h2>
-          <p style={{ margin: '0 0 1.5rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
-            Centi helps you schedule meetings via email. To get started, check out the Email Interactor Guide below or click the chat button in the bottom right corner if you have questions.
-          </p>
-          <button
-            onClick={() => setShowGuide(true)}
-            style={{
-              padding: '0.75rem 1.5rem',
-              backgroundColor: 'var(--primary-color)',
-              color: 'white',
-              border: 'none',
-              borderRadius: '6px',
-              cursor: 'pointer',
-              fontSize: '1rem',
-              fontWeight: '500',
-              transition: 'background-color 0.2s',
-            }}
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'var(--primary-color)';
-            }}
-          >
-            📖 View Email Interactor Guide
-          </button>
+          <div style={{
+            maxWidth: '600px',
+            backgroundColor: 'var(--bg-primary)',
+            padding: '3rem',
+            borderRadius: '12px',
+            boxShadow: `0 4px 6px var(--shadow)`,
+          }}>
+            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📧</div>
+            <h2 style={{ margin: '0 0 1rem', color: 'var(--text-primary)', fontSize: '1.8rem' }}>
+              Welcome to Centi!
+            </h2>
+            <p style={{ margin: '0 0 1.5rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
+              Centi helps you schedule meetings via email. To get started, check out the Email Interactor Guide below or click the chat button in the bottom right corner if you have questions.
+            </p>
+            <button
+              onClick={() => setShowGuide(true)}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: 'var(--primary-color)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: '1rem',
+                fontWeight: '500',
+                transition: 'background-color 0.2s',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary-color)';
+              }}
+            >
+              📖 View Email Interactor Guide
+            </button>
+          </div>
+        </div>
+
+        {/* Appointments List */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+        }}>
+          <AppointmentsList ref={appointmentsListRef} />
         </div>
       </div>
 
@@ -301,6 +335,11 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
           popupButton: 'parlant-chat-popup-button-hidden',
         }}
       />
+      {session && (
+        <PeriodicAppointmentsRefresh 
+          onRefresh={handleAppointmentChange} 
+        />
+      )}
     </div>
   );
 };

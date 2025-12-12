@@ -9,6 +9,7 @@ from app.config.settings import settings
 from app.services.supabase_service import SupabaseService
 from app.services.google_calendar_service import GoogleCalendarService
 from app.services.gmail_service import GmailService
+from app.services.langfuse_service import get_langfuse_client
 from app.tools.appointments import create_appointment_tools
 from app.tools.recurring_appointments import create_recurring_appointment_tools
 from app.agent.guidelines import setup_guidelines
@@ -22,6 +23,13 @@ async def main():
     """Main application function."""
     # Validate settings
     settings.validate()
+
+    # Initialize Langfuse client for tracking
+    langfuse_client = get_langfuse_client()
+    if langfuse_client:
+        logger.info("Langfuse tracking enabled")
+    else:
+        logger.info("Langfuse tracking disabled (credentials not configured)")
 
     # Initialize services
     supabase_service = SupabaseService()

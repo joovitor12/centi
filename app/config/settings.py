@@ -59,6 +59,14 @@ class Settings:
             raise ValueError(
                 f"Missing required environment variables: {', '.join(missing)}"
             )
+        
+        # Langfuse is optional - warn if not configured but don't fail
+        if not cls.LANGFUSE_SECRET_KEY or not cls.LANGFUSE_PUBLIC_KEY:
+            import logging
+            logging.getLogger(__name__).warning(
+                "Langfuse credentials not configured. Tracking will be disabled. "
+                "Set LANGFUSE_SECRET_KEY and LANGFUSE_PUBLIC_KEY to enable tracking."
+            )
 
 
 settings = Settings()

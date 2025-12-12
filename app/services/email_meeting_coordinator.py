@@ -6,7 +6,8 @@ from datetime import datetime, timedelta
 from typing import Optional, List, Dict, Any
 import pytz
 from pydantic import BaseModel, Field
-from openai import AsyncOpenAI
+from langfuse import observe
+from langfuse.openai import AsyncOpenAI
 
 from app.config.settings import settings
 from app.services.gmail_service import GmailService
@@ -100,9 +101,11 @@ class EmailMeetingCoordinator:
         self.centi_email = settings.CENTI_EMAIL_ADDRESS.lower()
         self.timezone = pytz.timezone(settings.GOOGLE_CALENDAR_TIMEZONE)
 
-        # Initialize OpenAI client
+        # Initialize OpenAI client with Langfuse tracking
+        # Use langfuse.openai wrapper for automatic tracking
         self.openai_client = AsyncOpenAI(api_key=settings.OPENAI_API_KEY)
 
+    @observe(name="detect_meeting_request", as_type="generation")
     async def detect_meeting_request(self, email_body: str) -> bool:
         """Detect if email contains a meeting scheduling request using OpenAI.
 
@@ -149,6 +152,7 @@ class EmailMeetingCoordinator:
                 or "centi" in email_body.lower()
             )
 
+    @observe(name="extract_meeting_context", as_type="generation")
     async def extract_meeting_context(self, email_body: str) -> Dict[str, Any]:
         """Extract meeting context from email body using OpenAI.
 
@@ -234,6 +238,7 @@ class EmailMeetingCoordinator:
 
         return [email.lower() for email in all_participants if email]
 
+    @observe(name="generate_time_suggestions")
     def generate_time_suggestions(
         self,
         participant_emails: List[str],
@@ -452,6 +457,7 @@ class EmailMeetingCoordinator:
 
         return "\n".join(body_parts)
 
+    @observe(name="process_meeting_response", as_type="generation")
     async def process_meeting_response(
         self, email_body: str, thread_data: Dict[str, Any]
     ) -> Dict[str, Any]:
@@ -533,6 +539,7 @@ class EmailMeetingCoordinator:
                 "cancelled": False,
             }
 
+    @observe(name="confirm_meeting")
     def confirm_meeting(
         self,
         thread_id: str,

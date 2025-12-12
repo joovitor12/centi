@@ -21,6 +21,7 @@ from app.workers.email_worker import EmailWorker
 from app.api.oauth import router as oauth_router
 from app.api.auth import router as auth_router
 from app.api.session import router as session_router
+from app.api.appointments import router as appointments_router
 from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 
@@ -47,6 +48,7 @@ api_app.add_middleware(
 api_app.include_router(oauth_router)
 api_app.include_router(auth_router)
 api_app.include_router(session_router)
+api_app.include_router(appointments_router)
 
 # Serve static files from frontend/build directory (if it exists)
 frontend_build_path = os.path.join(os.path.dirname(__file__), "frontend", "build")

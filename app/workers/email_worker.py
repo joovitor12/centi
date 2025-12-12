@@ -6,6 +6,7 @@ import base64
 from datetime import datetime
 from typing import Optional, Dict, Any
 from datetime import datetime as dt
+from langfuse import observe, propagate_attributes
 
 from app.config.settings import settings
 from app.services.gmail_service import GmailService
@@ -90,6 +91,7 @@ class EmailWorker:
         except Exception as e:
             logger.error(f"Error fetching emails: {e}", exc_info=True)
 
+    @observe(name="process_email")
     async def process_email(self, email_id: str):
         """Process a single email.
 
@@ -223,18 +225,29 @@ class EmailWorker:
             # Get user token for calendar access
             user_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
             
-            if thread_data:
-                # Existing thread - process as response
-                await self.handle_meeting_response(
-                    email_id, thread_id, email_data, email_body, thread_data, 
-                    owner_email=owner_email, user_token=user_token
-                )
-            else:
-                # New thread - check if it's a meeting request
-                await self.handle_new_meeting_request(
-                    email_id, thread_id, email_data, email_body, 
-                    owner_email=owner_email, user_token=user_token
-                )
+            # Use thread_id as session_id for Langfuse tracking
+            # This groups all operations related to this email thread
+            with propagate_attributes(
+                session_id=f"email_thread_{thread_id}",
+                user_id=owner_email if owner_email else None,
+                metadata={
+                    "email_id": email_id,
+                    "thread_id": thread_id,
+                    "source": "email_worker",
+                },
+            ):
+                if thread_data:
+                    # Existing thread - process as response
+                    await self.handle_meeting_response(
+                        email_id, thread_id, email_data, email_body, thread_data, 
+                        owner_email=owner_email, user_token=user_token
+                    )
+                else:
+                    # New thread - check if it's a meeting request
+                    await self.handle_new_meeting_request(
+                        email_id, thread_id, email_data, email_body, 
+                        owner_email=owner_email, user_token=user_token
+                    )
 
             # Mark email as processed (read)
             self.gmail_service.mark_as_read(email_id)
@@ -242,6 +255,7 @@ class EmailWorker:
         except Exception as e:
             logger.error(f"Error processing email {email_id}: {e}", exc_info=True)
 
+    @observe(name="handle_new_meeting_request")
     async def handle_new_meeting_request(
         self,
         email_id: str,
@@ -389,6 +403,7 @@ class EmailWorker:
         except Exception as e:
             logger.error(f"Error handling new meeting request: {e}", exc_info=True)
 
+    @observe(name="handle_meeting_response")
     async def handle_meeting_response(
         self,
         email_id: str,

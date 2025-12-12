@@ -6,6 +6,7 @@ from typing import Optional
 import parlant.sdk as p
 from app.services.supabase_service import SupabaseService
 from app.services.google_calendar_service import GoogleCalendarService
+from app.services.langfuse_service import track_parlant_tool
 
 logger = logging.getLogger(__name__)
 
@@ -23,6 +24,7 @@ def create_calendar_availability_tools(
     """
 
     @p.tool
+    @track_parlant_tool
     async def get_availability_slots(
         context: p.ToolContext,
         start_date: datetime,
