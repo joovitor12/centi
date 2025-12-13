@@ -351,6 +351,9 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
         }}
         classNames={{
           popupButton: 'parlant-chat-popup-button-hidden',
+          chatboxWrapper: 'parlant-chatbox-wrapper-responsive',
+          chatbox: 'parlant-chatbox-responsive',
+          messagesArea: 'parlant-messages-area-responsive',
         }}
       />
       {session && (
