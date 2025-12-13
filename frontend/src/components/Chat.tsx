@@ -319,10 +319,10 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
               onClick={toggleChatOpen}
               style={{
                 position: 'fixed',
-                bottom: '20px',
-                right: '20px',
-                width: '60px',
-                height: '60px',
+                bottom: isMobile ? '16px' : '20px',
+                right: isMobile ? '16px' : '20px',
+                width: isMobile ? '56px' : '60px',
+                height: isMobile ? '56px' : '60px',
                 borderRadius: '50%',
                 backgroundColor: 'var(--primary-color)',
                 display: 'flex',
@@ -345,7 +345,7 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
                 e.currentTarget.style.backgroundColor = 'var(--primary-color)';
               }}
             >
-              <span style={{ fontSize: '1.5rem' }}>💬</span>
+              <span style={{ fontSize: isMobile ? '1.3rem' : '1.5rem' }}>💬</span>
             </button>
           ),
         }}
