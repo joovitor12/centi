@@ -20,6 +20,11 @@ function App() {
         
         // If we have email from OAuth callback, store it and verify with backend
         if (authSuccess === 'true' && email) {
+          console.log('OAuth callback detected, email:', email);
+          
+          // Store email in sessionStorage as backup (for mobile Safari issues)
+          sessionStorage.setItem('centi_oauth_email', email);
+          
           // Clear URL params after reading (for security)
           window.history.replaceState({}, document.title, window.location.pathname);
           
@@ -28,7 +33,8 @@ function App() {
           try {
             // Verify with backend - this will set the cookie on backend domain
             const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-            await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(email)}`, {
+            console.log('Verifying auth with backend...');
+            const verifyResponse = await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(email)}`, {
               method: 'POST',
               credentials: 'include',
               headers: {
@@ -36,13 +42,41 @@ function App() {
               },
             });
             
+            if (!verifyResponse.ok) {
+              const errorText = await verifyResponse.text();
+              console.error('Verify response not OK:', verifyResponse.status, errorText);
+            } else {
+              console.log('Verify successful');
+            }
+            
+            // Wait a bit for cookie to be set (especially important on mobile)
+            await new Promise(resolve => setTimeout(resolve, 500));
+            
             // Now check auth normally
+            console.log('Checking auth...');
             const status = await auth.checkAuth();
+            console.log('Auth status:', status);
             setAuthStatus(status);
             
             if (status.authenticated) {
               const userData = await auth.getCurrentUser();
+              console.log('User data:', userData);
               setUser(userData);
+              // Clear backup email after successful auth
+              sessionStorage.removeItem('centi_oauth_email');
+            } else {
+              // If auth check failed but we have email, retry once after a delay
+              console.warn('Auth check failed after verify, retrying...');
+              await new Promise(resolve => setTimeout(resolve, 1000));
+              const retryStatus = await auth.checkAuth();
+              if (retryStatus.authenticated) {
+                const userData = await auth.getCurrentUser();
+                setUser(userData);
+                setAuthStatus(retryStatus);
+                sessionStorage.removeItem('centi_oauth_email');
+              } else {
+                console.error('Auth still failed after retry');
+              }
             }
           } catch (verifyError) {
             console.error('Verify failed:', verifyError);
@@ -52,9 +86,29 @@ function App() {
             if (status.authenticated) {
               const userData = await auth.getCurrentUser();
               setUser(userData);
+              sessionStorage.removeItem('centi_oauth_email');
             }
           }
         } else {
+          // Check if we have backup email in sessionStorage (for mobile Safari cookie issues)
+          const backupEmail = sessionStorage.getItem('centi_oauth_email');
+          if (backupEmail) {
+            console.log('Found backup email in sessionStorage, retrying verify...');
+            try {
+              const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+              await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(backupEmail)}`, {
+                method: 'POST',
+                credentials: 'include',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+              });
+              await new Promise(resolve => setTimeout(resolve, 500));
+            } catch (e) {
+              console.error('Backup verify failed:', e);
+            }
+          }
+          
           // Normal auth check
           const status = await auth.checkAuth();
           setAuthStatus(status);
@@ -62,6 +116,7 @@ function App() {
           if (status.authenticated) {
             const userData = await auth.getCurrentUser();
             setUser(userData);
+            sessionStorage.removeItem('centi_oauth_email');
           }
         }
       } catch (error) {
