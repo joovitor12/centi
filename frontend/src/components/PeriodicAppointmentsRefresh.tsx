@@ -30,3 +30,4 @@ export const PeriodicAppointmentsRefresh: React.FC<PeriodicAppointmentsRefreshPr
   return null;
 };
 
+
