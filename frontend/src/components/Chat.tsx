@@ -44,7 +44,7 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
         const sessionData = await auth.getOrCreateSession();
         setSession(sessionData);
         
-        // Check if we need to send initial message for this session
+          // Check if we need to send initial message for this session
         if (sessionData?.session_id) {
           const key = `centi_initial_message_sent_${sessionData.session_id}`;
           const hasSent = localStorage.getItem(key);
@@ -52,7 +52,11 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
           // If localStorage was cleared, check if the first message is already our welcome message
           if (!hasSent) {
             try {
-              const parlantServerUrl = process.env.REACT_APP_PARLANT_SERVER_URL || 'http://localhost:8800';
+              const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+              const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+              const parlantServerUrl = isDevelopment 
+                ? (process.env.REACT_APP_PARLANT_SERVER_URL || 'http://localhost:8800')
+                : apiBaseUrl; // Use backend as proxy in production
               const response = await fetch(`${parlantServerUrl}/sessions/${sessionData.session_id}/events`);
               
               if (response.ok) {
@@ -150,8 +154,12 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
     );
   }
 
-  // Get Parlant server URL from environment or use default
-  const parlantServerUrl = process.env.REACT_APP_PARLANT_SERVER_URL || 'http://localhost:8800';
+  // Get Parlant server URL - use backend as proxy in production, direct Parlant URL in development
+  const apiBaseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+  const isDevelopment = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+  const parlantServerUrl = isDevelopment 
+    ? (process.env.REACT_APP_PARLANT_SERVER_URL || 'http://localhost:8800')
+    : apiBaseUrl; // Use backend as proxy in production
   const agentId = process.env.REACT_APP_PARLANT_AGENT_ID || 'default';
 
   const handleCloseGuide = () => {
