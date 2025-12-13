@@ -22,6 +22,7 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
     const hasSeenGuide = localStorage.getItem('centi_has_seen_email_guide');
     return !hasSeenGuide;
   });
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
 
   // Stable callback for appointment changes - MUST be before any early returns
   const handleAppointmentChange = useCallback(async () => {
@@ -129,6 +130,15 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
     loadSession();
   }, []);
 
+  // Update mobile state on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   if (loading) {
     return <Loading />;
   }
@@ -165,17 +175,18 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
       
       {/* Header */}
       <div style={{
-        padding: '1rem',
+        padding: isMobile ? '0.75rem' : '1rem',
         backgroundColor: 'var(--bg-primary)',
         borderBottom: '1px solid var(--border-color)',
         display: 'flex',
         justifyContent: 'space-between',
         alignItems: 'center',
         boxShadow: `0 2px 4px var(--shadow)`,
+        flexWrap: isMobile ? 'wrap' : 'nowrap',
       }}>
-        <h1 style={{ margin: 0, fontSize: '1.5rem', color: 'var(--primary-color)' }}>Centi</h1>
-        <div style={{ display: 'flex', gap: '1rem', alignItems: 'center' }}>
-          <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{userEmail}</span>
+        <h1 style={{ margin: 0, fontSize: isMobile ? '1.2rem' : '1.5rem', color: 'var(--primary-color)' }}>Centi</h1>
+        <div style={{ display: 'flex', gap: isMobile ? '0.5rem' : '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {!isMobile && <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{userEmail}</span>}
           <ThemeToggle />
           <button
             onClick={async () => {
@@ -202,13 +213,14 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
               }
             }}
             style={{
-              padding: '0.5rem 1rem',
+              padding: isMobile ? '0.4rem 0.8rem' : '0.5rem 1rem',
               backgroundColor: 'var(--danger-color)',
               color: 'white',
               border: 'none',
               borderRadius: '4px',
               cursor: 'pointer',
               transition: 'background-color 0.2s',
+              fontSize: isMobile ? '0.85rem' : '1rem',
             }}
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = 'var(--danger-hover)';
@@ -226,31 +238,35 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
       <div style={{
         flex: 1,
         display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
         overflow: 'auto',
       }}>
         {/* Welcome Section */}
         <div style={{
-          flex: '0 0 400px',
+          flex: isMobile ? '0 0 auto' : '0 0 400px',
           display: 'flex',
           flexDirection: 'column',
           alignItems: 'center',
           justifyContent: 'center',
-          padding: '2rem',
+          padding: isMobile ? '1.5rem' : '2rem',
           textAlign: 'center',
-          borderRight: '1px solid var(--border-color)',
+          borderRight: isMobile ? 'none' : '1px solid var(--border-color)',
+          borderBottom: isMobile ? '1px solid var(--border-color)' : 'none',
+          minHeight: isMobile ? 'auto' : '100%',
         }}>
           <div style={{
             maxWidth: '600px',
+            width: '100%',
             backgroundColor: 'var(--bg-primary)',
-            padding: '3rem',
+            padding: isMobile ? '1.5rem' : '3rem',
             borderRadius: '12px',
             boxShadow: `0 4px 6px var(--shadow)`,
           }}>
-            <div style={{ fontSize: '4rem', marginBottom: '1rem' }}>📧</div>
-            <h2 style={{ margin: '0 0 1rem', color: 'var(--text-primary)', fontSize: '1.8rem' }}>
+            <div style={{ fontSize: isMobile ? '3rem' : '4rem', marginBottom: '1rem' }}>📧</div>
+            <h2 style={{ margin: '0 0 1rem', color: 'var(--text-primary)', fontSize: isMobile ? '1.5rem' : '1.8rem' }}>
               Welcome to Centi!
             </h2>
-            <p style={{ margin: '0 0 1.5rem', color: 'var(--text-secondary)', fontSize: '1rem', lineHeight: '1.6' }}>
+            <p style={{ margin: '0 0 1.5rem', color: 'var(--text-secondary)', fontSize: isMobile ? '0.9rem' : '1rem', lineHeight: '1.6' }}>
               Centi helps you schedule meetings via email. To get started, check out the Email Interactor Guide below or click the chat button in the bottom right corner if you have questions.
             </p>
             <button
@@ -262,9 +278,10 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
                 border: 'none',
                 borderRadius: '6px',
                 cursor: 'pointer',
-                fontSize: '1rem',
+                fontSize: isMobile ? '0.9rem' : '1rem',
                 fontWeight: '500',
                 transition: 'background-color 0.2s',
+                width: isMobile ? '100%' : 'auto',
               }}
               onMouseOver={(e) => {
                 e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
@@ -282,6 +299,7 @@ export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
         <div style={{
           flex: 1,
           overflowY: 'auto',
+          minHeight: isMobile ? '50vh' : 'auto',
         }}>
           <AppointmentsList ref={appointmentsListRef} />
         </div>
