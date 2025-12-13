@@ -14,7 +14,10 @@ supabase_service = SupabaseService()
 
 
 def get_user_email_from_session(request: Request) -> Optional[str]:
-    """Get user email from session cookie.
+    """Get user email from session cookie or X-User-Email header.
+    
+    Falls back to X-User-Email header for mobile Safari compatibility
+    (Safari blocks cross-domain cookies even with SameSite=None).
     
     Args:
         request: FastAPI request object
@@ -22,8 +25,15 @@ def get_user_email_from_session(request: Request) -> Optional[str]:
     Returns:
         User email if authenticated, None otherwise
     """
-    # Get session cookie (set during OAuth callback)
+    # First try cookie (preferred method)
     session_email = request.cookies.get("user_email")
+    
+    # Fallback to header (for mobile Safari cookie issues)
+    if not session_email:
+        session_email = request.headers.get("X-User-Email")
+        if session_email:
+            logger.debug(f"get_user_email_from_session: using email from X-User-Email header")
+    
     logger.debug(f"get_user_email_from_session: found email={session_email}, all cookies: {list(request.cookies.keys())}")
     return session_email
 
@@ -37,20 +47,15 @@ async def check_auth(request: Request):
     """
     user_email = get_user_email_from_session(request)
     
-    logger.debug(f"check_auth called, user_email from cookie: {user_email}, cookies: {list(request.cookies.keys())}")
-    
     if not user_email:
-        logger.debug("check_auth: No user_email in cookie, returning 401")
         raise HTTPException(status_code=401, detail="Not authenticated")
     
     # Get user from database
     user = supabase_service.get_user_by_email(user_email)
     
     if not user:
-        logger.warning(f"check_auth: User not found in database: {user_email}")
         raise HTTPException(status_code=401, detail="User not found")
     
-    logger.debug(f"check_auth: User authenticated: {user_email}")
     return {
         "authenticated": True,
         "user_email": user_email,
@@ -95,26 +100,18 @@ async def verify_auth(request: Request, response: Response, email: Optional[str]
     to set the session cookie on the backend domain.
     
     Args:
-        email: User email from OAuth callback (query parameter or body)
+        email: User email from OAuth callback (query parameter)
         request: FastAPI request object
         response: FastAPI response object
         
     Returns:
         Success message
     """
-    # Try to get email from multiple sources (query params, body, or function param)
+    # Try to get email from query params if not provided as function param
     if not email:
         email = request.query_params.get("email")
     
-    # Also try to get from request body (in case frontend sends as POST body)
-    if not email:
-        try:
-            body = await request.json()
-            email = body.get("email")
-        except Exception:
-            pass
-    
-    logger.info(f"Verify auth called with email: {email}, user agent: {request.headers.get('user-agent', 'unknown')}")
+    logger.info(f"Verify auth called with email: {email}")
     
     if not email:
         logger.error("Email is required but not provided")
@@ -131,38 +128,27 @@ async def verify_auth(request: Request, response: Response, email: Optional[str]
         logger.error(f"User not found in database: {email}")
         raise HTTPException(status_code=404, detail="User not found")
     
-    # Set session cookie with proper attributes for cross-domain (especially iOS Safari)
-    # iOS Safari requires SameSite=None AND Secure=True for cross-domain cookies
+    # Set session cookie
     import os
     frontend_url = os.environ.get("FRONTEND_URL", "http://localhost:3000")
     
-    # Always use secure=True and samesite=None for cross-domain cookies
-    # This is required for iOS Safari to accept the cookie
     response.set_cookie(
         key="user_email",
         value=email,
         max_age=60 * 60 * 24 * 7,  # 7 days
-        httponly=False,  # Allow JS to read (needed for frontend auth check)
-        secure=True,  # MUST be True when SameSite=None (required for iOS Safari)
-        samesite="None",  # Required for cross-domain cookies (frontend and backend on different domains)
-        path="/",  # Make cookie available for all paths
-        domain=None,  # Don't set domain - let browser use default (current domain)
+        httponly=False,  # Allow JS to read
+        secure=True,  # Always secure for cross-domain cookies
+        samesite="None",  # Required for cross-domain cookies
+        path="/",
     )
     
     logger.info(f"Auth verified and cookie set for {email}")
     
-    # Return response with additional headers to help with CORS
-    return JSONResponse(
-        content={
-            "success": True,
-            "message": "Auth verified successfully",
-            "user_email": email,
-        },
-        headers={
-            "Access-Control-Allow-Origin": frontend_url,
-            "Access-Control-Allow-Credentials": "true",
-        }
-    )
+    return {
+        "success": True,
+        "message": "Auth verified successfully",
+        "user_email": email,
+    }
 
 
 @router.get("/api/user/me")

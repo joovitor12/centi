@@ -2,13 +2,23 @@ const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
 
 async function fetchApi(endpoint: string, options: RequestInit = {}): Promise<Response> {
   const url = `${API_BASE_URL}${endpoint}`;
+  
+  // Add user email header if available (fallback for mobile Safari cookie issues)
+  const userEmail = localStorage.getItem('centi_user_email');
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...options.headers as Record<string, string>,
+  };
+  
+  // Add user email as header if available (backend can use this as fallback)
+  if (userEmail && !headers['X-User-Email']) {
+    headers['X-User-Email'] = userEmail;
+  }
+  
   const response = await fetch(url, {
     ...options,
     credentials: 'include', // Include cookies
-    headers: {
-      'Content-Type': 'application/json',
-      ...options.headers,
-    },
+    headers,
   });
   
   if (!response.ok) {

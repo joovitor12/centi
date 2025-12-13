@@ -21,6 +21,8 @@ export const auth = {
   
   async logout(): Promise<void> {
     await api.post('/api/auth/logout');
+    // Also clear localStorage
+    localStorage.removeItem('centi_user_email');
   },
   
   login(): void {

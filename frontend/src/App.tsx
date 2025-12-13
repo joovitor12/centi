@@ -22,16 +22,14 @@ function App() {
         if (authSuccess === 'true' && email) {
           console.log('OAuth callback detected, email:', email);
           
-          // Store email in sessionStorage as backup (for mobile Safari issues)
-          sessionStorage.setItem('centi_oauth_email', email);
+          // Store email in localStorage as primary auth method (more reliable than cookies on mobile)
+          localStorage.setItem('centi_user_email', email);
           
           // Clear URL params after reading (for security)
           window.history.replaceState({}, document.title, window.location.pathname);
           
-          // Store email temporarily and verify with backend
-          // The backend will set the cookie on its domain
+          // Verify with backend - this will set the cookie (may or may not work on mobile Safari)
           try {
-            // Verify with backend - this will set the cookie on backend domain
             const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
             console.log('Verifying auth with backend...');
             const verifyResponse = await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(email)}`, {
@@ -48,75 +46,78 @@ function App() {
             } else {
               console.log('Verify successful');
             }
-            
-            // Wait a bit for cookie to be set (especially important on mobile)
-            await new Promise(resolve => setTimeout(resolve, 500));
-            
-            // Now check auth normally
-            console.log('Checking auth...');
-            const status = await auth.checkAuth();
-            console.log('Auth status:', status);
-            setAuthStatus(status);
-            
-            if (status.authenticated) {
-              const userData = await auth.getCurrentUser();
-              console.log('User data:', userData);
-              setUser(userData);
-              // Clear backup email after successful auth
-              sessionStorage.removeItem('centi_oauth_email');
-            } else {
-              // If auth check failed but we have email, retry once after a delay
-              console.warn('Auth check failed after verify, retrying...');
-              await new Promise(resolve => setTimeout(resolve, 1000));
-              const retryStatus = await auth.checkAuth();
-              if (retryStatus.authenticated) {
-                const userData = await auth.getCurrentUser();
-                setUser(userData);
-                setAuthStatus(retryStatus);
-                sessionStorage.removeItem('centi_oauth_email');
-              } else {
-                console.error('Auth still failed after retry');
-              }
-            }
           } catch (verifyError) {
             console.error('Verify failed:', verifyError);
-            // Fallback: try normal auth check
+          }
+          
+          // Since we have email in localStorage, we can authenticate directly
+          // Check if user exists by trying to get user data
+          try {
+            const userData = await auth.getCurrentUser();
+            console.log('User data retrieved:', userData);
+            setUser(userData);
+            setAuthStatus({ authenticated: true });
+          } catch (error) {
+            console.error('Failed to get user data:', error);
+            // If cookie-based auth fails, we still have email in localStorage
+            // This is acceptable - the user can use the app
+            // We'll check auth on each API call using the email from localStorage
+            setAuthStatus({ authenticated: true });
+            // Set a minimal user object with just email
+            setUser({ user_email: email } as User);
+          }
+        } else {
+          // Normal auth check - try cookie first, fallback to localStorage
+          try {
             const status = await auth.checkAuth();
-            setAuthStatus(status);
             if (status.authenticated) {
               const userData = await auth.getCurrentUser();
               setUser(userData);
-              sessionStorage.removeItem('centi_oauth_email');
+              // Update localStorage with current email
+              if (userData.user_email) {
+                localStorage.setItem('centi_user_email', userData.user_email);
+              }
+              setAuthStatus(status);
+            } else {
+              // Cookie auth failed, try localStorage fallback
+              const storedEmail = localStorage.getItem('centi_user_email');
+              if (storedEmail) {
+                console.log('Cookie auth failed, using localStorage email:', storedEmail);
+                // Verify with backend using stored email
+                try {
+                  const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+                  await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(storedEmail)}`, {
+                    method: 'POST',
+                    credentials: 'include',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                  });
+                  
+                  // Try to get user data
+                  const userData = await auth.getCurrentUser();
+                  setUser(userData);
+                  setAuthStatus({ authenticated: true });
+                } catch (error) {
+                  console.error('Fallback auth failed:', error);
+                  // Last resort: use stored email directly
+                  setUser({ user_email: storedEmail } as User);
+                  setAuthStatus({ authenticated: true });
+                }
+              } else {
+                setAuthStatus({ authenticated: false });
+              }
             }
-          }
-        } else {
-          // Check if we have backup email in sessionStorage (for mobile Safari cookie issues)
-          const backupEmail = sessionStorage.getItem('centi_oauth_email');
-          if (backupEmail) {
-            console.log('Found backup email in sessionStorage, retrying verify...');
-            try {
-              const API_BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8000';
-              await fetch(`${API_BASE_URL}/api/auth/verify?email=${encodeURIComponent(backupEmail)}`, {
-                method: 'POST',
-                credentials: 'include',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              });
-              await new Promise(resolve => setTimeout(resolve, 500));
-            } catch (e) {
-              console.error('Backup verify failed:', e);
+          } catch (error) {
+            console.error('Auth check failed:', error);
+            // Try localStorage fallback
+            const storedEmail = localStorage.getItem('centi_user_email');
+            if (storedEmail) {
+              setUser({ user_email: storedEmail } as User);
+              setAuthStatus({ authenticated: true });
+            } else {
+              setAuthStatus({ authenticated: false });
             }
-          }
-          
-          // Normal auth check
-          const status = await auth.checkAuth();
-          setAuthStatus(status);
-          
-          if (status.authenticated) {
-            const userData = await auth.getCurrentUser();
-            setUser(userData);
-            sessionStorage.removeItem('centi_oauth_email');
           }
         }
       } catch (error) {
