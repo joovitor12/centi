@@ -246,8 +246,7 @@ class EmailMeetingCoordinator:
         days_ahead: int = 14,
         num_suggestions: int = 3,
         timezone_str: Optional[str] = None,
-        user_token: Optional[Dict[str, Any]] = None,
-        user_email: Optional[str] = None,
+        participant_tokens: Optional[Dict[str, Dict[str, Any]]] = None,
     ) -> List[Dict[str, Any]]:
         """Generate time suggestions for participants.
 
@@ -257,10 +256,9 @@ class EmailMeetingCoordinator:
             days_ahead: Number of days ahead to search
             num_suggestions: Number of suggestions to generate
             timezone_str: Optional timezone override
-            user_token: Optional user-specific OAuth token (dict) for multi-user support.
-                       If provided, uses this token to query freebusy information.
-            user_email: Optional user email address (required if user_token is provided
-                       to enable automatic token refresh persistence)
+            participant_tokens: Optional dictionary mapping email -> token dict for all registered participants.
+                               If provided, uses each participant's token to query their calendar.
+                               This avoids requiring calendars to be public or shared.
 
         Returns:
             List of suggestion dictionaries with start, end, verified_participants, etc.
@@ -283,19 +281,17 @@ class EmailMeetingCoordinator:
         end_date = now + timedelta(days=days_ahead)
 
         # Generate suggestions using calendar service
-        # If user_token is provided, use get_availability_slots (multi-user)
-        # Otherwise, use find_common_free_slots (single-user, backward compatible)
-        if user_token:
-            # Multi-user mode: use user's token to query freebusy
-            freebusy_result = self.calendar_service.get_availability_slots(
+        # Use participant_tokens to query each participant's calendar with their own token
+        # This avoids requiring calendars to be public or shared
+        if participant_tokens:
+            freebusy_result = self.calendar_service.get_availability_slots_multi_token(
+                participant_tokens=participant_tokens,
                 participant_emails=participant_emails,
                 start_date=start_date,
                 end_date=end_date,
                 duration_minutes=duration_minutes,
                 timezone_str=tz_str,
-                user_token=user_token,
-                supabase_service=self.supabase_service if user_email else None,
-                user_email=user_email,
+                supabase_service=self.supabase_service,
             )
             
             # Extract busy periods from freebusy result
@@ -309,7 +305,6 @@ class EmailMeetingCoordinator:
                 )
             
             # Convert freebusy result to suggestions format
-            # Use find_common_free_slots with the busy periods
             suggestions = self.calendar_service.find_common_free_slots(
                 participant_emails=participant_emails,
                 start_date=start_date,
@@ -319,21 +314,17 @@ class EmailMeetingCoordinator:
                 work_hours_start=9,
                 work_hours_end=17,
                 timezone_str=tz_str,
-                calendars_busy=calendars_busy,  # Pass pre-computed busy periods
-                unavailable=unavailable,  # Pass unavailable participants
+                calendars_busy=calendars_busy,
+                unavailable=unavailable,
             )
         else:
-            # Single-user mode: use existing global calendar service
-            suggestions = self.calendar_service.find_common_free_slots(
-                participant_emails=participant_emails,
-                start_date=start_date,
-                end_date=end_date,
-                duration_minutes=duration_minutes,
-                num_suggestions=num_suggestions,
-                work_hours_start=9,
-                work_hours_end=17,
-                timezone_str=tz_str,
+            # No participant tokens available - cannot query calendar availability
+            # Suggestions will be based only on the owner's calendar (if they authenticated)
+            logger.warning(
+                "No participant tokens provided. Cannot query calendar availability. "
+                "Only the calendar owner (user who authenticated) will be considered for suggestions."
             )
+            suggestions = []
 
         # Filter out any suggestions that are in the past (safety check)
         now_aware = datetime.now(tz)
@@ -489,11 +480,25 @@ class EmailMeetingCoordinator:
         if suggested_times and isinstance(suggested_times, list):
             suggestions_context = "Available suggestions:\n"
             for i, suggestion in enumerate(suggested_times, 1):
-                start = suggestion.get("start", {})
-                end = suggestion.get("end", {})
-                if isinstance(start, str):
-                    suggestions_context += f"{i}. {start} - {end}\n"
-                else:
+                start_str = suggestion.get("start", "")
+                end_str = suggestion.get("end", "")
+                
+                # Parse ISO format strings to datetime and format them
+                try:
+                    if isinstance(start_str, str):
+                        # Parse ISO format string
+                        start_dt = datetime.fromisoformat(start_str.replace("Z", "+00:00"))
+                        end_dt = datetime.fromisoformat(end_str.replace("Z", "+00:00"))
+                        
+                        # Format in readable format (same as email)
+                        start_formatted = start_dt.strftime("%A, %B %d, %Y at %I:%M %p")
+                        end_formatted = end_dt.strftime("%I:%M %p")
+                        
+                        suggestions_context += f"{i}. {start_formatted} - {end_formatted}\n"
+                    else:
+                        suggestions_context += f"{i}. Suggestion {i}\n"
+                except (ValueError, AttributeError) as e:
+                    logger.warning(f"Error formatting suggestion {i}: {e}")
                     suggestions_context += f"{i}. Suggestion {i}\n"
         else:
             suggestions_context = "No previous suggestions available."
@@ -556,7 +561,7 @@ class EmailMeetingCoordinator:
             selected_time: Selected time suggestion dictionary
             participant_emails: List of participant emails
             meeting_description: Meeting description
-            owner_email: Owner email (for calendar creation)
+            owner_email: Owner email (for reference)
             meeting_title: Optional meeting title/name provided by user
 
         Returns:
@@ -579,14 +584,46 @@ class EmailMeetingCoordinator:
             description_parts.append("Participants:")
             description_parts.extend([f"- {email}" for email in participant_emails])
 
-        # Create event in Google Calendar with attendees
-        event_id = self.calendar_service.create_event(
-            description="\n".join(description_parts) if description_parts else "",
-            start_time=start_time,
-            end_time=end_time,
-            summary=event_summary,
-            attendees=participant_emails,
-        )
+        # Create event in Centi's calendar with participants as attendees
+        # This way users don't need calendar write permissions
+        if self.calendar_service.service:
+            # Use Centi's calendar service to create event
+            event_id = self.calendar_service.create_event(
+                description="\n".join(description_parts) if description_parts else "",
+                start_time=start_time,
+                end_time=end_time,
+                summary=event_summary,
+                attendees=participant_emails,
+            )
+        else:
+            # Try to get Centi's token from database as fallback
+            centi_user_data = self.supabase_service.get_user_by_email(self.centi_email)
+            if centi_user_data:
+                centi_token = centi_user_data.get("calendar_access_token")
+                if centi_token:
+                    event_id = GoogleCalendarService.create_event_with_token(
+                        user_token=centi_token,
+                        description="\n".join(description_parts) if description_parts else "",
+                        start_time=start_time,
+                        end_time=end_time,
+                        summary=event_summary,
+                        attendees=participant_emails,
+                        timezone_str=settings.GOOGLE_CALENDAR_TIMEZONE,
+                        supabase_service=self.supabase_service,
+                        user_email=self.centi_email,
+                    )
+                else:
+                    logger.error(
+                        f"Cannot create calendar event for thread {thread_id}: "
+                        f"Centi calendar service not initialized and no Centi token found"
+                    )
+                    return None
+            else:
+                logger.error(
+                    f"Cannot create calendar event for thread {thread_id}: "
+                    f"Centi calendar service not initialized and Centi user not found"
+                )
+                return None
 
         if event_id:
             logger.info(f"Created calendar event {event_id} for thread {thread_id}")

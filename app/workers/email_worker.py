@@ -175,11 +175,16 @@ class EmailWorker:
                     all_participant_emails.update(msg_participants.get("cc", []))
             
             # Find which registered user is in the thread
+            # Exclude Centi email from owner search (Centi is the bot, not a real user)
             owner_email = None
             owner_user_data = None
             
-            # Try to find a registered user in the thread
+            # Try to find a registered user in the thread (excluding Centi email)
             for email in all_participant_emails:
+                # Skip Centi email - it's the bot, not a real user
+                if email.lower() == self.centi_email:
+                    continue
+                    
                 user_data = self.supabase_service.get_user_by_email(email.lower())
                 if user_data:
                     owner_email = email.lower()
@@ -222,9 +227,6 @@ class EmailWorker:
                 self.gmail_service.mark_as_read(email_id)
                 return
 
-            # Get user token for calendar access
-            user_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
-            
             # Use thread_id as session_id for Langfuse tracking
             # This groups all operations related to this email thread
             with propagate_attributes(
@@ -240,13 +242,13 @@ class EmailWorker:
                     # Existing thread - process as response
                     await self.handle_meeting_response(
                         email_id, thread_id, email_data, email_body, thread_data, 
-                        owner_email=owner_email, user_token=user_token
+                        owner_email=owner_email
                     )
                 else:
                     # New thread - check if it's a meeting request
                     await self.handle_new_meeting_request(
                         email_id, thread_id, email_data, email_body, 
-                        owner_email=owner_email, user_token=user_token
+                        owner_email=owner_email
                     )
 
             # Mark email as processed (read)
@@ -263,7 +265,6 @@ class EmailWorker:
         email_data: Dict[str, Any],
         email_body: str,
         owner_email: str,
-        user_token: Optional[Dict[str, Any]] = None,
     ):
         """Handle a new meeting request email.
 
@@ -300,22 +301,22 @@ class EmailWorker:
             # Get subject from email headers
             subject = self._extract_subject(email_data)
 
-            # Add owner email to participants if not already included
-            # This ensures the calendar owner is always included in availability checks
-            if owner_email and owner_email.lower() not in [
-                p.lower() for p in participant_emails
-            ]:
-                participant_emails.append(owner_email.lower())
-                logger.info(f"Added calendar owner {owner_email} to participants list")
-
-            # Generate time suggestions (use user token if available)
+            # Generate time suggestions based only on the owner's calendar
+            # We can only query calendars of users who have authenticated with Centi (owner)
+            # Fetch owner user data to get their token
+            owner_user_data = self.supabase_service.get_user_by_email(owner_email.lower()) if owner_email else None
+            owner_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
+            owner_participant_tokens = {}
+            if owner_email and owner_token:
+                owner_participant_tokens[owner_email.lower()] = owner_token
+            
+            # Generate time suggestions using owner's token (only calendar we can access)
             suggestions = self.coordinator.generate_time_suggestions(
-                participant_emails=participant_emails,
+                participant_emails=participant_emails,  # Keep all participants for context/email
                 duration_minutes=context.get("duration_minutes", 30),
                 days_ahead=context.get("days_ahead", 14),
                 timezone_str=context.get("timezone_str"),
-                user_token=user_token,
-                user_email=owner_email,
+                participant_tokens=owner_participant_tokens if owner_participant_tokens else None,
             )
 
             # Collect unverified participants
@@ -412,7 +413,6 @@ class EmailWorker:
         email_body: str,
         thread_data: Dict[str, Any],
         owner_email: str,
-        user_token: Optional[Dict[str, Any]] = None,
     ):
         """Handle a response to meeting suggestions.
 
@@ -520,6 +520,7 @@ class EmailWorker:
                     # Get meeting_title from thread_data (now stored directly in the database field)
                     meeting_title = thread_data.get("meeting_title")
 
+                    # Create event in Centi's calendar (users don't need calendar write permissions)
                     event_id = self.coordinator.confirm_meeting(
                         thread_id=thread_id,
                         selected_time=selected_time,
@@ -596,13 +597,20 @@ class EmailWorker:
 
                 participant_emails = thread_data.get("participant_emails", [])
                 duration_minutes = thread_data.get("duration_minutes", 30)
+                owner_email = thread_data.get("owner_email")
 
-                # Generate new suggestions (use user token if available)
+                # Generate new suggestions based only on the owner's calendar
+                owner_user_data = self.supabase_service.get_user_by_email(owner_email.lower()) if owner_email else None
+                owner_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
+                owner_participant_tokens = {}
+                if owner_email and owner_token:
+                    owner_participant_tokens[owner_email.lower()] = owner_token
+                
+                # Generate time suggestions using owner's token (only calendar we can access)
                 suggestions = self.coordinator.generate_time_suggestions(
-                    participant_emails=participant_emails,
+                    participant_emails=participant_emails,  # Keep all participants for context
                     duration_minutes=duration_minutes,
-                    user_token=user_token,
-                    user_email=owner_email,
+                    participant_tokens=owner_participant_tokens if owner_participant_tokens else None,
                 )
 
                 # Update suggested times

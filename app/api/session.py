@@ -114,13 +114,14 @@ async def create_parlant_session(user_email: str) -> str:
                     
                     # Send initial welcome message informing about email interactor
                     try:
+                        centi_email = settings.CENTI_EMAIL_ADDRESS or "centicoordinator@gmail.com"
                         welcome_message = (
                             "Hi! 👋\n\n"
                             "I'm Centi, your calendar assistant. Currently, I don't support creating reminders "
                             "or appointments via chat. Instead, please use the Email Interactor feature:\n\n"
                             "📧 **How to use Email Interactor:**\n"
                             "1. Send an email to the person you want to schedule with\n"
-                            "2. Add **centinteractor@gmail.com** in CC\n"
+                            f"2. Add **{centi_email}** in CC\n"
                             "3. Mention 'Centi' in your message asking to schedule a meeting\n"
                             "4. I'll analyze your calendars and suggest available times\n"
                             "5. Reply confirming your preferred time\n"
