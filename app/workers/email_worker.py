@@ -319,13 +319,6 @@ class EmailWorker:
                 participant_tokens=owner_participant_tokens if owner_participant_tokens else None,
             )
 
-            # Collect unverified participants
-            all_unverified = set()
-            for suggestion in suggestions:
-                all_unverified.update(suggestion.get("unverified_participants", []))
-
-            unverified_list = list(all_unverified)
-
             # Create thread record in database
             suggested_times_list = []
             for suggestion in suggestions:
@@ -366,7 +359,6 @@ class EmailWorker:
             reply_body = self.coordinator.format_suggestion_email(
                 suggestions=suggestions,
                 meeting_description=context.get("meeting_description"),
-                unverified_participants=unverified_list,
             )
 
             # Get all participants (excluding Centi) for reply
@@ -606,11 +598,16 @@ class EmailWorker:
                 if owner_email and owner_token:
                     owner_participant_tokens[owner_email.lower()] = owner_token
                 
+                # Get previously suggested times to exclude them from new suggestions
+                previous_suggestions = thread_data.get("suggested_times", [])
+                logger.info(f"Found {len(previous_suggestions)} previous suggestions to exclude: {previous_suggestions}")
+                
                 # Generate time suggestions using owner's token (only calendar we can access)
                 suggestions = self.coordinator.generate_time_suggestions(
                     participant_emails=participant_emails,  # Keep all participants for context
                     duration_minutes=duration_minutes,
                     participant_tokens=owner_participant_tokens if owner_participant_tokens else None,
+                    exclude_suggestions=previous_suggestions if previous_suggestions else None,
                 )
 
                 # Update suggested times
@@ -637,14 +634,10 @@ class EmailWorker:
 
                 # Send new suggestions
                 meeting_description = thread_data.get("meeting_description")
-                all_unverified = set()
-                for suggestion in suggestions:
-                    all_unverified.update(suggestion.get("unverified_participants", []))
 
                 reply_body = self.coordinator.format_suggestion_email(
                     suggestions=suggestions,
                     meeting_description=meeting_description,
-                    unverified_participants=list(all_unverified),
                 )
 
                 participants = self.coordinator.get_participants_from_email(

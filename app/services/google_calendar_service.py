@@ -1165,6 +1165,75 @@ class GoogleCalendarService:
             return False
 
     @staticmethod
+    def get_user_calendar_timezone(
+        user_token: Dict[str, Any],
+        calendar_id: str = "primary",
+        supabase_service=None,
+        user_email: Optional[str] = None,
+    ) -> Optional[str]:
+        """Get the timezone of a user's calendar.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            calendar_id: Calendar ID to check (default: "primary")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token
+            
+        Returns:
+            Timezone string (e.g., "America/Sao_Paulo") or None if unable to fetch
+        """
+        try:
+            # Create credentials from user token
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+            
+            # Refresh token if expired
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    logger.info("Token refreshed successfully for calendar timezone query")
+                    
+                    # Save refreshed token back to database if supabase_service is provided
+                    if supabase_service and user_email:
+                        try:
+                            refreshed_token_dict = {
+                                "token": creds.token,
+                                "refresh_token": creds.refresh_token,
+                                "token_uri": creds.token_uri,
+                                "client_id": creds.client_id,
+                                "client_secret": creds.client_secret,
+                                "scopes": creds.scopes or user_token.get("scopes", []),
+                            }
+                            supabase_service.update_user_token(user_email, refreshed_token_dict)
+                            logger.info(f"Refreshed token saved to database for user {user_email}")
+                        except Exception as e:
+                            logger.warning(f"Failed to save refreshed token: {e}")
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return None
+            
+            # Build service
+            service = build("calendar", "v3", credentials=creds)
+            
+            # Get calendar metadata
+            calendar = service.calendarList().get(calendarId=calendar_id).execute()
+            timezone_str = calendar.get("timeZone")
+            
+            if timezone_str:
+                logger.info(f"Retrieved timezone {timezone_str} for calendar {calendar_id}")
+                return timezone_str
+            else:
+                logger.warning(f"No timezone found for calendar {calendar_id}")
+                return None
+                
+        except HttpError as e:
+            logger.error(f"HTTP error getting calendar timezone: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error getting calendar timezone: {e}")
+            return None
+
+    @staticmethod
     def get_availability_slots(
         user_token: Dict[str, Any],
         participant_emails: List[str],

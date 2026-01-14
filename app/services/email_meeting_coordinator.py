@@ -65,7 +65,8 @@ class MeetingResponse(BaseModel):
     """Processed meeting response from email."""
 
     accepted: bool = Field(
-        default=False, description="Whether a suggestion was accepted and the meeting should be confirmed"
+        default=False,
+        description="Whether a suggestion was accepted and the meeting should be confirmed",
     )
     selected_suggestion_index: Optional[int] = Field(
         default=None,
@@ -247,6 +248,7 @@ class EmailMeetingCoordinator:
         num_suggestions: int = 3,
         timezone_str: Optional[str] = None,
         participant_tokens: Optional[Dict[str, Dict[str, Any]]] = None,
+        exclude_suggestions: Optional[List[Dict[str, Any]]] = None,
     ) -> List[Dict[str, Any]]:
         """Generate time suggestions for participants.
 
@@ -268,8 +270,29 @@ class EmailMeetingCoordinator:
             logger.warning("No participants provided for time suggestions")
             return []
 
-        # Use provided timezone or fallback to default
-        tz_str = timezone_str or settings.GOOGLE_CALENDAR_TIMEZONE
+        # Determine timezone: use provided, or fetch from owner's calendar, or fallback to default
+        tz_str = timezone_str
+        if not tz_str and participant_tokens:
+            # Try to get timezone from the first participant's calendar (typically the owner)
+            first_participant_email = list(participant_tokens.keys())[0]
+            first_participant_token = participant_tokens[first_participant_email]
+            try:
+                owner_tz = GoogleCalendarService.get_user_calendar_timezone(
+                    user_token=first_participant_token,
+                    calendar_id="primary",
+                    supabase_service=self.supabase_service,
+                    user_email=first_participant_email,
+                )
+                if owner_tz:
+                    tz_str = owner_tz
+                    logger.info(
+                        f"Using timezone {tz_str} from owner's calendar ({first_participant_email})"
+                    )
+            except Exception as e:
+                logger.warning(f"Could not fetch timezone from owner's calendar: {e}")
+
+        # Fallback to default if still no timezone
+        tz_str = tz_str or settings.GOOGLE_CALENDAR_TIMEZONE
         tz = pytz.timezone(tz_str) if tz_str else self.timezone
 
         # Calculate date range - start from NOW (not midnight) to ensure all suggestions are future
@@ -277,8 +300,23 @@ class EmailMeetingCoordinator:
         # Add 15 minutes buffer to current time to avoid suggesting times too soon
         start_date = now + timedelta(minutes=15)
         # Round down to nearest 15 minutes for cleaner suggestions
-        start_date = start_date.replace(minute=(start_date.minute // 15) * 15, second=0, microsecond=0)
+        start_date = start_date.replace(
+            minute=(start_date.minute // 15) * 15, second=0, microsecond=0
+        )
         end_date = now + timedelta(days=days_ahead)
+
+        # If we need to exclude previous suggestions, generate more to ensure we have enough
+        # Also start search slightly later to avoid finding the same slots
+        if exclude_suggestions and len(exclude_suggestions) > 0:
+            # Generate more suggestions to account for exclusions
+            num_suggestions = max(
+                num_suggestions * 2, 6
+            )  # At least 6, or double the requested amount
+            # Start search 1 hour later to find different slots
+            start_date = start_date + timedelta(hours=1)
+            logger.info(
+                f"Excluding previous suggestions: generating {num_suggestions} suggestions starting from {start_date}"
+            )
 
         # Generate suggestions using calendar service
         # Use participant_tokens to query each participant's calendar with their own token
@@ -293,17 +331,17 @@ class EmailMeetingCoordinator:
                 timezone_str=tz_str,
                 supabase_service=self.supabase_service,
             )
-            
+
             # Extract busy periods from freebusy result
             calendars_busy = freebusy_result.get("calendars", {})
             unavailable = freebusy_result.get("unavailable", [])
-            
+
             if unavailable:
                 logger.warning(
                     f"Could not access calendars for: {unavailable}. "
                     "Suggestions may be incomplete."
                 )
-            
+
             # Convert freebusy result to suggestions format
             suggestions = self.calendar_service.find_common_free_slots(
                 participant_emails=participant_emails,
@@ -328,13 +366,85 @@ class EmailMeetingCoordinator:
 
         # Filter out any suggestions that are in the past (safety check)
         now_aware = datetime.now(tz)
-        future_suggestions = [
-            s for s in suggestions
-            if s["start"] > now_aware
-        ]
+        future_suggestions = [s for s in suggestions if s["start"] > now_aware]
+
+        # Exclude previously suggested times if provided
+        if exclude_suggestions:
+            exclude_starts = []
+            logger.info(
+                f"Excluding {len(exclude_suggestions)} previously suggested times: {exclude_suggestions}"
+            )
+            for prev_suggestion in exclude_suggestions:
+                # Handle both datetime objects and ISO strings
+                prev_start = prev_suggestion.get("start")
+                if not prev_start:
+                    logger.warning(
+                        f"Previous suggestion missing 'start' field: {prev_suggestion}"
+                    )
+                    continue
+
+                try:
+                    if isinstance(prev_start, str):
+                        prev_start = datetime.fromisoformat(
+                            prev_start.replace("Z", "+00:00")
+                        )
+                        prev_start = prev_start.astimezone(tz)
+                    elif isinstance(prev_start, datetime):
+                        # Already a datetime, ensure it's timezone-aware
+                        if prev_start.tzinfo is None:
+                            prev_start = tz.localize(prev_start)
+                        else:
+                            prev_start = prev_start.astimezone(tz)
+                    else:
+                        logger.warning(
+                            f"Unexpected prev_start type: {type(prev_start)}"
+                        )
+                        continue
+
+                    exclude_starts.append(prev_start)
+                    logger.debug(f"Added excluded time: {prev_start}")
+                except Exception as e:
+                    logger.warning(
+                        f"Error parsing previous suggestion start time: {e}, suggestion: {prev_suggestion}"
+                    )
+
+            logger.info(
+                f"Parsed {len(exclude_starts)} excluded start times from {len(exclude_suggestions)} previous suggestions"
+            )
+
+            # Filter out suggestions that match excluded times (within 5 minutes tolerance)
+            filtered_suggestions = []
+            excluded_count = 0
+            for suggestion in future_suggestions:
+                suggestion_start = suggestion["start"]
+                if suggestion_start.tzinfo is None:
+                    suggestion_start = tz.localize(suggestion_start)
+                else:
+                    suggestion_start = suggestion_start.astimezone(tz)
+
+                # Check if this suggestion matches any excluded time (within 5 minutes)
+                is_excluded = False
+                for excluded_start in exclude_starts:
+                    time_diff = abs((suggestion_start - excluded_start).total_seconds())
+                    if time_diff < 300:  # 5 minutes tolerance
+                        is_excluded = True
+                        excluded_count += 1
+                        logger.debug(
+                            f"Excluded suggestion {suggestion_start} (matches {excluded_start}, diff: {time_diff}s)"
+                        )
+                        break
+
+                if not is_excluded:
+                    filtered_suggestions.append(suggestion)
+
+            future_suggestions = filtered_suggestions
+            logger.info(
+                f"Excluded {excluded_count} previously suggested times. "
+                f"Returning {len(future_suggestions)} new suggestions."
+            )
 
         logger.info(
-            f"Filtered {len(suggestions) - len(future_suggestions)} past suggestions. "
+            f"Filtered {len(suggestions) - len(future_suggestions)} past/excluded suggestions. "
             f"Returning {len(future_suggestions)} future suggestions."
         )
 
@@ -400,13 +510,6 @@ class EmailMeetingCoordinator:
             "Please reply with the number of your preferred time, or let me know if you need different options."
         )
 
-        if unverified_participants:
-            unverified_list = ", ".join(unverified_participants)
-            body_parts.append("")
-            body_parts.append(
-                f"Note: I couldn't access the calendars for: {unverified_list}. Suggestions are based on available calendars only."
-            )
-
         body_parts.extend(
             [
                 "",
@@ -421,20 +524,11 @@ class EmailMeetingCoordinator:
         self, unverified_participants: List[str] = None
     ) -> str:
         """Format email when no suggestions are available."""
-        unverified_participants = unverified_participants or []
-
         body_parts = [
             "Hi everyone,",
             "",
             "I checked the calendars but couldn't find any available time slots in the next two weeks.",
         ]
-
-        if unverified_participants:
-            unverified_list = ", ".join(unverified_participants)
-            body_parts.append("")
-            body_parts.append(
-                f"Note: I couldn't access the calendars for: {unverified_list}. This may have affected the availability search."
-            )
 
         body_parts.extend(
             [
@@ -475,26 +569,30 @@ class EmailMeetingCoordinator:
 
         # Get suggested times for context
         suggested_times = thread_data.get("suggested_times", [])
-        
+
         suggestions_context = ""
         if suggested_times and isinstance(suggested_times, list):
             suggestions_context = "Available suggestions:\n"
             for i, suggestion in enumerate(suggested_times, 1):
                 start_str = suggestion.get("start", "")
                 end_str = suggestion.get("end", "")
-                
+
                 # Parse ISO format strings to datetime and format them
                 try:
                     if isinstance(start_str, str):
                         # Parse ISO format string
-                        start_dt = datetime.fromisoformat(start_str.replace("Z", "+00:00"))
+                        start_dt = datetime.fromisoformat(
+                            start_str.replace("Z", "+00:00")
+                        )
                         end_dt = datetime.fromisoformat(end_str.replace("Z", "+00:00"))
-                        
+
                         # Format in readable format (same as email)
                         start_formatted = start_dt.strftime("%A, %B %d, %Y at %I:%M %p")
                         end_formatted = end_dt.strftime("%I:%M %p")
-                        
-                        suggestions_context += f"{i}. {start_formatted} - {end_formatted}\n"
+
+                        suggestions_context += (
+                            f"{i}. {start_formatted} - {end_formatted}\n"
+                        )
                     else:
                         suggestions_context += f"{i}. Suggestion {i}\n"
                 except (ValueError, AttributeError) as e:
@@ -571,7 +669,11 @@ class EmailMeetingCoordinator:
         end_time = selected_time["end"]
 
         # Use meeting_title if provided, otherwise default to "Meeting"
-        event_summary = meeting_title.strip() if meeting_title and meeting_title.strip() else "Meeting"
+        event_summary = (
+            meeting_title.strip()
+            if meeting_title and meeting_title.strip()
+            else "Meeting"
+        )
 
         # Build event description with participants
         description_parts = []
@@ -584,10 +686,67 @@ class EmailMeetingCoordinator:
             description_parts.append("Participants:")
             description_parts.extend([f"- {email}" for email in participant_emails])
 
+        # Determine timezone: try to get from owner's calendar, or use default
+        event_timezone = settings.GOOGLE_CALENDAR_TIMEZONE
+        if owner_email:
+            owner_user_data = self.supabase_service.get_user_by_email(
+                owner_email.lower()
+            )
+            if owner_user_data:
+                owner_token = owner_user_data.get("calendar_access_token")
+                if owner_token:
+                    try:
+                        owner_tz = GoogleCalendarService.get_user_calendar_timezone(
+                            user_token=owner_token,
+                            calendar_id="primary",
+                            supabase_service=self.supabase_service,
+                            user_email=owner_email.lower(),
+                        )
+                        if owner_tz:
+                            event_timezone = owner_tz
+                            logger.info(
+                                f"Using timezone {event_timezone} from owner's calendar for event creation"
+                            )
+                    except Exception as e:
+                        logger.warning(
+                            f"Could not fetch timezone from owner's calendar: {e}"
+                        )
+
         # Create event in Centi's calendar with participants as attendees
         # This way users don't need calendar write permissions
-        if self.calendar_service.service:
-            # Use Centi's calendar service to create event
+        # Always use Centi's token to ensure event is created in Centi's calendar
+        centi_user_data = self.supabase_service.get_user_by_email(self.centi_email)
+        if centi_user_data:
+            centi_token = centi_user_data.get("calendar_access_token")
+            if centi_token:
+                # Use Centi's token to create event in Centi's calendar
+                event_id = GoogleCalendarService.create_event_with_token(
+                    user_token=centi_token,
+                    description="\n".join(description_parts)
+                    if description_parts
+                    else "",
+                    start_time=start_time,
+                    end_time=end_time,
+                    summary=event_summary,
+                    attendees=participant_emails,
+                    timezone_str=event_timezone,
+                    supabase_service=self.supabase_service,
+                    user_email=self.centi_email,
+                )
+            else:
+                logger.error(
+                    f"Cannot create calendar event for thread {thread_id}: "
+                    f"No Centi token found in database"
+                )
+                return None
+        elif self.calendar_service.service:
+            # Fallback: Use Centi's calendar service if token not available
+            # But verify calendar_id is set to Centi's email
+            if self.calendar_service.calendar_id.lower() != self.centi_email.lower():
+                logger.warning(
+                    f"Calendar ID ({self.calendar_service.calendar_id}) doesn't match Centi email ({self.centi_email}). "
+                    f"Using Centi's calendar service anyway, but this may create event in wrong calendar."
+                )
             event_id = self.calendar_service.create_event(
                 description="\n".join(description_parts) if description_parts else "",
                 start_time=start_time,
@@ -603,12 +762,14 @@ class EmailMeetingCoordinator:
                 if centi_token:
                     event_id = GoogleCalendarService.create_event_with_token(
                         user_token=centi_token,
-                        description="\n".join(description_parts) if description_parts else "",
+                        description="\n".join(description_parts)
+                        if description_parts
+                        else "",
                         start_time=start_time,
                         end_time=end_time,
                         summary=event_summary,
                         attendees=participant_emails,
-                        timezone_str=settings.GOOGLE_CALENDAR_TIMEZONE,
+                        timezone_str=event_timezone,
                         supabase_service=self.supabase_service,
                         user_email=self.centi_email,
                     )
@@ -671,21 +832,20 @@ class EmailMeetingCoordinator:
         remaining_participants = []
         if participant_emails and accepting_participant:
             remaining_participants = [
-                p for p in participant_emails
+                p
+                for p in participant_emails
                 if p.lower() != accepting_participant.lower()
             ]
 
         if remaining_participants:
             participant_list = ", ".join(remaining_participants)
-            body_parts.append(
-                f"Waiting for confirmation from: {participant_list}"
-            )
+            body_parts.append(f"Waiting for confirmation from: {participant_list}")
             body_parts.append("")
-            body_parts.append(
-                "Please reply to confirm if this time works for you!"
-            )
+            body_parts.append("Please reply to confirm if this time works for you!")
         else:
-            body_parts.append("Waiting for confirmation from the remaining participants.")
+            body_parts.append(
+                "Waiting for confirmation from the remaining participants."
+            )
             body_parts.append("")
 
         body_parts.extend(
