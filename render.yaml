@@ -3,9 +3,11 @@ services:
     name: centi-frontend
     runtime: node
     rootDir: frontend
-    buildCommand: npm ci && npm run build
+    buildCommand: npm ci --include=dev && npm run build
     startCommand: npm run start
     envVars:
+      - key: NPM_CONFIG_PRODUCTION
+        value: "false"
       - key: NEXT_PUBLIC_API_BASE_URL
         sync: false
       - key: NEXT_PUBLIC_SUPABASE_URL
