@@ -17,26 +17,34 @@ class SupabaseService:
             settings.SUPABASE_URL, settings.SUPABASE_KEY
         )
 
-    def get_all_appointments(self) -> List[Dict[str, Any]]:
-        """Get all appointments ordered by time."""
+    def get_all_appointments(self, user_email: Optional[str] = None) -> List[Dict[str, Any]]:
+        """Get all appointments ordered by time, optionally filtered by user_email.
+        
+        Args:
+            user_email: Optional email to filter appointments by user. If None, returns all appointments.
+        """
         try:
-            response = (
-                self.client.table("appointments").select("*").order("time").execute()
-            )
+            query = self.client.table("appointments").select("*")
+            if user_email:
+                query = query.eq("user_email", user_email)
+            response = query.order("time").execute()
             return response.data or []
         except Exception as e:
             logger.error(f"Error fetching appointments: {e}")
             raise
 
-    def get_appointment_by_id(self, appointment_id: int) -> Optional[Dict[str, Any]]:
-        """Get a single appointment by ID."""
+    def get_appointment_by_id(self, appointment_id: int, user_email: Optional[str] = None) -> Optional[Dict[str, Any]]:
+        """Get a single appointment by ID, optionally filtered by user_email.
+        
+        Args:
+            appointment_id: Appointment ID
+            user_email: Optional email to verify appointment ownership
+        """
         try:
-            response = (
-                self.client.table("appointments")
-                .select("*")
-                .eq("id", appointment_id)
-                .execute()
-            )
+            query = self.client.table("appointments").select("*").eq("id", appointment_id)
+            if user_email:
+                query = query.eq("user_email", user_email)
+            response = query.execute()
             return response.data[0] if response.data else None
         except Exception as e:
             logger.error(f"Error fetching appointment {appointment_id}: {e}")
@@ -46,11 +54,19 @@ class SupabaseService:
         self,
         description: str,
         time: str,
+        user_email: str,
         google_calendar_event_id: Optional[str] = None,
     ) -> Dict[str, Any]:
-        """Create a new appointment."""
+        """Create a new appointment.
+        
+        Args:
+            description: Appointment description
+            time: Appointment time (ISO format string)
+            user_email: Email of the user who owns this appointment
+            google_calendar_event_id: Optional Google Calendar event ID
+        """
         try:
-            data = {"time": time, "description": description}
+            data = {"time": time, "description": description, "user_email": user_email}
             if google_calendar_event_id:
                 data["google_calendar_event_id"] = google_calendar_event_id
             response = self.client.table("appointments").insert(data).execute()
@@ -515,6 +531,27 @@ class SupabaseService:
             logger.error(f"Error fetching all users: {e}")
             raise
 
+    def get_user_by_parlant_session(self, session_id: str) -> Optional[Dict[str, Any]]:
+        """Get user by Parlant session ID.
+        
+        Args:
+            session_id: Parlant session ID
+            
+        Returns:
+            User dict if found, None otherwise
+        """
+        try:
+            response = (
+                self.client.table("users")
+                .select("*")
+                .eq("parlant_session_id", session_id)
+                .execute()
+            )
+            return response.data[0] if response.data else None
+        except Exception as e:
+            logger.error(f"Error fetching user by session ID {session_id}: {e}")
+            return None
+
     def get_user_by_listen_address(self, listen_address: str) -> Optional[Dict[str, Any]]:
         """Get user by listen address (agent email).
         
@@ -534,4 +571,35 @@ class SupabaseService:
             return response.data[0] if response.data else None
         except Exception as e:
             logger.error(f"Error fetching user by listen_address {listen_address}: {e}")
+            raise
+    
+    def update_user_parlant_session(
+        self, user_email: str, parlant_session_id: str
+    ) -> Dict[str, Any]:
+        """Update user's Parlant session ID.
+        
+        Args:
+            user_email: User's email address
+            parlant_session_id: Parlant session ID
+            
+        Returns:
+            Updated user record
+        """
+        try:
+            from datetime import datetime
+            
+            update_data = {
+                "parlant_session_id": parlant_session_id,
+                "updated_at": datetime.now().isoformat(),
+            }
+            
+            response = (
+                self.client.table("users")
+                .update(update_data)
+                .eq("user_email", user_email.lower())
+                .execute()
+            )
+            return response.data[0] if response.data else {}
+        except Exception as e:
+            logger.error(f"Error updating user parlant session {user_email}: {e}")
             raise

@@ -45,7 +45,7 @@ class GoogleCalendarService:
 
     def _authenticate(self):
         """Authenticate with Google Calendar API using OAuth 2.0.
-        
+
         Priority order:
         1. GOOGLE_TOKEN_JSON (environment variable with JSON string)
         2. GOOGLE_TOKEN_PATH (file path)
@@ -60,7 +60,7 @@ class GoogleCalendarService:
                 f"GOOGLE_CREDENTIALS_JSON={'set' if settings.GOOGLE_CREDENTIALS_JSON else 'not set'}, "
                 f"GOOGLE_CREDENTIALS_PATH={'set' if settings.GOOGLE_CREDENTIALS_PATH else 'not set'}"
             )
-            
+
             # Priority 1: Use token from environment variable (JSON string)
             if settings.GOOGLE_TOKEN_JSON:
                 try:
@@ -77,7 +77,9 @@ class GoogleCalendarService:
                     elif self.creds and self.creds.expired and self.creds.refresh_token:
                         try:
                             self.creds.refresh(Request())
-                            self.service = build("calendar", "v3", credentials=self.creds)
+                            self.service = build(
+                                "calendar", "v3", credentials=self.creds
+                            )
                             logger.info(
                                 "Google Calendar service initialized successfully after refreshing token from GOOGLE_TOKEN_JSON"
                             )
@@ -106,7 +108,9 @@ class GoogleCalendarService:
                     elif self.creds and self.creds.expired and self.creds.refresh_token:
                         try:
                             self.creds.refresh(Request())
-                            self.service = build("calendar", "v3", credentials=self.creds)
+                            self.service = build(
+                                "calendar", "v3", credentials=self.creds
+                            )
                             logger.info(
                                 f"Google Calendar service initialized successfully after refreshing token from {settings.GOOGLE_TOKEN_PATH}"
                             )
@@ -127,20 +131,31 @@ class GoogleCalendarService:
                     credentials_data = json.loads(settings.GOOGLE_CREDENTIALS_JSON)
                     # For cloud deployments, we expect a token JSON, not OAuth credentials
                     # If it's a token, use it directly
-                    if "token" in credentials_data or "refresh_token" in credentials_data:
+                    if (
+                        "token" in credentials_data
+                        or "refresh_token" in credentials_data
+                    ):
                         self.creds = Credentials.from_authorized_user_info(
                             credentials_data, COMBINED_SCOPES
                         )
                         if self.creds and self.creds.valid:
-                            self.service = build("calendar", "v3", credentials=self.creds)
+                            self.service = build(
+                                "calendar", "v3", credentials=self.creds
+                            )
                             logger.info(
                                 "Google Calendar service initialized successfully using credentials from GOOGLE_CREDENTIALS_JSON"
                             )
                             return
-                        elif self.creds and self.creds.expired and self.creds.refresh_token:
+                        elif (
+                            self.creds
+                            and self.creds.expired
+                            and self.creds.refresh_token
+                        ):
                             try:
                                 self.creds.refresh(Request())
-                                self.service = build("calendar", "v3", credentials=self.creds)
+                                self.service = build(
+                                    "calendar", "v3", credentials=self.creds
+                                )
                                 logger.info(
                                     "Google Calendar service initialized successfully after refreshing credentials from GOOGLE_CREDENTIALS_JSON"
                                 )
@@ -199,7 +214,7 @@ class GoogleCalendarService:
                     # No valid credentials available - disable service
                     # Users should use the OAuth endpoint at /auth/google to authenticate
                     logger.warning(
-                        f"No valid Google Calendar credentials found. "
+                        "No valid Google Calendar credentials found. "
                         "Google Calendar integration will be disabled. "
                         "To authenticate, use the OAuth endpoint at /auth/google"
                     )
@@ -854,6 +869,371 @@ class GoogleCalendarService:
             return {"calendars": {}, "unavailable": participant_emails}
 
     @staticmethod
+    def create_event_with_token(
+        user_token: Dict[str, Any],
+        description: str,
+        start_time: datetime,
+        end_time: Optional[datetime] = None,
+        summary: Optional[str] = None,
+        attendees: Optional[List[str]] = None,
+        timezone_str: Optional[str] = None,
+        supabase_service=None,
+        user_email: Optional[str] = None,
+    ) -> Optional[str]:
+        """Create a calendar event using a user's own token.
+
+        This method creates a temporary service instance using the user's token
+        to create an event in their calendar. Used for multi-user scenarios where
+        each user has their own OAuth token.
+
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            description: Event description (body text)
+            start_time: Event start time as datetime object
+            end_time: Event end time as datetime object. If None, defaults to start_time + 1 hour
+            summary: Event title/summary. If None, uses description
+            attendees: List of email addresses to invite as attendees
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token (required if supabase_service is provided)
+
+        Returns:
+            Event ID if successful, None otherwise
+        """
+        try:
+            # Create credentials from user token
+            # Use calendar scope (full access needed to create events with attendees)
+            # The token should have been obtained with calendar scope
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+
+            # Refresh token if expired and save updated token back to database
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    logger.info(
+                        "Token refreshed successfully for calendar event creation"
+                    )
+
+                    # Save refreshed token back to database if supabase_service is provided
+                    if supabase_service and user_email:
+                        try:
+                            refreshed_token_dict = {
+                                "token": creds.token,
+                                "refresh_token": creds.refresh_token,
+                                "token_uri": creds.token_uri,
+                                "client_id": creds.client_id,
+                                "client_secret": creds.client_secret,
+                                "scopes": creds.scopes or user_token.get("scopes", []),
+                            }
+
+                            supabase_service.update_user_token(
+                                user_email, refreshed_token_dict
+                            )
+                            logger.info(
+                                f"Refreshed token saved to database for user {user_email}"
+                            )
+                        except Exception as e:
+                            logger.warning(
+                                f"Failed to save refreshed token to database for {user_email}: {e}. "
+                                "Token was refreshed but not persisted."
+                            )
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return None
+
+            # Build temporary service
+            service = build("calendar", "v3", credentials=creds)
+
+            # Use provided timezone or default
+            tz = (
+                pytz.timezone(timezone_str)
+                if timezone_str
+                else pytz.timezone("America/Sao_Paulo")
+            )
+
+            # Default end_time to 1 hour after start_time if not provided
+            if end_time is None:
+                end_time = start_time + timedelta(hours=1)
+
+            # Ensure datetimes are timezone-aware
+            if start_time.tzinfo is None:
+                start_time = tz.localize(start_time)
+            else:
+                start_time = start_time.astimezone(tz)
+
+            if end_time.tzinfo is None:
+                end_time = tz.localize(end_time)
+            else:
+                end_time = end_time.astimezone(tz)
+
+            # Format as RFC3339
+            start_time_str = start_time.isoformat()
+            end_time_str = end_time.isoformat()
+
+            # Prepare event
+            event = {
+                "summary": summary or description,
+                "description": description,
+                "start": {
+                    "dateTime": start_time_str,
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                },
+                "end": {
+                    "dateTime": end_time_str,
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                },
+            }
+
+            # Add attendees if provided
+            if attendees:
+                event["attendees"] = [{"email": email} for email in attendees]
+
+            # Insert event into user's primary calendar
+            created_event = (
+                service.events().insert(calendarId="primary", body=event).execute()
+            )
+
+            event_id = created_event.get("id")
+            logger.info(f"Created Google Calendar event {event_id} for user")
+
+            return event_id
+
+        except HttpError as e:
+            logger.error(f"Error creating Google Calendar event with user token: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error in create_event_with_token: {e}")
+            return None
+
+    @staticmethod
+    def update_event_with_token(
+        user_token: Dict[str, Any],
+        event_id: str,
+        description: Optional[str] = None,
+        start_time: Optional[datetime] = None,
+        end_time: Optional[datetime] = None,
+        summary: Optional[str] = None,
+        timezone_str: Optional[str] = None,
+        supabase_service=None,
+        user_email: Optional[str] = None,
+    ) -> bool:
+        """Update a calendar event using a user's own token.
+
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            event_id: Google Calendar event ID
+            description: New event description (optional)
+            start_time: New event start time (optional)
+            end_time: New event end time (optional)
+            summary: New event title/summary (optional)
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    if supabase_service and user_email:
+                        refreshed_token_dict = {
+                            "token": creds.token,
+                            "refresh_token": creds.refresh_token,
+                            "token_uri": creds.token_uri,
+                            "client_id": creds.client_id,
+                            "client_secret": creds.client_secret,
+                            "scopes": creds.scopes or user_token.get("scopes", []),
+                        }
+                        supabase_service.update_user_token(
+                            user_email, refreshed_token_dict
+                        )
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return False
+
+            service = build("calendar", "v3", credentials=creds)
+            tz = (
+                pytz.timezone(timezone_str)
+                if timezone_str
+                else pytz.timezone("America/Sao_Paulo")
+            )
+
+            # Get existing event
+            event = (
+                service.events().get(calendarId="primary", eventId=event_id).execute()
+            )
+
+            # Update fields
+            if summary:
+                event["summary"] = summary
+            if description:
+                event["description"] = description
+            if start_time:
+                if start_time.tzinfo is None:
+                    start_time = tz.localize(start_time)
+                else:
+                    start_time = start_time.astimezone(tz)
+                event["start"] = {
+                    "dateTime": start_time.isoformat(),
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                }
+            if end_time:
+                if end_time.tzinfo is None:
+                    end_time = tz.localize(end_time)
+                else:
+                    end_time = end_time.astimezone(tz)
+                event["end"] = {
+                    "dateTime": end_time.isoformat(),
+                    "timeZone": timezone_str or "America/Sao_Paulo",
+                }
+
+            service.events().update(
+                calendarId="primary", eventId=event_id, body=event
+            ).execute()
+            logger.info(f"Updated Google Calendar event {event_id} for user")
+            return True
+
+        except HttpError as e:
+            logger.error(f"Error updating Google Calendar event with user token: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error in update_event_with_token: {e}")
+            return False
+
+    @staticmethod
+    def delete_event_with_token(
+        user_token: Dict[str, Any],
+        event_id: str,
+        supabase_service=None,
+        user_email: Optional[str] = None,
+    ) -> bool:
+        """Delete a calendar event using a user's own token.
+
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            event_id: Google Calendar event ID
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token
+
+        Returns:
+            True if successful, False otherwise
+        """
+        try:
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    if supabase_service and user_email:
+                        refreshed_token_dict = {
+                            "token": creds.token,
+                            "refresh_token": creds.refresh_token,
+                            "token_uri": creds.token_uri,
+                            "client_id": creds.client_id,
+                            "client_secret": creds.client_secret,
+                            "scopes": creds.scopes or user_token.get("scopes", []),
+                        }
+                        supabase_service.update_user_token(
+                            user_email, refreshed_token_dict
+                        )
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return False
+
+            service = build("calendar", "v3", credentials=creds)
+            service.events().delete(calendarId="primary", eventId=event_id).execute()
+            logger.info(f"Deleted Google Calendar event {event_id} for user")
+            return True
+
+        except HttpError as e:
+            if e.resp.status == 404:
+                logger.warning(
+                    f"Event {event_id} not found (may have been already deleted)"
+                )
+                return True
+            logger.error(f"Error deleting Google Calendar event with user token: {e}")
+            return False
+        except Exception as e:
+            logger.error(f"Unexpected error in delete_event_with_token: {e}")
+            return False
+
+    @staticmethod
+    def get_user_calendar_timezone(
+        user_token: Dict[str, Any],
+        calendar_id: str = "primary",
+        supabase_service=None,
+        user_email: Optional[str] = None,
+    ) -> Optional[str]:
+        """Get the timezone of a user's calendar.
+        
+        Args:
+            user_token: User's OAuth token JSON (dict)
+            calendar_id: Calendar ID to check (default: "primary")
+            supabase_service: Optional SupabaseService instance to save refreshed token
+            user_email: Optional user email to save refreshed token
+            
+        Returns:
+            Timezone string (e.g., "America/Sao_Paulo") or None if unable to fetch
+        """
+        try:
+            # Create credentials from user token
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar.readonly"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+            
+            # Refresh token if expired
+            if creds.expired and creds.refresh_token:
+                try:
+                    creds.refresh(Request())
+                    logger.info("Token refreshed successfully for calendar timezone query")
+                    
+                    # Save refreshed token back to database if supabase_service is provided
+                    if supabase_service and user_email:
+                        try:
+                            refreshed_token_dict = {
+                                "token": creds.token,
+                                "refresh_token": creds.refresh_token,
+                                "token_uri": creds.token_uri,
+                                "client_id": creds.client_id,
+                                "client_secret": creds.client_secret,
+                                "scopes": creds.scopes or user_token.get("scopes", []),
+                            }
+                            supabase_service.update_user_token(user_email, refreshed_token_dict)
+                            logger.info(f"Refreshed token saved to database for user {user_email}")
+                        except Exception as e:
+                            logger.warning(f"Failed to save refreshed token: {e}")
+                except Exception as e:
+                    logger.error(f"Failed to refresh token: {e}")
+                    return None
+            
+            # Build service
+            service = build("calendar", "v3", credentials=creds)
+            
+            # Get calendar metadata
+            calendar = service.calendarList().get(calendarId=calendar_id).execute()
+            timezone_str = calendar.get("timeZone")
+            
+            if timezone_str:
+                logger.info(f"Retrieved timezone {timezone_str} for calendar {calendar_id}")
+                return timezone_str
+            else:
+                logger.warning(f"No timezone found for calendar {calendar_id}")
+                return None
+                
+        except HttpError as e:
+            logger.error(f"HTTP error getting calendar timezone: {e}")
+            return None
+        except Exception as e:
+            logger.error(f"Unexpected error getting calendar timezone: {e}")
+            return None
+
+    @staticmethod
     def get_availability_slots(
         user_token: Dict[str, Any],
         participant_emails: List[str],
@@ -861,15 +1241,15 @@ class GoogleCalendarService:
         end_date: datetime,
         duration_minutes: int = 30,
         timezone_str: Optional[str] = None,
-        supabase_service = None,
+        supabase_service=None,
         user_email: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Get availability slots for a user using their own token.
-        
+
         This method creates a temporary service instance using the user's token
         to query freebusy information. Used for multi-user scenarios where
         each user has their own OAuth token.
-        
+
         Args:
             user_token: User's OAuth token JSON (dict)
             participant_emails: List of email addresses to check availability for
@@ -879,7 +1259,7 @@ class GoogleCalendarService:
             timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
             supabase_service: Optional SupabaseService instance to save refreshed token
             user_email: Optional user email to save refreshed token (required if supabase_service is provided)
-            
+
         Returns:
             Dictionary with structure:
             {
@@ -895,18 +1275,18 @@ class GoogleCalendarService:
         """
         try:
             # Create credentials from user token
-            # Scope for freebusy is calendar.freebusy
-            freebusy_scopes = ["https://www.googleapis.com/auth/calendar.freebusy"]
-            creds = Credentials.from_authorized_user_info(user_token, freebusy_scopes)
-            
+            # Use calendar.freebusy scope (more privacy-friendly, only checks availability)
+            calendar_scopes = ["https://www.googleapis.com/auth/calendar.freebusy"]
+            creds = Credentials.from_authorized_user_info(user_token, calendar_scopes)
+
             # Refresh token if expired and save updated token back to database
-            token_was_refreshed = False
             if creds.expired and creds.refresh_token:
                 try:
                     creds.refresh(Request())
-                    token_was_refreshed = True
-                    logger.info("Token refreshed successfully for calendar freebusy query")
-                    
+                    logger.info(
+                        "Token refreshed successfully for calendar freebusy query"
+                    )
+
                     # Save refreshed token back to database if supabase_service is provided
                     if supabase_service and user_email:
                         try:
@@ -919,9 +1299,13 @@ class GoogleCalendarService:
                                 "client_secret": creds.client_secret,
                                 "scopes": creds.scopes or user_token.get("scopes", []),
                             }
-                            
-                            supabase_service.update_user_token(user_email, refreshed_token_dict)
-                            logger.info(f"Refreshed token saved to database for user {user_email}")
+
+                            supabase_service.update_user_token(
+                                user_email, refreshed_token_dict
+                            )
+                            logger.info(
+                                f"Refreshed token saved to database for user {user_email}"
+                            )
                         except Exception as e:
                             logger.warning(
                                 f"Failed to save refreshed token to database for {user_email}: {e}. "
@@ -930,43 +1314,47 @@ class GoogleCalendarService:
                 except Exception as e:
                     logger.error(f"Failed to refresh token: {e}")
                     return {"calendars": {}, "unavailable": participant_emails}
-            
+
             # Build temporary service
             service = build("calendar", "v3", credentials=creds)
-            
+
             # Use provided timezone or default
-            tz = pytz.timezone(timezone_str) if timezone_str else pytz.timezone("America/Sao_Paulo")
-            
+            tz = (
+                pytz.timezone(timezone_str)
+                if timezone_str
+                else pytz.timezone("America/Sao_Paulo")
+            )
+
             # Ensure datetimes are timezone-aware
             if start_date.tzinfo is None:
                 start_date = tz.localize(start_date)
             else:
                 start_date = start_date.astimezone(tz)
-                
+
             if end_date.tzinfo is None:
                 end_date = tz.localize(end_date)
             else:
                 end_date = end_date.astimezone(tz)
-            
+
             # Format as RFC3339 for API
             time_min = start_date.isoformat()
             time_max = end_date.isoformat()
-            
+
             # Prepare items (each email is a calendar to check)
             items = [{"id": email} for email in participant_emails]
-            
+
             # Call freebusy API
             body = {
                 "timeMin": time_min,
                 "timeMax": time_max,
                 "items": items,
             }
-            
+
             freebusy_response = service.freebusy().query(body=body).execute()
-            
+
             calendars_result = freebusy_response.get("calendars", {})
             unavailable = []
-            
+
             # Check which calendars were successfully queried
             for email in participant_emails:
                 if email not in calendars_result:
@@ -976,7 +1364,7 @@ class GoogleCalendarService:
                     logger.warning(
                         f"Error accessing calendar for {email}: {calendars_result[email].get('errors')}"
                     )
-            
+
             result = {
                 "calendars": {
                     email: calendars_result[email]
@@ -985,19 +1373,114 @@ class GoogleCalendarService:
                 },
                 "unavailable": unavailable,
             }
-            
+
             logger.info(
                 f"Freebusy query completed for user: {len(participant_emails) - len(unavailable)}/{len(participant_emails)} calendars accessible"
             )
-            
+
             return result
-            
+
         except HttpError as e:
             logger.error(f"Error querying freebusy with user token: {e}")
             return {"calendars": {}, "unavailable": participant_emails}
         except Exception as e:
             logger.error(f"Unexpected error in get_availability_slots: {e}")
             return {"calendars": {}, "unavailable": participant_emails}
+
+    @staticmethod
+    def get_availability_slots_multi_token(
+        participant_tokens: Dict[str, Dict[str, Any]],
+        participant_emails: List[str],
+        start_date: datetime,
+        end_date: datetime,
+        duration_minutes: int = 30,
+        timezone_str: Optional[str] = None,
+        supabase_service=None,
+    ) -> Dict[str, Any]:
+        """Get availability slots using tokens from multiple participants.
+
+        This method queries freebusy for each participant using their own token.
+        This allows accessing calendars without requiring them to be public or shared.
+
+        Args:
+            participant_tokens: Dictionary mapping email -> token dict for registered participants
+            participant_emails: List of all participant email addresses to check
+            start_date: Start of time range to query
+            end_date: End of time range to query
+            duration_minutes: Minimum duration for free slots
+            timezone_str: Optional timezone string (e.g., "America/Sao_Paulo")
+            supabase_service: Optional SupabaseService instance to save refreshed tokens
+
+        Returns:
+            Dictionary with structure:
+            {
+                "calendars": {
+                    "email@example.com": {
+                        "busy": [
+                            {"start": "2025-11-20T10:00:00Z", "end": "2025-11-20T11:00:00Z"}
+                        ]
+                    }
+                },
+                "unavailable": ["email2@example.com"]
+            }
+        """
+        all_calendars = {}
+        unavailable = []
+
+        # Query each participant's calendar using their own token
+        for email in participant_emails:
+            email_lower = email.lower()
+
+            # Check if we have a token for this participant
+            if email_lower in participant_tokens:
+                token = participant_tokens[email_lower]
+
+                # Query this participant's calendar using their token
+                # Only query their own calendar (not all participants)
+                try:
+                    result = GoogleCalendarService.get_availability_slots(
+                        user_token=token,
+                        participant_emails=[
+                            email
+                        ],  # Only query this participant's calendar
+                        start_date=start_date,
+                        end_date=end_date,
+                        duration_minutes=duration_minutes,
+                        timezone_str=timezone_str,
+                        supabase_service=supabase_service,
+                        user_email=email_lower,
+                    )
+
+                    # Merge result into all_calendars
+                    calendars = result.get("calendars", {})
+                    if email_lower in calendars:
+                        all_calendars[email_lower] = calendars[email_lower]
+                    elif email_lower not in result.get("unavailable", []):
+                        # If not in unavailable, might be in calendars with different case
+                        for cal_email, cal_data in calendars.items():
+                            if cal_email.lower() == email_lower:
+                                all_calendars[email_lower] = cal_data
+                                break
+                        else:
+                            unavailable.append(email_lower)
+                    else:
+                        unavailable.append(email_lower)
+
+                except Exception as e:
+                    logger.warning(f"Error querying calendar for {email}: {e}")
+                    unavailable.append(email_lower)
+            else:
+                # No token for this participant - mark as unavailable
+                unavailable.append(email_lower)
+
+        logger.info(
+            f"Multi-token freebusy query completed: {len(participant_emails) - len(unavailable)}/{len(participant_emails)} calendars accessible"
+        )
+
+        return {
+            "calendars": all_calendars,
+            "unavailable": unavailable,
+        }
 
     def find_common_free_slots(
         self,
@@ -1046,7 +1529,7 @@ class GoogleCalendarService:
             if not self.service:
                 logger.warning("Google Calendar service not initialized")
                 return []
-            
+
             # Query freebusy (pass timezone down)
             freebusy_result = self.freebusy_query(
                 participant_emails, start_date, end_date, duration_minutes, timezone_str

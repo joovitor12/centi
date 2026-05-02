@@ -5367,3 +5367,637 @@ Recommended actions:
 [2m2025-12-10T16:01:52.673255Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
 [2m2025-12-10T16:06:59.207230Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
 [2m2025-12-10T16:06:59.208233Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T03:48:20.742631Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T03:48:20.743630Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T03:48:20.745630Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T03:48:20.841630Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T03:48:34.216899Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T03:48:34.217900Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T03:48:34.217900Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T03:48:34.217900Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T03:48:34.217900Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T03:53:17.444813Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-11T03:53:17.446813Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T03:53:33.415446Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T03:53:33.415446Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T03:53:33.418446Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T03:53:33.433446Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T03:53:46.432314Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T03:53:46.432314Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T03:53:46.432314Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T03:53:46.433313Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T03:53:46.433313Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T03:55:49.493789Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-11T03:55:49.495791Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T03:56:08.376277Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T03:56:08.376277Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T03:56:08.378276Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T03:56:08.393276Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T03:56:22.236479Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T03:56:22.236479Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T03:56:22.237479Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T03:56:22.237479Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T03:56:22.237479Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T03:58:01.129048Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-11T03:58:01.131047Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T12:57:07.963607Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T12:57:07.964610Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T12:57:07.966608Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T12:57:08.013184Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T12:57:23.321396Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T12:57:23.321396Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T12:57:23.321396Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T12:57:23.322396Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T12:57:23.322396Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:03:21.432553Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-11T13:03:21.434552Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:03:38.999008Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:03:38.999008Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:03:39.001008Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:03:39.018008Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:03:55.153440Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:03:55.153440Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:03:55.154443Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:03:55.154443Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:03:55.154443Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:07:01.922996Z[0m [[32m[1minfo     [0m] [1m[R8vd3rhgSD6::process] Processing context for session TU58zqpjZw finished in 12.586 seconds[0m
+[2m2025-12-11T13:07:47.741119Z[0m [[32m[1minfo     [0m] [1m[R4d5XwQzXLW::process] Processing context for session TU58zqpjZw finished in 30.744 seconds[0m
+[2m2025-12-11T13:08:43.077803Z[0m [[32m[1minfo     [0m] [1m[Ro8w0YyPmNg::process] Processing context for session TU58zqpjZw finished in 38.764 seconds[0m
+[2m2025-12-11T13:09:30.120862Z[0m [[32m[1minfo     [0m] [1m[RiWIWINpfqp::process] Processing context for session TU58zqpjZw finished in 45.082 seconds[0m
+[2m2025-12-11T13:10:11.533181Z[0m [[32m[1minfo     [0m] [1m[R5Oc0DHxK2I::process] Processing context for session 4FkrkSZKSc finished in 6.472 seconds[0m
+[2m2025-12-11T13:11:00.586415Z[0m [[32m[1minfo     [0m] [1m[Rz57tYKHyRM::process] Processing context for session 4FkrkSZKSc finished in 33.553 seconds[0m
+[2m2025-12-11T13:17:21.968078Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T13:17:21.970078Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:17:40.713820Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:17:40.713820Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:17:40.715819Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:17:40.742821Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:17:52.744352Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:17:52.744352Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:17:52.744352Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:17:52.744352Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:17:52.744352Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:18:45.485801Z[0m [[32m[1minfo     [0m] [1m[RQz88mhFhMc] Session not found (id='4FkrkSZKSc')[0m
+[2m2025-12-11T13:18:45.486799Z[0m [[32m[1minfo     [0m] [1m[R2BvbrS0Hcm] Session not found (id='4FkrkSZKSc')[0m
+[2m2025-12-11T13:18:46.504044Z[0m [[32m[1minfo     [0m] [1m[RhayzEby4Yd] Session not found (id='4FkrkSZKSc')[0m
+[2m2025-12-11T13:19:00.783632Z[0m [[32m[1minfo     [0m] [1m[ReibjTWxwqe] Session not found (id='4FkrkSZKSc')[0m
+[2m2025-12-11T13:19:44.364039Z[0m [[32m[1minfo     [0m] [1m[RQz7HusXdUn::process] Processing context for session gat9ODGlSG finished in 28.705 seconds[0m
+[2m2025-12-11T13:21:56.179681Z[0m [[32m[1minfo     [0m] [1m[RseVXaGMjcc::process] Processing context for session gat9ODGlSG finished in 31.983 seconds[0m
+[2m2025-12-11T13:25:15.028588Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T13:25:15.030588Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:25:36.009779Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:25:36.009779Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:25:36.012580Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:25:36.030612Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:25:50.024645Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:25:50.025645Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:25:50.025645Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:25:50.025645Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:25:50.025645Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:25:54.314893Z[0m [[32m[1minfo     [0m] [1m[R2IwwtKF9WP] Session not found (id='gat9ODGlSG')[0m
+[2m2025-12-11T13:25:54.314893Z[0m [[32m[1minfo     [0m] [1m[RSQ1P1Q0aLF] Session not found (id='gat9ODGlSG')[0m
+[2m2025-12-11T13:25:55.332321Z[0m [[32m[1minfo     [0m] [1m[RyCgyhK1rkU] Session not found (id='gat9ODGlSG')[0m
+[2m2025-12-11T13:25:58.178936Z[0m [[32m[1minfo     [0m] [1m[R53WRVnQyjq] Session not found (id='gat9ODGlSG')[0m
+[2m2025-12-11T13:25:58.179934Z[0m [[32m[1minfo     [0m] [1m[Rf3UpOP1RFI] Session not found (id='gat9ODGlSG')[0m
+[2m2025-12-11T13:26:02.729988Z[0m [[32m[1minfo     [0m] [1m[RsbHOMdW8tt] Session not found (id='gat9ODGlSG')[0m
+[2m2025-12-11T13:26:36.666096Z[0m [[32m[1minfo     [0m] [1m[RbZU2TzwY82::process] Processing context for session jFRYadMMSS finished in 30.385 seconds[0m
+[2m2025-12-11T13:27:47.135757Z[0m [[32m[1minfo     [0m] [1m[RuF7arkhpCr::process] Processing context for session jFRYadMMSS finished in 43.811 seconds[0m
+[2m2025-12-11T13:31:45.289892Z[0m [[33m[1mwarning  [0m] [1m[REiZM0OpFQa] HTTP Request: GET /sessions/jFRYadMMSS/events cancelled after 7.857 seconds[0m
+[2m2025-12-11T13:31:45.290893Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T13:31:45.291892Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:32:03.151232Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:32:03.151232Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:32:03.154233Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:32:03.168232Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:32:18.611673Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:32:18.611673Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:32:18.611673Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:32:18.611673Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:32:18.612671Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:38:10.042415Z[0m [[32m[1minfo     [0m] [1m[RahuF8hDHfw] Session not found (id='jFRYadMMSS')[0m
+[2m2025-12-11T13:38:10.043919Z[0m [[32m[1minfo     [0m] [1m[RwSm92mKPHM] Session not found (id='jFRYadMMSS')[0m
+[2m2025-12-11T13:38:25.659482Z[0m [[32m[1minfo     [0m] [1m[R5OI2Rr8xOj] Session not found (id='jFRYadMMSS')[0m
+[2m2025-12-11T13:38:58.750244Z[0m [[32m[1minfo     [0m] [1m[RBsNO39MZut::process] Processing context for session y0ggUyaRRw finished in 28.003 seconds[0m
+[2m2025-12-11T13:40:47.382788Z[0m [[33m[1mwarning  [0m] [1m[R6PXmr91iuH] HTTP Request: GET /sessions/y0ggUyaRRw/events cancelled after 51.496 seconds[0m
+[2m2025-12-11T13:40:47.383789Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T13:40:47.384792Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:41:04.771296Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:41:04.771296Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:41:04.774805Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:41:04.791837Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:41:19.678656Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:41:19.679656Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:41:19.679656Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:41:19.679656Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:41:19.679656Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:41:33.572519Z[0m [[32m[1minfo     [0m] [1m[Rmoecqe9Lrq] Session not found (id='y0ggUyaRRw')[0m
+[2m2025-12-11T13:41:33.573524Z[0m [[32m[1minfo     [0m] [1m[RJuWs7z68PW] Session not found (id='y0ggUyaRRw')[0m
+[2m2025-12-11T13:41:34.596870Z[0m [[32m[1minfo     [0m] [1m[RXdZzC5EAYJ] Session not found (id='y0ggUyaRRw')[0m
+[2m2025-12-11T13:42:00.809209Z[0m [[32m[1minfo     [0m] [1m[RoL4S5TecLy] Session not found (id='y0ggUyaRRw')[0m
+[2m2025-12-11T13:42:28.722456Z[0m [[32m[1minfo     [0m] [1m[Rm8MC3ifQpP::process] Processing context for session vCstUKsOgP finished in 24.967 seconds[0m
+[2m2025-12-11T13:45:10.846223Z[0m [[33m[1mwarning  [0m] [1m[R1zrwG9prJ9] HTTP Request: GET /sessions/vCstUKsOgP/events cancelled after 41.957 seconds[0m
+[2m2025-12-11T13:45:10.847226Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T13:45:10.848226Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:45:28.741220Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:45:28.742219Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:45:28.744220Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:45:28.760253Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:45:41.146716Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:45:41.146716Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:45:41.146716Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:45:41.147715Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:45:41.147715Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:48:00.025259Z[0m [[32m[1minfo     [0m] [1m[Ry8gmwWpsjE] Session not found (id='vCstUKsOgP')[0m
+[2m2025-12-11T13:48:00.026259Z[0m [[32m[1minfo     [0m] [1m[RJcsIW8aLiA] Session not found (id='vCstUKsOgP')[0m
+[2m2025-12-11T13:48:01.046021Z[0m [[32m[1minfo     [0m] [1m[RuxjEVdHWM5] Session not found (id='vCstUKsOgP')[0m
+[2m2025-12-11T13:48:16.757785Z[0m [[32m[1minfo     [0m] [1m[Rso6WEHWMIY] Session not found (id='vCstUKsOgP')[0m
+[2m2025-12-11T13:48:53.142666Z[0m [[32m[1minfo     [0m] [1m[RHWy7gKYdsR::process] Processing context for session E0cqewKTZG finished in 33.897 seconds[0m
+[2m2025-12-11T13:51:33.143724Z[0m [[33m[1mwarning  [0m] [1m[RfjClPaigsw] HTTP Request: GET /sessions/E0cqewKTZG/events cancelled after 41.256 seconds[0m
+[2m2025-12-11T13:51:33.144724Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T13:51:33.145724Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T13:51:50.993753Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T13:51:50.994751Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T13:51:50.996751Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T13:51:51.013287Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T13:52:08.130244Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T13:52:08.130244Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T13:52:08.130244Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T13:52:08.131245Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T13:52:08.131245Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T13:52:47.116849Z[0m [[32m[1minfo     [0m] [1m[RwYKA2rAixp] Session not found (id='E0cqewKTZG')[0m
+[2m2025-12-11T13:52:47.116849Z[0m [[32m[1minfo     [0m] [1m[R2Vbkbt7gBn] Session not found (id='E0cqewKTZG')[0m
+[2m2025-12-11T13:52:48.135801Z[0m [[32m[1minfo     [0m] [1m[R89kk2sdQAF] Session not found (id='E0cqewKTZG')[0m
+[2m2025-12-11T13:53:22.553111Z[0m [[32m[1minfo     [0m] [1m[R8LVPbocno1] Session not found (id='E0cqewKTZG')[0m
+[2m2025-12-11T13:53:54.878709Z[0m [[32m[1minfo     [0m] [1m[RndnHRG9Yr3::process] Processing context for session iraKn3H2u0 finished in 28.853 seconds[0m
+[2m2025-12-11T14:02:23.456426Z[0m [[33m[1mwarning  [0m] [1m[R2rwAheX9du] HTTP Request: GET /sessions/iraKn3H2u0/events cancelled after 12.114 seconds[0m
+[2m2025-12-11T14:02:23.456426Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T14:02:23.459116Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T14:03:26.855570Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T14:03:26.855570Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T14:03:26.858571Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T14:03:26.876571Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T14:03:40.511906Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T14:03:40.512906Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T14:03:40.512906Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T14:03:40.512906Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T14:03:40.512906Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T14:07:17.918717Z[0m [[32m[1minfo     [0m] [1m[RlFkeGfy9rH] Session not found (id='iraKn3H2u0')[0m
+[2m2025-12-11T14:07:17.919716Z[0m [[32m[1minfo     [0m] [1m[R6OFKvME3yc] Session not found (id='iraKn3H2u0')[0m
+[2m2025-12-11T14:07:33.398263Z[0m [[32m[1minfo     [0m] [1m[R98Y1Kzum5u] Session not found (id='iraKn3H2u0')[0m
+[2m2025-12-11T14:24:55.031982Z[0m [[32m[1minfo     [0m] [1m[R4MbFGQP4ie::process] Processing context for session 6IEc07bEqH finished in 6.65 seconds[0m
+[2m2025-12-11T14:38:38.222315Z[0m [[32m[1minfo     [0m] [1m[R5K8mZBgYtA::process] Processing context for session 6IEc07bEqH finished in 21.414 seconds[0m
+[2m2025-12-11T14:38:46.480077Z[0m [[33m[1mwarning  [0m] [1m[RczJOvRun7H] HTTP Request: GET /sessions/6IEc07bEqH/events cancelled after 12.696 seconds[0m
+[2m2025-12-11T14:38:46.481077Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T14:38:46.482076Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T14:39:04.748627Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T14:39:04.749627Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T14:39:04.751627Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T14:39:04.766627Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T14:39:19.563590Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T14:39:19.563590Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T14:39:19.563590Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T14:39:19.563590Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T14:39:19.563590Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T14:39:35.303389Z[0m [[32m[1minfo     [0m] [1m[RgqlpNK4pdP] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.304390Z[0m [[32m[1minfo     [0m] [1m[Rf799r79pAi] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.310391Z[0m [[32m[1minfo     [0m] [1m[RKDVCobXUq3] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.312391Z[0m [[32m[1minfo     [0m] [1m[Rtk2KZtYVcG] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.313390Z[0m [[32m[1minfo     [0m] [1m[R6MW4q8h184] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.319390Z[0m [[32m[1minfo     [0m] [1m[Rkj1VQJNjka] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.320392Z[0m [[32m[1minfo     [0m] [1m[RIUGb0GDtC0] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.322392Z[0m [[32m[1minfo     [0m] [1m[RDfWUKvta51] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.322392Z[0m [[32m[1minfo     [0m] [1m[RclkMpYTW3W] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:35.330166Z[0m [[32m[1minfo     [0m] [1m[RJsV5EDECNS] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:36.316450Z[0m [[32m[1minfo     [0m] [1m[RU5sCq4o4C9] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:36.343450Z[0m [[32m[1minfo     [0m] [1m[RXz3PFe7r5H] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:39:53.176051Z[0m [[32m[1minfo     [0m] [1m[Rrdb2o3EeoC] Session not found (id='6IEc07bEqH')[0m
+[2m2025-12-11T14:40:06.951041Z[0m [[32m[1minfo     [0m] [1m[RYFgFotLKIT::process] Processing context for session SetXhRuN4c finished in 5.78 seconds[0m
+[2m2025-12-11T14:42:50.452401Z[0m [[33m[1mwarning  [0m] [1m[Ru4qLk826Ng] HTTP Request: GET /sessions/SetXhRuN4c/events cancelled after 39.518 seconds[0m
+[2m2025-12-11T14:42:50.453401Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T14:42:50.454402Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-11T14:43:06.878373Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-11T14:43:06.879378Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-11T14:43:06.881378Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-11T14:43:06.897402Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-11T14:43:21.374221Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-11T14:43:21.375220Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-11T14:43:21.375220Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-11T14:43:21.375220Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-11T14:43:21.375220Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-11T14:44:33.188478Z[0m [[32m[1minfo     [0m] [1m[R5KdjqFhOqI] Session not found (id='SetXhRuN4c')[0m
+[2m2025-12-11T14:44:33.189477Z[0m [[32m[1minfo     [0m] [1m[RlT4h1jenuv] Session not found (id='SetXhRuN4c')[0m
+[2m2025-12-11T14:44:33.190477Z[0m [[32m[1minfo     [0m] [1m[R2gwwbBxPrE] Session not found (id='SetXhRuN4c')[0m
+[2m2025-12-11T14:44:34.207370Z[0m [[32m[1minfo     [0m] [1m[R94dZa7Syvz] Session not found (id='SetXhRuN4c')[0m
+[2m2025-12-11T14:44:34.207370Z[0m [[32m[1minfo     [0m] [1m[RRYYwz6xGzs] Session not found (id='SetXhRuN4c')[0m
+[2m2025-12-11T14:44:36.719973Z[0m [[32m[1minfo     [0m] [1m[RlbjGkkg5Hw] Session not found (id='SetXhRuN4c')[0m
+[2m2025-12-11T14:44:52.105814Z[0m [[32m[1minfo     [0m] [1m[RGYDRci046k::process] Processing context for session XixK4Gdux9 finished in 11.078 seconds[0m
+[2m2025-12-11T14:47:01.390365Z[0m [[32m[1minfo     [0m] [1m[RFk2Q4mjwp3::process] Processing context for session XixK4Gdux9 finished in 6.176 seconds[0m
+[2m2025-12-11T14:48:04.786998Z[0m [[32m[1minfo     [0m] [1m[R4zqGiib18o] Session not found (id='V2WlE9a610')[0m
+[2m2025-12-11T14:48:17.065840Z[0m [[32m[1minfo     [0m] [1m[Rsu75NHwKSJ::process] Processing context for session 4nIpaIwAaw finished in 7.987 seconds[0m
+[2m2025-12-11T14:48:46.229882Z[0m [[32m[1minfo     [0m] [1m[RxhX2aCrQIa::process] Processing context for session 4nIpaIwAaw finished in 20.646 seconds[0m
+[2m2025-12-11T14:52:27.727934Z[0m [[32m[1minfo     [0m] [1m[RabSccZiiQa::process] Processing context for session kCebiDrlW7 finished in 5.442 seconds[0m
+[2m2025-12-11T15:00:13.163755Z[0m [[32m[1minfo     [0m] [1m[RucxczFggfP::process] Processing context for session kCebiDrlW7 finished in 7.921 seconds[0m
+[2m2025-12-11T15:01:18.329547Z[0m [[33m[1mwarning  [0m] [1m[RbEj3lyYR4N] HTTP Request: GET /sessions/kCebiDrlW7/events cancelled after 3.397 seconds[0m
+[2m2025-12-11T15:01:18.330549Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-11T15:01:18.332549Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-12T20:37:44.705708Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-12T20:37:44.705708Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-12T20:37:44.707708Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-12T20:37:44.807331Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-12T20:37:59.751526Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-12T20:37:59.751526Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-12T20:37:59.751526Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-12T20:37:59.751526Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-12T20:37:59.751526Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-12T20:38:14.861928Z[0m [[32m[1minfo     [0m] [1m[RzmrcdopHVl::process] Processing context for session 8wIZJ71QWt finished in 5.881 seconds[0m
+[2m2025-12-12T20:39:17.058037Z[0m [[32m[1minfo     [0m] [1m[R0KXPSNuGMe::process] Processing context for session 8wIZJ71QWt finished in 26.149 seconds[0m
+[2m2025-12-12T20:40:57.025089Z[0m [[32m[1minfo     [0m] [1m[RPG11vdGEuG::process] Processing context for session 8wIZJ71QWt finished in 40.672 seconds[0m
+[2m2025-12-12T20:41:15.285827Z[0m [[33m[1mwarning  [0m] [1m[RmFElxVMriW] HTTP Request: GET /sessions/8wIZJ71QWt/events cancelled after 24.006 seconds[0m
+[2m2025-12-12T20:41:15.286828Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-12T20:41:15.288828Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-12T20:41:44.749422Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-12T20:41:44.749422Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-12T20:41:44.752422Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-12T20:41:44.768448Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-12T20:41:58.487933Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-12T20:41:58.487933Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-12T20:41:58.488940Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-12T20:41:58.488940Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-12T20:41:58.488940Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-12T20:41:58.642860Z[0m [[32m[1minfo     [0m] [1m[RNPJSonWpj1] Session not found (id='8wIZJ71QWt')[0m
+[2m2025-12-12T20:42:43.204923Z[0m [[32m[1minfo     [0m] [1m[R3ebNLfrp0q] Session not found (id='kCebiDrlW7')[0m
+[2m2025-12-12T20:42:43.463770Z[0m [[32m[1minfo     [0m] [1m[RBN0BN30JQL] Session not found (id='4nIpaIwAaw')[0m
+[2m2025-12-12T20:46:57.675935Z[0m [[33m[1mwarning  [0m] [1m[RyGvRDsjPLw] HTTP Request: GET /sessions/cZCVAud3uD/events cancelled after 25.124 seconds[0m
+[2m2025-12-12T20:46:57.675935Z[0m [[33m[1mwarning  [0m] [1m[RlezKXiPhql] HTTP Request: GET /sessions/cZCVAud3uD/events cancelled after 34.929 seconds[0m
+[2m2025-12-12T20:46:57.676941Z[0m [[33m[1mwarning  [0m] [1m[R2ynYrag9hm] HTTP Request: GET /sessions/cZCVAud3uD/events cancelled after 55.095 seconds[0m
+[2m2025-12-12T20:46:57.676941Z[0m [[33m[1mwarning  [0m] [1m[RtH0KlgTp94] HTTP Request: GET /sessions/UW88IczMTV/events cancelled after 8.746 seconds[0m
+[2m2025-12-12T20:46:57.677941Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-12T20:46:57.678944Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-12T20:47:16.603030Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-12T20:47:16.603030Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-12T20:47:16.606029Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-12T20:47:16.624567Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-12T20:47:30.314863Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-12T20:47:30.315864Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-12T20:47:30.315864Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-12T20:47:30.315864Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-12T20:47:30.315864Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-12T20:47:52.247783Z[0m [[32m[1minfo     [0m] [1m[RIECpn1xQV2] Session not found (id='cZCVAud3uD')[0m
+[2m2025-12-12T20:48:47.622445Z[0m [[33m[1mwarning  [0m] [1m[RetA0bAxcHR] HTTP Request: GET /sessions/4gfOpRB4tl/events cancelled after 54.584 seconds[0m
+[2m2025-12-12T20:48:47.622445Z[0m [[33m[1mwarning  [0m] [1m[Rlp75gvoyZB] HTTP Request: GET /sessions/4gfOpRB4tl/events cancelled after 18.737 seconds[0m
+[2m2025-12-12T20:48:47.623448Z[0m [[33m[1mwarning  [0m] [1m[RUd6rWMXnvP] HTTP Request: GET /sessions/4gfOpRB4tl/events cancelled after 34.462 seconds[0m
+[2m2025-12-12T20:48:47.623448Z[0m [[33m[1mwarning  [0m] [1m[Rrej0wD3BTw] HTTP Request: GET /sessions/4gfOpRB4tl/events cancelled after 3.553 seconds[0m
+[2m2025-12-12T20:48:47.624445Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-12T20:48:47.626446Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-12T20:49:44.751649Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-12T20:49:44.752647Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-12T20:49:44.754648Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-12T20:49:44.771673Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-12T20:49:59.005575Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-12T20:49:59.005575Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-12T20:49:59.005575Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-12T20:49:59.005575Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-12T20:49:59.006575Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-12T20:50:28.570128Z[0m [[32m[1minfo     [0m] [1m[RbMBeVXTTXs] Session not found (id='4gfOpRB4tl')[0m
+[2m2025-12-12T20:54:43.404549Z[0m [[33m[1mwarning  [0m] [1m[RwOg593CTRS] HTTP Request: GET /sessions/MoO97yfFwf/events cancelled after 42.266 seconds[0m
+[2m2025-12-12T20:54:43.404549Z[0m [[33m[1mwarning  [0m] [1m[R2nbv0sUKgS] HTTP Request: GET /sessions/MoO97yfFwf/events cancelled after 4.531 seconds[0m
+[2m2025-12-12T20:54:43.405549Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2025-12-12T20:54:43.407550Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-12T20:55:22.795303Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-12T20:55:22.796303Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-12T20:55:22.797815Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-12T20:55:22.816842Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-12T20:55:39.211320Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-12T20:55:39.212321Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-12T20:55:39.212321Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-12T20:55:39.212321Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-12T20:55:39.212321Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-12T20:56:49.088007Z[0m [[32m[1minfo     [0m] [1m[RNYysEob489] Session not found (id='MoO97yfFwf')[0m
+[2m2025-12-12T21:02:16.482129Z[0m [[32m[1minfo     [0m] [1m[RICcKYKsdDR::process] Processing context for session GLqhTYD7XW finished in 37.796 seconds[0m
+[2m2025-12-12T21:03:47.945709Z[0m [[32m[1minfo     [0m] [1m[RFIraBE2pA2::process] Processing context for session GLqhTYD7XW finished in 28.527 seconds[0m
+[2m2025-12-12T21:04:37.267931Z[0m [[32m[1minfo     [0m] [1m[RCeKFjlV0LN::process] Processing context for session GLqhTYD7XW finished in 30.048 seconds[0m
+[2m2025-12-12T21:05:49.841155Z[0m [[32m[1minfo     [0m] [1m[RgquPuRCLSG::process] Processing context for session GLqhTYD7XW finished in 39.466 seconds[0m
+[2m2025-12-12T21:57:33.226675Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-12T21:57:33.228675Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-12T21:57:49.712650Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-12T21:57:49.712650Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-12T21:57:49.715650Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-12T21:57:49.731651Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-12T21:58:02.207363Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-12T21:58:02.208364Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-12T21:58:02.208364Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-12T21:58:02.208364Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-12T21:58:02.208364Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-12T21:58:02.349365Z[0m [[32m[1minfo     [0m] [1m[RcNH3AWViEA] Session not found (id='GLqhTYD7XW')[0m
+[2m2025-12-12T22:00:20.860334Z[0m [[32m[1minfo     [0m] [1m[RJ1fkG3W3Tk] Session not found (id='OJ1dKB79ap')[0m
+[2m2025-12-12T22:05:08.700255Z[0m [[32m[1minfo     [0m] [1m[RieJLcLnUoW::process] Processing context for session Elr5mSZVvx finished in 51.51 seconds[0m
+[2m2025-12-12T22:13:37.459902Z[0m [[32m[1minfo     [0m] [1m[RNOQsS6dP0v::process] Processing context for session Elr5mSZVvx finished in 53.044 seconds[0m
+[2m2025-12-12T22:20:11.785157Z[0m [[32m[1minfo     [0m] [1m[RlppKS3JfHw::process] Processing context for session Elr5mSZVvx finished in 33.674 seconds[0m
+[2m2025-12-12T22:23:41.143202Z[0m [[32m[1minfo     [0m] [1m[RXtOytxljYB::process] Processing context for session Elr5mSZVvx finished in 59.631 seconds[0m
+[2m2025-12-12T22:24:32.702593Z[0m [[32m[1minfo     [0m] [1m[RhI1V5bvfEf::process] Processing context for session Elr5mSZVvx finished in 23.961 seconds[0m
+[2m2025-12-12T22:38:41.884912Z[0m [[32m[1minfo     [0m] [1m[RwWAZMB8yUo::process] Processing context for session Elr5mSZVvx finished in 31.01 seconds[0m
+[2m2025-12-12T22:40:27.721743Z[0m [[32m[1minfo     [0m] [1m[RKceDiSRtli::process] Processing context for session Elr5mSZVvx finished in 45.746 seconds[0m
+[2m2025-12-12T22:42:41.664599Z[0m [[32m[1minfo     [0m] [1m[R54MHShYVYJ::process] Processing context for session Elr5mSZVvx finished in 47.633 seconds[0m
+[2m2025-12-12T22:43:40.527442Z[0m [[32m[1minfo     [0m] [1m[RYLHX8qLzOV::process] Processing context for session Elr5mSZVvx finished in 44.379 seconds[0m
+[2m2025-12-12T22:45:53.777892Z[0m [[32m[1minfo     [0m] [1m[Rm6VMCSfSK2::process] Processing context for session Elr5mSZVvx finished in 20.728 seconds[0m
+[2m2025-12-12T22:48:15.352873Z[0m [[32m[1minfo     [0m] [1m[ROpMCKl1lDj::process] Processing context for session Elr5mSZVvx finished in 43.402 seconds[0m
+[2m2025-12-12T22:48:48.002338Z[0m [[33m[1mwarning  [0m] [1m[Rz87nKSJ1ZU] HTTP Request: GET /sessions/Elr5mSZVvx/events cancelled after 3.713 seconds[0m
+[2m2025-12-12T22:48:48.003337Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-12T22:48:48.004337Z[0m [[33m[1mwarning  [0m] [1m[RWFaRqu64fR::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponseDraftSchema)] LLM Request (CannedResponseDraftSchema) cancelled after 3.967 seconds[0m
+[2m2025-12-12T22:48:48.004337Z[0m [[33m[1mwarning  [0m] [1m[RWFaRqu64fR::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponseDraftSchema)] Response generation cancelled after 3.968 seconds[0m
+[2m2025-12-12T22:48:48.004337Z[0m [[33m[1mwarning  [0m] [1m[RWFaRqu64fR::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponseDraftSchema)] Processing cancelled[0m
+[2m2025-12-12T22:48:48.006341Z[0m [[33m[1mwarning  [0m] [1m[RWFaRqu64fR::process][MessageEventComposer][CannedResponseGenerator][OpenAISchematicGenerator][LLM Request (CannedResponseDraftSchema)] Processing context for session Elr5mSZVvx cancelled after 27.199 seconds[0m
+[2m2025-12-12T22:48:48.007342Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-13T04:56:01.648055Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-13T04:56:01.649055Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-13T04:56:01.652055Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-13T04:56:01.751057Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-13T04:56:12.571195Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-13T04:56:12.571195Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-13T04:56:12.572195Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-13T04:56:12.572195Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-13T04:56:12.572195Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-13T04:56:31.802104Z[0m [[32m[1minfo     [0m] [1m[R1M9prHLQEy] Session not found (id='QsWDJf54f7')[0m
+[2m2025-12-13T04:56:32.475883Z[0m [[32m[1minfo     [0m] [1m[RPGbF9f7CQZ] Session not found (id='bnk97tZmnz')[0m
+[2m2025-12-13T04:58:58.713214Z[0m [[32m[1minfo     [0m] [1m[Rvk8DazX1ia::process] Processing context for session ZRiu7bNJEF finished in 8.961 seconds[0m
+[2m2025-12-13T04:59:31.196578Z[0m [[32m[1minfo     [0m] [1m[RK9FLbSDVXU::process] Processing context for session ZRiu7bNJEF finished in 22.981 seconds[0m
+[2m2025-12-13T05:00:21.039149Z[0m [[32m[1minfo     [0m] [1m[R8oYtgxMJPH::process] Processing context for session ZRiu7bNJEF finished in 38.493 seconds[0m
+[2m2025-12-13T05:01:23.078326Z[0m [[32m[1minfo     [0m] [1m[RN1JP9Z0Lhx::process] Processing context for session ZRiu7bNJEF finished in 41.807 seconds[0m
+[2m2025-12-13T05:06:25.482328Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
+[2m2025-12-13T05:06:25.484328Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2025-12-13T05:06:48.665862Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-13T05:06:48.666863Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-13T05:06:48.668861Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-13T05:06:48.684861Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-13T05:07:00.038963Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-13T05:07:00.039469Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-13T05:07:00.039469Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-13T05:07:00.039469Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-13T05:07:00.039469Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-13T14:30:05.210226Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2025-12-13T14:30:05.211233Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2025-12-13T14:30:05.213727Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2025-12-13T14:30:05.240514Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2025-12-13T14:30:18.224327Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2025-12-13T14:30:18.224327Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2025-12-13T14:30:18.225327Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2025-12-13T14:30:18.225327Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2025-12-13T14:30:18.225327Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2025-12-13T14:30:18.456350Z[0m [[32m[1minfo     [0m] [1m[RdIRvqzXjKP] Session not found (id='yL6Y9oFETP')[0m
+[2m2025-12-13T14:30:18.662382Z[0m [[32m[1minfo     [0m] [1m[RtnN4OZmffq] Session not found (id='yL6Y9oFETP')[0m
+[2m2026-01-13T13:02:32.606820Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T13:02:32.607820Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T13:02:32.609821Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T13:02:32.713335Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T13:02:51.209978Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T13:02:51.209978Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T13:02:51.209978Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T13:02:51.209978Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T13:02:51.211482Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T13:06:43.359467Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T13:06:43.361474Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T13:17:13.368960Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T13:17:13.369960Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T13:17:13.371962Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T13:17:13.389981Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T13:17:28.816797Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T13:17:28.817300Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T13:17:28.817300Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T13:17:28.817300Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T13:17:28.817300Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T13:37:22.011842Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T13:37:22.013842Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T13:37:38.272040Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T13:37:38.272040Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T13:37:38.275042Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T13:37:38.295073Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T13:37:53.253716Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T13:37:53.254715Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T13:37:53.254715Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T13:37:53.254715Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T13:37:53.254715Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T13:38:56.508578Z[0m [[32m[1minfo     [0m] [1m[Re0hPecgqDM] Session not found (id='duhDhgzLt5')[0m
+[2m2026-01-13T13:44:01.823410Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T13:44:01.825413Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T13:44:23.020335Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T13:44:23.021333Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T13:44:23.023842Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T13:44:23.040360Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T13:44:35.886978Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T13:44:35.886978Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T13:44:35.886978Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T13:44:35.887978Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T13:44:35.887978Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T13:46:09.824081Z[0m [[32m[1minfo     [0m] [1m[RH9MtQOIp0u] Session not found (id='35rYCuTq8z')[0m
+[2m2026-01-13T13:51:25.453186Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T13:51:25.455186Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T13:51:44.985321Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T13:51:44.985321Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T13:51:44.987830Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T13:51:45.006855Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T13:51:58.984810Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T13:51:58.984810Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T13:51:58.984810Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T13:51:58.985811Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T13:51:58.985811Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T13:55:47.956149Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T13:55:47.957281Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T13:56:06.682360Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T13:56:06.683360Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T13:56:06.685360Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T13:56:06.700206Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T13:56:19.221284Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T13:56:19.222284Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T13:56:19.222284Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T13:56:19.223284Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T13:56:19.223284Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:01:03.182648Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T14:01:03.184651Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T14:01:21.124650Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T14:01:21.124650Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T14:01:21.127320Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T14:01:21.142246Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T14:01:34.904724Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T14:01:34.904724Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T14:01:34.904724Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T14:01:34.904724Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T14:01:34.904724Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:02:21.155987Z[0m [[32m[1minfo     [0m] [1m[Ru4NKd8nhOJ] Session not found (id='i4F7gYTbkf')[0m
+[2m2026-01-13T14:06:00.872764Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T14:06:00.874949Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T14:07:20.736889Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T14:07:20.736889Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T14:07:20.739397Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T14:07:20.758391Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T14:07:35.782600Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T14:07:35.782600Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T14:07:35.782600Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T14:07:35.782600Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T14:07:35.784605Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:08:32.398197Z[0m [[32m[1minfo     [0m] [1m[RMxmDPqZpsh] Session not found (id='0f24h1U0ay')[0m
+[2m2026-01-13T14:10:40.238138Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T14:10:40.240301Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T14:11:06.206979Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T14:11:06.208046Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T14:11:06.208828Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T14:11:06.229476Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T14:11:22.590476Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T14:11:22.590476Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T14:11:22.590476Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T14:11:22.590476Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T14:11:22.592481Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:14:33.445966Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T14:14:33.447971Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T14:18:43.341365Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T14:18:43.341365Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T14:18:43.343751Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T14:18:43.358007Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T14:19:00.261379Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T14:19:00.262471Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T14:19:00.262471Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T14:19:00.262471Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T14:19:00.263471Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:40:36.299441Z[0m [[32m[1minfo     [0m] [1m[Rfe41DHsIDj] Session not found (id='n1r5R1boyR')[0m
+[2m2026-01-13T14:43:45.084820Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T14:43:45.086825Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T14:44:08.550733Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T14:44:08.551370Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T14:44:08.553360Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T14:44:08.572074Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T14:44:25.428303Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T14:44:25.428303Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T14:44:25.428303Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T14:44:25.429807Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T14:44:25.429807Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:45:00.914667Z[0m [[32m[1minfo     [0m] [1m[ReY6bpRqzzr] Session not found (id='2bpHLCui0A')[0m
+[2m2026-01-13T14:54:34.377377Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T14:54:34.379381Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T14:54:59.588758Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T14:54:59.588758Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T14:54:59.591858Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T14:54:59.611124Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T14:55:16.852004Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T14:55:16.852004Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T14:55:16.852004Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T14:55:16.852004Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T14:55:16.852004Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T14:59:14.318881Z[0m [[32m[1minfo     [0m] [1m[REbVTydQkfn] Session not found (id='AzEMPJnjTV')[0m
+[2m2026-01-13T15:08:47.564935Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T15:08:47.566938Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T15:09:04.500040Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T15:09:04.500040Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T15:09:04.502537Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T15:09:04.517646Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T15:09:15.336444Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T15:09:15.336444Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T15:09:15.336444Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T15:09:15.336444Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T15:09:15.336444Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T15:09:50.933937Z[0m [[32m[1minfo     [0m] [1m[R4zz3vGvDE1] Session not found (id='gizKbBxV9a')[0m
+[2m2026-01-13T15:22:31.913229Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T15:22:31.915234Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T15:22:49.360445Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T15:22:49.362022Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T15:22:49.364396Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T15:22:49.383269Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T15:23:03.325600Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T15:23:03.326602Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T15:23:03.326602Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T15:23:03.326602Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T15:23:03.327601Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T15:31:09.846587Z[0m [[32m[1minfo     [0m] [1m[RPVfa9n5WSU] Session not found (id='JXciNf433l')[0m
+[2m2026-01-13T15:38:13.155582Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T15:38:13.157287Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T15:38:28.546419Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T15:38:28.550989Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T15:38:28.554693Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T15:38:28.570938Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T15:38:39.260830Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T15:38:39.260830Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T15:38:39.260830Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T15:38:39.261832Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T15:38:39.261832Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T15:39:38.669726Z[0m [[32m[1minfo     [0m] [1m[RHxb2SkG4A4] Session not found (id='pruFdj88WC')[0m
+[2m2026-01-13T15:47:05.511924Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T15:47:05.513928Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T15:47:32.228385Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T15:47:32.228385Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T15:47:32.230955Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T15:47:32.248090Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T15:47:50.046224Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T15:47:50.048229Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T15:47:50.048229Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T15:47:50.048229Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T15:47:50.048229Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T15:48:46.652543Z[0m [[32m[1minfo     [0m] [1m[RMvE1vkElq3] Session not found (id='vT103OF2cX')[0m
+[2m2026-01-13T15:49:18.227238Z[0m [[32m[1minfo     [0m] [1m[RKntYs4D1Bg] Session not found (id='45ne9hZzDo')[0m
+[2m2026-01-13T15:56:06.275620Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T15:56:06.277623Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-13T15:56:22.271499Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-13T15:56:22.271499Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-13T15:56:22.273500Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-13T15:56:22.296694Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-13T15:56:39.544872Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-13T15:56:39.545872Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-13T15:56:39.545872Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-13T15:56:39.545872Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-13T15:56:39.545872Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-13T17:11:32.363435Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-13T17:11:32.365442Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-14T13:01:33.618038Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-14T13:01:33.619038Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-14T13:01:33.621037Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-14T13:01:33.723538Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-14T13:01:48.438653Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-14T13:01:48.439653Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-14T13:01:48.439653Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-14T13:01:48.439653Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-14T13:01:48.439653Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-14T13:02:35.812188Z[0m [[32m[1minfo     [0m] [1m[R55tfLx61tT] Session not found (id='KqmyE5ET0p')[0m
+[2m2026-01-14T13:10:23.923033Z[0m [[32m[1minfo     [0m] [1m[RF20R7cuL7h] Session not found (id='ApfQgbYqi8')[0m
+[2m2026-01-14T13:23:12.421007Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-14T13:23:12.423010Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-14T13:23:26.851915Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-14T13:23:26.851915Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-14T13:23:26.853915Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-14T13:23:26.871423Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-14T13:23:37.519039Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-14T13:23:37.520040Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-14T13:23:37.520040Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-14T13:23:37.521039Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-14T13:23:37.521039Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-14T13:31:51.162574Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-14T13:31:51.164574Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-14T13:32:07.643441Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-14T13:32:07.645954Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-14T13:32:07.647959Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-14T13:32:07.665983Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-14T13:32:19.713232Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-14T13:32:19.713232Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-14T13:32:19.713232Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-14T13:32:19.714232Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-14T13:32:19.714232Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-14T13:41:10.498535Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-14T13:41:10.500535Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-14T13:41:24.838980Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-14T13:41:24.839980Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-14T13:41:24.842981Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-14T13:41:24.865978Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-14T13:41:36.775149Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-14T13:41:36.776149Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-14T13:41:36.776149Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-14T13:41:36.776149Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-14T13:41:36.777149Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-14T13:55:45.130876Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-14T13:55:45.132875Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-01-14T13:55:59.051805Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.0.3[0m
+[2m2026-01-14T13:55:59.052804Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-01-14T13:55:59.056804Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-01-14T13:55:59.079803Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-01-14T13:56:11.599018Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-01-14T13:56:11.599018Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-01-14T13:56:11.599018Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-01-14T13:56:11.600018Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-01-14T13:56:11.600018Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-01-14T14:17:12.938738Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (3)[0m
+[2m2026-01-14T14:17:12.940741Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m

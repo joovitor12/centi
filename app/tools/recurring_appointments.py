@@ -6,6 +6,7 @@ from typing import Optional
 import parlant.sdk as p
 from app.services.supabase_service import SupabaseService
 from app.services.google_calendar_service import GoogleCalendarService
+from app.services.langfuse_service import track_parlant_tool
 
 logger = logging.getLogger(__name__)
 
@@ -25,6 +26,7 @@ def create_recurring_appointment_tools(
     """
 
     @p.tool
+    @track_parlant_tool
     async def create_recurring_appointment(
         context: p.ToolContext,
         description: str,
@@ -159,6 +161,7 @@ def create_recurring_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def list_recurring_appointments(
         context: p.ToolContext, active_only: bool = True
     ) -> p.ToolResult:
@@ -225,6 +228,7 @@ def create_recurring_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def get_recurring_appointment(
         context: p.ToolContext, recurring_appointment_id: int
     ) -> p.ToolResult:
@@ -251,6 +255,7 @@ def create_recurring_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def edit_recurring_appointment(
         context: p.ToolContext,
         recurring_appointment_id: int,
@@ -356,6 +361,7 @@ def create_recurring_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def pause_recurring_appointment(
         context: p.ToolContext, recurring_appointment_id: int
     ) -> p.ToolResult:
@@ -411,6 +417,7 @@ def create_recurring_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def resume_recurring_appointment(
         context: p.ToolContext, recurring_appointment_id: int
     ) -> p.ToolResult:
@@ -491,6 +498,7 @@ def create_recurring_appointment_tools(
             )
 
     @p.tool
+    @track_parlant_tool
     async def delete_recurring_appointment(
         context: p.ToolContext, recurring_appointment_id: int
     ) -> p.ToolResult:

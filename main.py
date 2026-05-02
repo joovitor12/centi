@@ -9,6 +9,7 @@ from app.config.settings import settings
 from app.services.supabase_service import SupabaseService
 from app.services.google_calendar_service import GoogleCalendarService
 from app.services.gmail_service import GmailService
+from app.services.langfuse_service import get_langfuse_client
 from app.tools.appointments import create_appointment_tools
 from app.tools.recurring_appointments import create_recurring_appointment_tools
 from app.agent.guidelines import setup_guidelines
@@ -23,6 +24,13 @@ async def main():
     # Validate settings
     settings.validate()
 
+    # Initialize Langfuse client for tracking
+    langfuse_client = get_langfuse_client()
+    if langfuse_client:
+        logger.info("Langfuse tracking enabled")
+    else:
+        logger.info("Langfuse tracking disabled (credentials not configured)")
+
     # Initialize services
     supabase_service = SupabaseService()
     google_calendar_service = GoogleCalendarService()
@@ -33,7 +41,26 @@ async def main():
 
     if settings.CENTI_EMAIL_ADDRESS:
         try:
-            gmail_service = GmailService()
+            # Try to get token from Supabase for the Centi email address
+            # This allows using tokens from OAuth flow instead of file-based tokens
+            centi_email_lower = settings.CENTI_EMAIL_ADDRESS.lower()
+            centi_user_data = supabase_service.get_user_by_email(centi_email_lower)
+
+            user_token = None
+            if centi_user_data and centi_user_data.get("calendar_access_token"):
+                user_token = centi_user_data.get("calendar_access_token")
+                logger.info(
+                    f"Found token in Supabase for {centi_email_lower}. Using it for Gmail service."
+                )
+            else:
+                logger.info(
+                    f"No token found in Supabase for {centi_email_lower}. "
+                    f"Will try file-based authentication. "
+                    f"To use OAuth tokens, authenticate via /auth/google with this email."
+                )
+
+            # Initialize GmailService with token from Supabase if available
+            gmail_service = GmailService(user_token=user_token)
             email_worker = EmailWorker(
                 gmail_service, google_calendar_service, supabase_service
             )

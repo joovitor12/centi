@@ -31,6 +31,7 @@ class Settings:
     GOOGLE_CLIENT_SECRET: str = os.environ.get("GOOGLE_CLIENT_SECRET", "")
     OAUTH_REDIRECT_URI: str = os.environ.get("OAUTH_REDIRECT_URI", "http://localhost:8000/auth/google/callback")
     BASE_URL: str = os.environ.get("BASE_URL", "http://localhost:8000")
+    FRONTEND_URL: str = os.environ.get("FRONTEND_URL", "http://localhost:3000")
 
     # Gmail
     GMAIL_POLL_INTERVAL_SECONDS: int = os.environ.get("GMAIL_POLL_INTERVAL_SECONDS", 120)
@@ -40,6 +41,10 @@ class Settings:
     LANGFUSE_SECRET_KEY: str = os.environ.get("LANGFUSE_SECRET_KEY", "")
     LANGFUSE_PUBLIC_KEY: str = os.environ.get("LANGFUSE_PUBLIC_KEY", "")
     LANGFUSE_BASE_URL: str = os.environ.get("LANGFUSE_BASE_URL", "")
+    
+    # Parlant
+    PARLANT_SERVER_URL: str = os.environ.get("PARLANT_SERVER_URL", "http://localhost:8800")
+    PARLANT_AGENT_ID: str = os.environ.get("PARLANT_AGENT_ID", "")
 
     @classmethod
     def validate(cls) -> None:
@@ -53,6 +58,14 @@ class Settings:
         if missing:
             raise ValueError(
                 f"Missing required environment variables: {', '.join(missing)}"
+            )
+        
+        # Langfuse is optional - warn if not configured but don't fail
+        if not cls.LANGFUSE_SECRET_KEY or not cls.LANGFUSE_PUBLIC_KEY:
+            import logging
+            logging.getLogger(__name__).warning(
+                "Langfuse credentials not configured. Tracking will be disabled. "
+                "Set LANGFUSE_SECRET_KEY and LANGFUSE_PUBLIC_KEY to enable tracking."
             )
 
 

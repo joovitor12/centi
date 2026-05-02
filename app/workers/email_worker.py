@@ -6,6 +6,7 @@ import base64
 from datetime import datetime
 from typing import Optional, Dict, Any
 from datetime import datetime as dt
+from langfuse import observe, propagate_attributes
 
 from app.config.settings import settings
 from app.services.gmail_service import GmailService
@@ -90,6 +91,7 @@ class EmailWorker:
         except Exception as e:
             logger.error(f"Error fetching emails: {e}", exc_info=True)
 
+    @observe(name="process_email")
     async def process_email(self, email_id: str):
         """Process a single email.
 
@@ -173,11 +175,16 @@ class EmailWorker:
                     all_participant_emails.update(msg_participants.get("cc", []))
             
             # Find which registered user is in the thread
+            # Exclude Centi email from owner search (Centi is the bot, not a real user)
             owner_email = None
             owner_user_data = None
             
-            # Try to find a registered user in the thread
+            # Try to find a registered user in the thread (excluding Centi email)
             for email in all_participant_emails:
+                # Skip Centi email - it's the bot, not a real user
+                if email.lower() == self.centi_email:
+                    continue
+                    
                 user_data = self.supabase_service.get_user_by_email(email.lower())
                 if user_data:
                     owner_email = email.lower()
@@ -220,21 +227,29 @@ class EmailWorker:
                 self.gmail_service.mark_as_read(email_id)
                 return
 
-            # Get user token for calendar access
-            user_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
-            
-            if thread_data:
-                # Existing thread - process as response
-                await self.handle_meeting_response(
-                    email_id, thread_id, email_data, email_body, thread_data, 
-                    owner_email=owner_email, user_token=user_token
-                )
-            else:
-                # New thread - check if it's a meeting request
-                await self.handle_new_meeting_request(
-                    email_id, thread_id, email_data, email_body, 
-                    owner_email=owner_email, user_token=user_token
-                )
+            # Use thread_id as session_id for Langfuse tracking
+            # This groups all operations related to this email thread
+            with propagate_attributes(
+                session_id=f"email_thread_{thread_id}",
+                user_id=owner_email if owner_email else None,
+                metadata={
+                    "email_id": email_id,
+                    "thread_id": thread_id,
+                    "source": "email_worker",
+                },
+            ):
+                if thread_data:
+                    # Existing thread - process as response
+                    await self.handle_meeting_response(
+                        email_id, thread_id, email_data, email_body, thread_data, 
+                        owner_email=owner_email
+                    )
+                else:
+                    # New thread - check if it's a meeting request
+                    await self.handle_new_meeting_request(
+                        email_id, thread_id, email_data, email_body, 
+                        owner_email=owner_email
+                    )
 
             # Mark email as processed (read)
             self.gmail_service.mark_as_read(email_id)
@@ -242,6 +257,7 @@ class EmailWorker:
         except Exception as e:
             logger.error(f"Error processing email {email_id}: {e}", exc_info=True)
 
+    @observe(name="handle_new_meeting_request")
     async def handle_new_meeting_request(
         self,
         email_id: str,
@@ -249,7 +265,6 @@ class EmailWorker:
         email_data: Dict[str, Any],
         email_body: str,
         owner_email: str,
-        user_token: Optional[Dict[str, Any]] = None,
     ):
         """Handle a new meeting request email.
 
@@ -286,30 +301,23 @@ class EmailWorker:
             # Get subject from email headers
             subject = self._extract_subject(email_data)
 
-            # Add owner email to participants if not already included
-            # This ensures the calendar owner is always included in availability checks
-            if owner_email and owner_email.lower() not in [
-                p.lower() for p in participant_emails
-            ]:
-                participant_emails.append(owner_email.lower())
-                logger.info(f"Added calendar owner {owner_email} to participants list")
-
-            # Generate time suggestions (use user token if available)
+            # Generate time suggestions based only on the owner's calendar
+            # We can only query calendars of users who have authenticated with Centi (owner)
+            # Fetch owner user data to get their token
+            owner_user_data = self.supabase_service.get_user_by_email(owner_email.lower()) if owner_email else None
+            owner_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
+            owner_participant_tokens = {}
+            if owner_email and owner_token:
+                owner_participant_tokens[owner_email.lower()] = owner_token
+            
+            # Generate time suggestions using owner's token (only calendar we can access)
             suggestions = self.coordinator.generate_time_suggestions(
-                participant_emails=participant_emails,
+                participant_emails=participant_emails,  # Keep all participants for context/email
                 duration_minutes=context.get("duration_minutes", 30),
                 days_ahead=context.get("days_ahead", 14),
                 timezone_str=context.get("timezone_str"),
-                user_token=user_token,
-                user_email=owner_email,
+                participant_tokens=owner_participant_tokens if owner_participant_tokens else None,
             )
-
-            # Collect unverified participants
-            all_unverified = set()
-            for suggestion in suggestions:
-                all_unverified.update(suggestion.get("unverified_participants", []))
-
-            unverified_list = list(all_unverified)
 
             # Create thread record in database
             suggested_times_list = []
@@ -351,7 +359,6 @@ class EmailWorker:
             reply_body = self.coordinator.format_suggestion_email(
                 suggestions=suggestions,
                 meeting_description=context.get("meeting_description"),
-                unverified_participants=unverified_list,
             )
 
             # Get all participants (excluding Centi) for reply
@@ -389,6 +396,7 @@ class EmailWorker:
         except Exception as e:
             logger.error(f"Error handling new meeting request: {e}", exc_info=True)
 
+    @observe(name="handle_meeting_response")
     async def handle_meeting_response(
         self,
         email_id: str,
@@ -397,7 +405,6 @@ class EmailWorker:
         email_body: str,
         thread_data: Dict[str, Any],
         owner_email: str,
-        user_token: Optional[Dict[str, Any]] = None,
     ):
         """Handle a response to meeting suggestions.
 
@@ -505,6 +512,7 @@ class EmailWorker:
                     # Get meeting_title from thread_data (now stored directly in the database field)
                     meeting_title = thread_data.get("meeting_title")
 
+                    # Create event in Centi's calendar (users don't need calendar write permissions)
                     event_id = self.coordinator.confirm_meeting(
                         thread_id=thread_id,
                         selected_time=selected_time,
@@ -581,13 +589,25 @@ class EmailWorker:
 
                 participant_emails = thread_data.get("participant_emails", [])
                 duration_minutes = thread_data.get("duration_minutes", 30)
+                owner_email = thread_data.get("owner_email")
 
-                # Generate new suggestions (use user token if available)
+                # Generate new suggestions based only on the owner's calendar
+                owner_user_data = self.supabase_service.get_user_by_email(owner_email.lower()) if owner_email else None
+                owner_token = owner_user_data.get("calendar_access_token") if owner_user_data else None
+                owner_participant_tokens = {}
+                if owner_email and owner_token:
+                    owner_participant_tokens[owner_email.lower()] = owner_token
+                
+                # Get previously suggested times to exclude them from new suggestions
+                previous_suggestions = thread_data.get("suggested_times", [])
+                logger.info(f"Found {len(previous_suggestions)} previous suggestions to exclude: {previous_suggestions}")
+                
+                # Generate time suggestions using owner's token (only calendar we can access)
                 suggestions = self.coordinator.generate_time_suggestions(
-                    participant_emails=participant_emails,
+                    participant_emails=participant_emails,  # Keep all participants for context
                     duration_minutes=duration_minutes,
-                    user_token=user_token,
-                    user_email=owner_email,
+                    participant_tokens=owner_participant_tokens if owner_participant_tokens else None,
+                    exclude_suggestions=previous_suggestions if previous_suggestions else None,
                 )
 
                 # Update suggested times
@@ -614,14 +634,10 @@ class EmailWorker:
 
                 # Send new suggestions
                 meeting_description = thread_data.get("meeting_description")
-                all_unverified = set()
-                for suggestion in suggestions:
-                    all_unverified.update(suggestion.get("unverified_participants", []))
 
                 reply_body = self.coordinator.format_suggestion_email(
                     suggestions=suggestions,
                     meeting_description=meeting_description,
-                    unverified_participants=list(all_unverified),
                 )
 
                 participants = self.coordinator.get_participants_from_email(
