@@ -51,9 +51,14 @@ class NewsletterBuilderService:
             model=model,
             description="Newsletter content assistant",
             instructions=[
-                "You generate engaging newsletters with concise sections.",
+                "You generate engaging newsletters with practical depth.",
                 "Use DuckDuckGo search/news tools to gather recent and relevant facts for each theme before writing.",
                 "Prefer recent, factual information and avoid speculation.",
+                "For each theme section, include concrete details (what happened, why it matters, practical implications).",
+                "Do not say that there are no highlights if you can find relevant web sources.",
+                "Include a final 'Sources' section with the links you actually used while researching.",
+                "In html_content, sources must be clickable links (<a href='...'>...</a>).",
+                "In text_content, sources must be plain URLs.",
                 "Always return valid JSON only.",
                 "The JSON keys must be: title, html_content, text_content.",
                 "html_content must be safe and use simple tags only.",
@@ -75,11 +80,22 @@ class NewsletterBuilderService:
         )
 
     def _build_prompt(self, title: str, themes: List[str], language: str) -> str:
-        return self._newsletter_prompt.compile(
+        base_prompt = self._newsletter_prompt.compile(
             language=language,
             title=title,
             themes=", ".join(themes),
         )
+        source_requirements = (
+            "\n\nHard requirements:\n"
+            "1) Write a richer newsletter, not a shallow summary.\n"
+            "2) For each theme, include at least two concrete points grounded in web research.\n"
+            "3) Add a final section named 'Sources' (or 'Fontes' in pt-BR).\n"
+            "4) The Sources/Fontes section must include at least 3 distinct URLs used in your research.\n"
+            "5) In html_content, render sources as clickable links.\n"
+            "6) In text_content, include the same URLs in plain text.\n"
+            "7) Output must remain valid JSON with exactly: title, html_content, text_content.\n"
+        )
+        return f"{base_prompt}{source_requirements}"
 
     def _extract_payload(self, run_result: Any) -> Dict[str, str]:
         """Handle Agno response object formats safely."""
