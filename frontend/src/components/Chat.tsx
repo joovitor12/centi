@@ -1,0 +1,367 @@
+import React, { useEffect, useState, useCallback, useRef } from 'react';
+import ParlantChatbox from 'parlant-chat-react';
+import { auth } from '../services/auth';
+import { Session } from '../types';
+import { Loading } from './Loading';
+import { EmailInteractorGuide } from './EmailInteractorGuide';
+import { ThemeToggle } from './ThemeToggle';
+import { AppointmentsList, AppointmentsListRef } from './AppointmentsList';
+import { PeriodicAppointmentsRefresh } from './PeriodicAppointmentsRefresh';
+
+interface ChatProps {
+  userEmail: string;
+}
+
+export const Chat: React.FC<ChatProps> = ({ userEmail }) => {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const appointmentsListRef = useRef<AppointmentsListRef>(null);
+  const [showGuide, setShowGuide] = useState(() => {
+    // Show guide if user hasn't seen it before (stored in localStorage)
+    const hasSeenGuide = localStorage.getItem('centi_has_seen_email_guide');
+    return !hasSeenGuide;
+  });
+  const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+  // Stable callback for appointment changes - MUST be before any early returns
+  const handleAppointmentChange = useCallback(async () => {
+    console.log('handleAppointmentChange called, refreshing appointments list...');
+    if (appointmentsListRef.current) {
+      try {
+        await appointmentsListRef.current.refresh();
+        console.log('Appointments list refreshed successfully');
+      } catch (error) {
+        console.error('Error refreshing appointments list:', error);
+      }
+    } else {
+      console.warn('appointmentsListRef.current is null');
+    }
+  }, []);
+  useEffect(() => {
+    const loadSession = async () => {
+      try {
+        setLoading(true);
+        const sessionData = await auth.getOrCreateSession();
+        setSession(sessionData);
+        
+        // Check if we need to send initial message for this session
+        if (sessionData?.session_id) {
+          const key = `centi_initial_message_sent_${sessionData.session_id}`;
+          const hasSent = localStorage.getItem(key);
+          
+          // If localStorage was cleared, check if the first message is already our welcome message
+          if (!hasSent) {
+            try {
+              const parlantServerUrl = process.env.REACT_APP_PARLANT_SERVER_URL || 'http://localhost:8800';
+              const response = await fetch(`${parlantServerUrl}/sessions/${sessionData.session_id}/events`);
+              
+              if (response.ok) {
+                const events = await response.json();
+                // Filter to only message events (ignore system events)
+                const messageEvents = Array.isArray(events) 
+                  ? events.filter((event: any) => 
+                      event.kind === 'message' && 
+                      (event.source === 'agent' || event.source === 'customer')
+                    )
+                  : [];
+                
+                // Check if first message is our welcome message
+                const welcomeMessageStart = "Hi there! 👋";
+                const firstAgentMessage = messageEvents.find((e: any) => e.source === 'agent');
+                const alreadyHasWelcomeMessage = firstAgentMessage?.message?.startsWith(welcomeMessageStart);
+                
+                // Only send if session is empty OR first message is not our welcome message
+                if (messageEvents.length === 0 || !alreadyHasWelcomeMessage) {
+                  // Send initial message via API
+                  const welcomeMessage = (
+                    "Hi there! 👋\n\n" +
+                    "I'm Centi, your calendar assistant. Please note that chat support for creating reminders and appointments directly in your calendar is not yet available. You can use the Email Interactor for that.\n\n" +
+                    "📧 **How to use Email Interactor:**\n" +
+                    "1. Send an email to the person you want to schedule with\n" +
+                    "2. Add **centinteractor@gmail.com** in CC\n" +
+                    "3. Mention 'Centi' in your message asking to schedule a meeting\n" +
+                    "4. I'll analyze your calendars and suggest available times\n" +
+                    "5. Reply confirming your preferred time\n" +
+                    "6. I'll create the calendar event and confirm with everyone\n\n" +
+                    "For more details, check the 'How to use Email Interactor' guide in the header above.\n\n" +
+                    "How can I help you today? 🎉"
+                  );
+                  
+                  const sendResponse = await fetch(`${parlantServerUrl}/sessions/${sessionData.session_id}/events`, {
+                    method: 'POST',
+                    headers: {
+                      'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                      kind: 'message',
+                      source: 'agent',
+                      message: welcomeMessage,
+                    }),
+                  });
+                  
+                  if (sendResponse.ok) {
+                    // Mark as sent only if successfully sent
+                    localStorage.setItem(key, 'true');
+                    console.log('Initial welcome message sent to session');
+                  }
+                } else {
+                  // First message is already our welcome message, mark as sent
+                  localStorage.setItem(key, 'true');
+                  console.log('Session already has welcome message, skipping');
+                }
+              } else {
+                console.warn('Failed to fetch session events:', response.status);
+              }
+            } catch (err) {
+              console.warn('Failed to check/send initial message:', err);
+            }
+          } else {
+            console.log('Initial message already sent for this session (from localStorage)');
+          }
+        }
+      } catch (err: any) {
+        setError(err.message || 'Failed to load session');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    loadSession();
+  }, []);
+
+  // Update mobile state on resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
+  if (loading) {
+    return <Loading />;
+  }
+
+  if (error) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <p style={{ color: 'red' }}>Error: {error}</p>
+        <button onClick={() => window.location.reload()}>Retry</button>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return (
+      <div style={{ padding: '2rem', textAlign: 'center' }}>
+        <p>No session available</p>
+      </div>
+    );
+  }
+
+  // Get Parlant server URL from environment or use default
+  const parlantServerUrl = process.env.REACT_APP_PARLANT_SERVER_URL || 'http://localhost:8800';
+  const agentId = process.env.REACT_APP_PARLANT_AGENT_ID || 'default';
+
+  const handleCloseGuide = () => {
+    setShowGuide(false);
+    localStorage.setItem('centi_has_seen_email_guide', 'true');
+  };
+
+  return (
+    <div style={{ height: '100vh', display: 'flex', flexDirection: 'column', backgroundColor: 'var(--bg-secondary)' }}>
+      {showGuide && <EmailInteractorGuide onClose={handleCloseGuide} />}
+      
+      {/* Header */}
+      <div style={{
+        padding: isMobile ? '0.75rem' : '1rem',
+        backgroundColor: 'var(--bg-primary)',
+        borderBottom: '1px solid var(--border-color)',
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        boxShadow: `0 2px 4px var(--shadow)`,
+        flexWrap: isMobile ? 'wrap' : 'nowrap',
+      }}>
+        <h1 style={{ margin: 0, fontSize: isMobile ? '1.2rem' : '1.5rem', color: 'var(--primary-color)' }}>Centi</h1>
+        <div style={{ display: 'flex', gap: isMobile ? '0.5rem' : '1rem', alignItems: 'center', flexWrap: 'wrap' }}>
+          {!isMobile && <span style={{ color: 'var(--text-secondary)', fontSize: '0.9rem' }}>{userEmail}</span>}
+          <ThemeToggle />
+          <button
+            onClick={async () => {
+              try {
+                await auth.logout();
+                // Clear any localStorage items related to auth
+                // Clear all localStorage keys that start with 'centi_'
+                Object.keys(localStorage).forEach(key => {
+                  if (key.startsWith('centi_')) {
+                    localStorage.removeItem(key);
+                  }
+                });
+                // Force reload to clear any cached state
+                window.location.href = '/';
+              } catch (error) {
+                console.error('Logout error:', error);
+                // Even if logout fails, try to clear local storage and reload
+                Object.keys(localStorage).forEach(key => {
+                  if (key.startsWith('centi_')) {
+                    localStorage.removeItem(key);
+                  }
+                });
+                window.location.href = '/';
+              }
+            }}
+            style={{
+              padding: isMobile ? '0.4rem 0.8rem' : '0.5rem 1rem',
+              backgroundColor: 'var(--danger-color)',
+              color: 'white',
+              border: 'none',
+              borderRadius: '4px',
+              cursor: 'pointer',
+              transition: 'background-color 0.2s',
+              fontSize: isMobile ? '0.85rem' : '1rem',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--danger-hover)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--danger-color)';
+            }}
+          >
+            Logout
+          </button>
+        </div>
+      </div>
+
+      {/* Main Content Area */}
+      <div style={{
+        flex: 1,
+        display: 'flex',
+        flexDirection: isMobile ? 'column' : 'row',
+        overflow: 'auto',
+      }}>
+        {/* Welcome Section */}
+        <div style={{
+          flex: isMobile ? '0 0 auto' : '0 0 400px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          justifyContent: 'center',
+          padding: isMobile ? '1.5rem' : '2rem',
+          textAlign: 'center',
+          borderRight: isMobile ? 'none' : '1px solid var(--border-color)',
+          borderBottom: isMobile ? '1px solid var(--border-color)' : 'none',
+          minHeight: isMobile ? 'auto' : '100%',
+        }}>
+          <div style={{
+            maxWidth: '600px',
+            width: '100%',
+            backgroundColor: 'var(--bg-primary)',
+            padding: isMobile ? '1.5rem' : '3rem',
+            borderRadius: '12px',
+            boxShadow: `0 4px 6px var(--shadow)`,
+          }}>
+            <div style={{ fontSize: isMobile ? '3rem' : '4rem', marginBottom: '1rem' }}>📧</div>
+            <h2 style={{ margin: '0 0 1rem', color: 'var(--text-primary)', fontSize: isMobile ? '1.5rem' : '1.8rem' }}>
+              Welcome to Centi!
+            </h2>
+            <p style={{ margin: '0 0 1.5rem', color: 'var(--text-secondary)', fontSize: isMobile ? '0.9rem' : '1rem', lineHeight: '1.6' }}>
+              Centi helps you schedule meetings via email. To get started, check out the Email Interactor Guide below or click the chat button in the bottom right corner if you have questions.
+            </p>
+            <button
+              onClick={() => setShowGuide(true)}
+              style={{
+                padding: '0.75rem 1.5rem',
+                backgroundColor: 'var(--primary-color)',
+                color: 'white',
+                border: 'none',
+                borderRadius: '6px',
+                cursor: 'pointer',
+                fontSize: isMobile ? '0.9rem' : '1rem',
+                fontWeight: '500',
+                transition: 'background-color 0.2s',
+                width: isMobile ? '100%' : 'auto',
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.backgroundColor = 'var(--primary-color)';
+              }}
+            >
+              📖 View Email Interactor Guide
+            </button>
+          </div>
+        </div>
+
+        {/* Appointments List */}
+        <div style={{
+          flex: 1,
+          overflowY: 'auto',
+          minHeight: isMobile ? '50vh' : 'auto',
+        }}>
+          <AppointmentsList ref={appointmentsListRef} />
+        </div>
+      </div>
+
+      {/* Floating Chat Widget */}
+      <ParlantChatbox
+        server={parlantServerUrl}
+        agentId={agentId}
+        sessionId={session.session_id}
+        float={true}
+        components={{
+          popupButton: ({ toggleChatOpen }) => (
+            <button
+              type="button"
+              className="custom-parlant-button"
+              onClick={toggleChatOpen}
+              style={{
+                position: 'fixed',
+                bottom: isMobile ? '16px' : '20px',
+                right: isMobile ? '16px' : '20px',
+                width: isMobile ? '56px' : '60px',
+                height: isMobile ? '56px' : '60px',
+                borderRadius: '50%',
+                backgroundColor: 'var(--primary-color)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                cursor: 'pointer',
+                boxShadow: `0 4px 12px var(--shadow-hover)`,
+                transition: 'all 0.3s',
+                zIndex: 999,
+                border: 'none',
+                padding: 0,
+                margin: 0,
+              }}
+              onMouseOver={(e) => {
+                e.currentTarget.style.transform = 'scale(1.1)';
+                e.currentTarget.style.backgroundColor = 'var(--primary-hover)';
+              }}
+              onMouseOut={(e) => {
+                e.currentTarget.style.transform = 'scale(1)';
+                e.currentTarget.style.backgroundColor = 'var(--primary-color)';
+              }}
+            >
+              <span style={{ fontSize: isMobile ? '1.3rem' : '1.5rem' }}>💬</span>
+            </button>
+          ),
+        }}
+        classNames={{
+          popupButton: 'parlant-chat-popup-button-hidden',
+          chatboxWrapper: 'parlant-chatbox-wrapper-responsive',
+          chatbox: 'parlant-chatbox-responsive',
+          messagesArea: 'parlant-messages-area-responsive',
+        }}
+      />
+      {session && (
+        <PeriodicAppointmentsRefresh 
+          onRefresh={handleAppointmentChange} 
+        />
+      )}
+    </div>
+  );
+};
+
