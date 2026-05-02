@@ -21,13 +21,16 @@ depends_on: Union[str, Sequence[str], None] = None
 
 def upgrade() -> None:
     """Add meeting_title column to email_meeting_threads table."""
-    op.add_column(
-        "email_meeting_threads",
-        sa.Column("meeting_title", sa.Text(), nullable=True),
+    op.execute(
+        "ALTER TABLE email_meeting_threads "
+        "ADD COLUMN IF NOT EXISTS meeting_title TEXT"
     )
 
 
 def downgrade() -> None:
     """Remove meeting_title column from email_meeting_threads table."""
-    op.drop_column("email_meeting_threads", "meeting_title")
+    op.execute(
+        "ALTER TABLE email_meeting_threads "
+        "DROP COLUMN IF EXISTS meeting_title"
+    )
 

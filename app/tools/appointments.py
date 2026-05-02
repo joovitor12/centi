@@ -11,13 +11,11 @@ logger = logging.getLogger(__name__)
 
 def create_appointment_tools(
     supabase_service: SupabaseService,
-    google_calendar_service=None,
 ):
     """Create appointment management tools.
 
     Args:
         supabase_service: SupabaseService instance
-        google_calendar_service: Optional GoogleCalendarService instance for calendar sync
 
     Returns:
         List of tool functions
@@ -107,34 +105,10 @@ def create_appointment_tools(
                     control={"lifespan": "response"},
                 )
 
-            # Sync to Google Calendar first if service is available (to get event_id)
-            calendar_event_id = None
-            if google_calendar_service:
-                try:
-                    calendar_event_id = google_calendar_service.create_event(
-                        description=description,
-                        start_time=appointment_time,
-                    )
-                    if calendar_event_id:
-                        logger.info(
-                            f"Appointment synced to Google Calendar: {calendar_event_id}"
-                        )
-                    else:
-                        logger.warning(
-                            "Failed to sync appointment to Google Calendar, but appointment will be saved to database"
-                        )
-                except Exception as e:
-                    # Log error but don't fail the appointment creation
-                    logger.warning(
-                        f"Error syncing appointment to Google Calendar: {e}. "
-                        "Appointment will be saved to database."
-                    )
-
-            # Save to database (including google_calendar_event_id if available)
+            # Save to database
             appointment = supabase_service.create_appointment(
                 description=description,
                 time=appointment_time.isoformat(),
-                google_calendar_event_id=calendar_event_id,
             )
 
             # Format user-friendly response
@@ -178,28 +152,6 @@ def create_appointment_tools(
                     data=f"No appointment found with ID {appointment_id}",
                     control={"lifespan": "response"},
                 )
-
-            # Delete from Google Calendar if event_id exists
-            google_calendar_event_id = appointment.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    deleted = google_calendar_service.delete_event(
-                        google_calendar_event_id
-                    )
-                    if deleted:
-                        logger.info(
-                            f"Deleted Google Calendar event: {google_calendar_event_id}"
-                        )
-                    else:
-                        logger.warning(
-                            f"Failed to delete Google Calendar event: {google_calendar_event_id}"
-                        )
-                except Exception as e:
-                    # Log error but continue with database deletion
-                    logger.warning(
-                        f"Error deleting Google Calendar event: {e}. "
-                        "Proceeding with database deletion."
-                    )
 
             # Delete the appointment from database
             success = supabase_service.delete_appointment(appointment_id)
@@ -282,41 +234,6 @@ def create_appointment_tools(
                 return p.ToolResult(
                     data="No updates provided.", control={"lifespan": "response"}
                 )
-
-            # Update Google Calendar event if event_id exists
-            google_calendar_event_id = appointment.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    # Prepare update parameters for Google Calendar
-                    calendar_start_time = None
-                    calendar_end_time = None
-
-                    if update_time:
-                        calendar_start_time = datetime.fromisoformat(
-                            update_time.replace("T", " ")
-                        )
-                        calendar_end_time = calendar_start_time + timedelta(hours=1)
-
-                    updated = google_calendar_service.update_event(
-                        event_id=google_calendar_event_id,
-                        description=update_description,
-                        start_time=calendar_start_time,
-                        end_time=calendar_end_time,
-                    )
-                    if updated:
-                        logger.info(
-                            f"Updated Google Calendar event: {google_calendar_event_id}"
-                        )
-                    else:
-                        logger.warning(
-                            f"Failed to update Google Calendar event: {google_calendar_event_id}"
-                        )
-                except Exception as e:
-                    # Log error but continue with database update
-                    logger.warning(
-                        f"Error updating Google Calendar event: {e}. "
-                        "Proceeding with database update."
-                    )
 
             # Update the appointment in database
             updated_at = datetime.now().isoformat()

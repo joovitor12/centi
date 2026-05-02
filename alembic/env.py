@@ -4,6 +4,7 @@ from dotenv import load_dotenv
 
 from sqlalchemy import engine_from_config
 from sqlalchemy import pool
+from sqlalchemy import text
 
 from alembic import context
 
@@ -19,10 +20,9 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# add your model's MetaData object here
-# for 'autogenerate' support
-from models import Base
-target_metadata = Base.metadata
+# No SQLAlchemy declarative models module is used in this project yet.
+# Keep metadata unset so versioned migrations can run normally.
+target_metadata = None
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:
@@ -73,6 +73,28 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
+        # Some legacy environments created alembic_version.version_num as VARCHAR(32).
+        # Newer revision ids in this repo are longer, so widen the column safely.
+        connection.execute(
+            text(
+                """
+                DO $$
+                BEGIN
+                    IF EXISTS (
+                        SELECT 1
+                        FROM information_schema.columns
+                        WHERE table_name = 'alembic_version'
+                          AND column_name = 'version_num'
+                          AND character_maximum_length IS NOT NULL
+                          AND character_maximum_length < 128
+                    ) THEN
+                        ALTER TABLE alembic_version
+                        ALTER COLUMN version_num TYPE VARCHAR(128);
+                    END IF;
+                END $$;
+                """
+            )
+        )
         context.configure(
             connection=connection, target_metadata=target_metadata
         )

@@ -1,24 +1,21 @@
 """Recurring appointment management tools for Parlant."""
 
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from typing import Optional
 import parlant.sdk as p
 from app.services.supabase_service import SupabaseService
-from app.services.google_calendar_service import GoogleCalendarService
 
 logger = logging.getLogger(__name__)
 
 
 def create_recurring_appointment_tools(
     supabase_service: SupabaseService,
-    google_calendar_service: Optional[GoogleCalendarService] = None,
 ):
     """Create recurring appointment management tools.
 
     Args:
         supabase_service: SupabaseService instance
-        google_calendar_service: Optional GoogleCalendarService instance for calendar sync
 
     Returns:
         List of tool functions
@@ -65,10 +62,9 @@ def create_recurring_appointment_tools(
                 )
 
             # Parse end_time if provided
-            end_datetime = None
             if end_time:
                 try:
-                    end_datetime = datetime.fromisoformat(end_time.replace("T", " "))
+                    datetime.fromisoformat(end_time.replace("T", " "))
                 except ValueError:
                     return p.ToolResult(
                         data=f"Invalid end_time format: '{end_time}'. Please use 'YYYY-MM-DD HH:MM:SS' format.",
@@ -76,12 +72,9 @@ def create_recurring_appointment_tools(
                     )
 
             # Parse end_date if provided
-            end_date_datetime = None
             if end_date:
                 try:
-                    end_date_datetime = datetime.fromisoformat(
-                        end_date.replace("T", " ")
-                    )
+                    datetime.fromisoformat(end_date.replace("T", " "))
                 except ValueError:
                     return p.ToolResult(
                         data=f"Invalid end_date format: '{end_date}'. Please use 'YYYY-MM-DD HH:MM:SS' format.",
@@ -100,35 +93,6 @@ def create_recurring_appointment_tools(
                     control={"lifespan": "response"},
                 )
 
-            # Create recurring event in Google Calendar first (to get event_id)
-            calendar_event_id = None
-            if google_calendar_service:
-                try:
-                    calendar_event_id = google_calendar_service.create_recurring_event(
-                        description=description,
-                        start_time=start_datetime,
-                        recurrence_pattern=recurrence_pattern,
-                        recurrence_interval=recurrence_interval,
-                        recurrence_byday=recurrence_byday,
-                        recurrence_bymonthday=recurrence_bymonthday,
-                        end_time=end_datetime,
-                        end_date=end_date_datetime,
-                        max_occurrences=max_occurrences,
-                    )
-                    if calendar_event_id:
-                        logger.info(
-                            f"Recurring appointment synced to Google Calendar: {calendar_event_id}"
-                        )
-                    else:
-                        logger.warning(
-                            "Failed to sync recurring appointment to Google Calendar, but will save to database"
-                        )
-                except Exception as e:
-                    logger.warning(
-                        f"Error syncing recurring appointment to Google Calendar: {e}. "
-                        "Will save to database."
-                    )
-
             # Save to database
             recurring_appointment = supabase_service.create_recurring_appointment(
                 description=description,
@@ -140,7 +104,6 @@ def create_recurring_appointment_tools(
                 end_time=end_time,
                 end_date=end_date,
                 max_occurrences=max_occurrences,
-                google_calendar_event_id=calendar_event_id,
             )
 
             formatted_start = start_datetime.strftime("%B %d, %Y at %I:%M %p")
@@ -265,7 +228,7 @@ def create_recurring_appointment_tools(
     ) -> p.ToolResult:
         """Edit a recurring appointment.
 
-        Updates both the template in database and the recurring event in Google Calendar.
+        Updates the recurring appointment template in database.
         
         Args:
             recurring_appointment_id: ID of the recurring appointment to edit
@@ -291,43 +254,6 @@ def create_recurring_appointment_tools(
                     data=f"No recurring appointment found with ID {recurring_appointment_id}",
                     control={"lifespan": "response"},
                 )
-
-            # Update Google Calendar if event_id exists
-            google_calendar_event_id = existing.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    start_datetime = None
-                    end_datetime = None
-                    if start_time:
-                        start_datetime = datetime.fromisoformat(
-                            start_time.replace("T", " ")
-                        )
-                    if end_time:
-                        end_datetime = datetime.fromisoformat(
-                            end_time.replace("T", " ")
-                        )
-
-                    updated = google_calendar_service.update_recurring_event(
-                        event_id=google_calendar_event_id,
-                        description=description,
-                        start_time=start_datetime,
-                        end_time=end_datetime,
-                        recurrence_pattern=recurrence_pattern,
-                        recurrence_interval=recurrence_interval,
-                        recurrence_byday=recurrence_byday,
-                        recurrence_bymonthday=recurrence_bymonthday,
-                        end_date=datetime.fromisoformat(end_date.replace("T", " "))
-                        if end_date
-                        else None,
-                    )
-                    if not updated:
-                        logger.warning(
-                            f"Failed to update Google Calendar event: {google_calendar_event_id}"
-                        )
-                except Exception as e:
-                    logger.warning(
-                        f"Error updating Google Calendar event: {e}. Proceeding with database update."
-                    )
 
             # Update in database
             updated_appointment = supabase_service.update_recurring_appointment(
@@ -374,27 +300,10 @@ def create_recurring_appointment_tools(
                     control={"lifespan": "response"},
                 )
 
-            # Delete from Google Calendar (simple approach: delete the recurring event)
-            google_calendar_event_id = existing.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    deleted = google_calendar_service.delete_recurring_event(
-                        google_calendar_event_id
-                    )
-                    if deleted:
-                        logger.info(
-                            f"Deleted Google Calendar recurring event: {google_calendar_event_id}"
-                        )
-                except Exception as e:
-                    logger.warning(
-                        f"Error deleting Google Calendar event: {e}. Proceeding with database update."
-                    )
-
             # Mark as inactive in database
             updated_appointment = supabase_service.update_recurring_appointment(
                 recurring_appointment_id=recurring_appointment_id,
                 is_active=False,
-                google_calendar_event_id=None,  # Clear event_id since we deleted it
             )
 
             return p.ToolResult(
@@ -431,50 +340,10 @@ def create_recurring_appointment_tools(
                     control={"lifespan": "response"},
                 )
 
-            # Recreate in Google Calendar
-            calendar_event_id = None
-            if google_calendar_service:
-                try:
-                    start_datetime = datetime.fromisoformat(
-                        existing["start_time"].replace("T", " ")
-                    )
-                    end_datetime = None
-                    if existing.get("end_time"):
-                        end_datetime = datetime.fromisoformat(
-                            existing["end_time"].replace("T", " ")
-                        )
-                    end_date_datetime = None
-                    if existing.get("end_date"):
-                        end_date_datetime = datetime.fromisoformat(
-                            existing["end_date"].replace("T", " ")
-                        )
-
-                    calendar_event_id = google_calendar_service.create_recurring_event(
-                        description=existing["description"],
-                        start_time=start_datetime,
-                        recurrence_pattern=existing["recurrence_pattern"],
-                        recurrence_interval=existing.get("recurrence_interval", 1),
-                        recurrence_byday=existing.get("recurrence_byday"),
-                        recurrence_bymonthday=existing.get("recurrence_bymonthday"),
-                        end_time=end_datetime,
-                        end_date=end_date_datetime,
-                        max_occurrences=existing.get("max_occurrences"),
-                    )
-
-                    if calendar_event_id:
-                        logger.info(
-                            f"Recreated Google Calendar recurring event: {calendar_event_id}"
-                        )
-                except Exception as e:
-                    logger.warning(
-                        f"Error recreating Google Calendar event: {e}. Proceeding with database update."
-                    )
-
-            # Mark as active and update event_id
+            # Mark as active
             updated_appointment = supabase_service.update_recurring_appointment(
                 recurring_appointment_id=recurring_appointment_id,
                 is_active=True,
-                google_calendar_event_id=calendar_event_id,
             )
 
             return p.ToolResult(
@@ -495,15 +364,13 @@ def create_recurring_appointment_tools(
         context: p.ToolContext, recurring_appointment_id: int
     ) -> p.ToolResult:
         """Delete a recurring appointment completely.
-
-        Removes the template and all future occurrences from Google Calendar.
         """
         try:
             logger.info(
                 f"Deleting recurring appointment ID: {recurring_appointment_id}"
             )
 
-            # Get existing to check Google Calendar event_id
+            # Get existing to confirm it exists
             existing = supabase_service.get_recurring_appointment_by_id(
                 recurring_appointment_id
             )
@@ -513,22 +380,6 @@ def create_recurring_appointment_tools(
                     data=f"No recurring appointment found with ID {recurring_appointment_id}",
                     control={"lifespan": "response"},
                 )
-
-            # Delete from Google Calendar
-            google_calendar_event_id = existing.get("google_calendar_event_id")
-            if google_calendar_event_id and google_calendar_service:
-                try:
-                    deleted = google_calendar_service.delete_recurring_event(
-                        google_calendar_event_id
-                    )
-                    if deleted:
-                        logger.info(
-                            f"Deleted Google Calendar recurring event: {google_calendar_event_id}"
-                        )
-                except Exception as e:
-                    logger.warning(
-                        f"Error deleting Google Calendar event: {e}. Proceeding with database deletion."
-                    )
 
             # Delete from database
             success = supabase_service.delete_recurring_appointment(

@@ -1105,7 +1105,577 @@
         "agent_intention_condition": null,
         "internal_action": null
       }
+    },
+    {
+      "id": "4bca39c2228d5cfe3a553ead71ebbf1d",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the newsletter ID.",
+          "agent_action": "The agent calls delete_newsletter using the provided newsletter ID."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "f7b202874eb83a27ca0df5ce6afe868f",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "15b4afe574f2d48b3e55f70b9505565f",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "e4079d4ea0de4d00ff9e9a0c0a54af0e",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "0fcb9455c170d8e0d6bbaef757ec256d",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides their user_id and email if they are missing.",
+          "agent_action": "The agent enforces max 5 themes, suggests defaults (videogames, tecnologia, esportes), and calls create_newsletter."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "5e441b195ace9311418b633f3e0b5882",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "62bfa6cebf2a703356fb67ca2dc8aa6e",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "954640fe371f069bb288b4478ce72a3a",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides details about the recurring pattern, start time, and duration for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "65cb454c892556cf594b1219976f0bc5",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "d7bf6f5958fb7527bbf992e7453366b2",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "e7424daf63734bd59a5f13f0da0f9f01",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides details about the recurring pattern, start time, and duration or end date for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "dec3bc91039bfe0c718158b4d1a2613c",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": true,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "3ab9b6ca0a50d8bdf676cb5dd3368fba",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": true,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides their language preference.",
+          "agent_action": "The agent replies in the language used by the user's latest message or asks one short language preference question if the language is mixed or unclear."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "99e7116bcf599726545ce731ca0a8c9a",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "65314bd9947949c4fb57b0b7fa078bb8",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides details about the recurring pattern, start time, and duration for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "77e9fb79886e1b21efe872201d92ef7c",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides their user_id/email if the tool feedback indicates it was not found in context.",
+          "agent_action": "The agent uses authenticated session context for user_id/email whenever available, asks the user for user_id/email if tool feedback says they were not found in context, enforces max 5 themes, suggests defaults (videogames, tecnologia, esportes), and calls create_newsletter."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "08d4899094b43aa8394ec663b392f6eb",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "e23be2fae2c0e3517e037176d003e89d",
+      "version": "3.0.3",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the details of the recurring appointment, such as the recurrence pattern, start time, and duration.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
     }
   ],
-  "journey_evaluations_3.0.3": []
+  "journey_evaluations_3.0.3": [],
+  "guideline_evaluations_3.3.2": [
+    {
+      "id": "62bfa6cebf2a703356fb67ca2dc8aa6e",
+      "creation_utc": "2026-05-02T03:04:44.980454+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "15b4afe574f2d48b3e55f70b9505565f",
+      "creation_utc": "2026-05-02T03:04:45.479039+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "cc7416db27ae2b3af3c9be83c409152e",
+      "creation_utc": "2026-05-02T03:04:45.479039+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "7eebbb8e49ab695abbf463065f5bdba7",
+      "creation_utc": "2026-05-02T03:04:45.479039+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to pause by ID",
+          "agent_action": "The agent uses list_recurring_appointments to show recurring appointments and calls pause_recurring_appointment with the recurring_appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "6996140cbef11974e14a35eb61211d91",
+      "creation_utc": "2026-05-02T03:04:45.479039+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to delete by ID",
+          "agent_action": "The agent uses list_recurring_appointments to show recurring appointments and calls delete_recurring_appointment with the recurring_appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "f7b202874eb83a27ca0df5ce6afe868f",
+      "creation_utc": "2026-05-02T03:04:45.986430+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "3ab9b6ca0a50d8bdf676cb5dd3368fba",
+      "creation_utc": "2026-05-02T03:04:45.986430+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": true,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides their language preference",
+          "agent_action": "The agent replies in the language used by the user's latest message or asks one short language preference question if the language is mixed or unclear."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "92273e4961c49c7339630ad9a7f4f4de",
+      "creation_utc": "2026-05-02T03:04:45.986430+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to resume by ID",
+          "agent_action": "The agent uses list_recurring_appointments to show recurring appointments (including inactive ones) and calls resume_recurring_appointment with the recurring_appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "77e9fb79886e1b21efe872201d92ef7c",
+      "creation_utc": "2026-05-02T03:04:45.986430+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides their user_id/email if asked.",
+          "agent_action": "The agent uses authenticated session context for user_id/email whenever available, asks the user for user_id/email if tool feedback says they were not found in context, enforces max 5 themes, suggests defaults (videogames, tecnologia, esportes), and calls create_newsletter."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "4bca39c2228d5cfe3a553ead71ebbf1d",
+      "creation_utc": "2026-05-02T03:04:45.986430+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the newsletter ID",
+          "agent_action": "The agent calls delete_newsletter using the provided newsletter ID."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "dec3bc91039bfe0c718158b4d1a2613c",
+      "creation_utc": "2026-05-02T03:04:46.494727+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": true,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": "You are likely to answer questions about what the assistant can do, available features/tools, or provide a precise capabilities list.",
+        "internal_action": null
+      }
+    },
+    {
+      "id": "e4079d4ea0de4d00ff9e9a0c0a54af0e",
+      "creation_utc": "2026-05-02T03:04:46.494727+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "9fb10291ceef5ec4c4d70f5d8d857da3",
+      "creation_utc": "2026-05-02T03:04:47.002966+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": "You are likely to schedule, add, or create an appointment, meeting, reminder, or task, and the user does NOT mention recurring, repeating, daily, weekly, monthly, or 'every' patterns",
+        "internal_action": null
+      }
+    },
+    {
+      "id": "164de340231d92432522066b93923c1d",
+      "creation_utc": "2026-05-02T03:04:47.002966+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides an ID for the specific recurring appointment",
+          "agent_action": "The agent uses get_recurring_appointment with the provided recurring_appointment_id, or lists recurring appointments to show options if the user hasn't listed appointments yet, and then uses get_recurring_appointment with the ID the user specifies"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "be75b4cbd1e6b82d6b59bddbd2614032",
+      "creation_utc": "2026-05-02T03:04:47.002966+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "df69d3da864f25e8f00adaf476adba47",
+      "creation_utc": "2026-05-02T03:04:47.002966+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which appointment to delete by ID number, description, or time",
+          "agent_action": "The agent uses find_appointments to list all appointments and calls the delete_appointment tool with the specified appointment_id"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "b9d2a4bbe3338a64a1e529aa81dd48c9",
+      "creation_utc": "2026-05-02T03:04:48.528284+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The user specifies which appointment to edit and provides the new description and/or new time",
+          "agent_action": "The agent uses find_appointments to list all appointments, extracts the new description and/or new time from the user's request, and calls the edit_appointment tool with the appropriate parameters"
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "fd8cea231c9365b1565eebfe245250a3",
+      "creation_utc": "2026-05-02T03:04:50.044331+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer specifies which recurring appointment to edit by ID and provides the fields to update (description, time, pattern, etc.)",
+          "agent_action": "The agent lists all recurring appointments, uses edit_recurring_appointment with the specified ID, and updates the fields as instructed by the customer."
+        },
+        "agent_intention_condition": null,
+        "internal_action": null
+      }
+    },
+    {
+      "id": "8e90c3a84326620bb7785a3ef9682359",
+      "creation_utc": "2026-05-02T03:04:51.552155+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides details about the recurring pattern, start time, and duration or end date for the appointment.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": "You are likely to schedule, add, or create a recurring, repeating, daily, weekly, monthly, or repeating appointment, meeting, reminder, or task",
+        "internal_action": null
+      }
+    },
+    {
+      "id": "e52969988aac1b5523aa014688a976b4",
+      "creation_utc": "2026-05-02T03:16:33.485537+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": "You are likely to schedule, add, or create an appointment, meeting, reminder, or task, and the user does NOT mention recurring, repeating, daily, weekly, monthly, or 'every' patterns",
+        "internal_action": null
+      }
+    },
+    {
+      "id": "512a2b3d024164aa4bfb9c11ba26a911",
+      "creation_utc": "2026-05-02T03:16:39.057302+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides the details of the recurring appointment, such as the recurrence pattern, start time, and duration.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": "You are likely to schedule, add, or create a recurring, repeating, daily, weekly, monthly, or repeating appointment, meeting, reminder, or task",
+        "internal_action": null
+      }
+    }
+  ],
+  "journey_evaluations_3.3.2": []
 }

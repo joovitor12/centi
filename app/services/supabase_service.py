@@ -46,13 +46,10 @@ class SupabaseService:
         self,
         description: str,
         time: str,
-        google_calendar_event_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a new appointment."""
         try:
             data = {"time": time, "description": description}
-            if google_calendar_event_id:
-                data["google_calendar_event_id"] = google_calendar_event_id
             response = self.client.table("appointments").insert(data).execute()
             return response.data[0] if response.data else {}
         except Exception as e:
@@ -112,7 +109,6 @@ class SupabaseService:
         end_time: Optional[str] = None,
         end_date: Optional[str] = None,
         max_occurrences: Optional[int] = None,
-        google_calendar_event_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Create a new recurring appointment template."""
         try:
@@ -134,8 +130,6 @@ class SupabaseService:
                 data["end_date"] = end_date
             if max_occurrences is not None:
                 data["max_occurrences"] = max_occurrences
-            if google_calendar_event_id is not None:
-                data["google_calendar_event_id"] = google_calendar_event_id
 
             response = (
                 self.client.table("recurring_appointments").insert(data).execute()
@@ -192,7 +186,6 @@ class SupabaseService:
         end_date: Optional[str] = None,
         max_occurrences: Optional[int] = None,
         is_active: Optional[bool] = None,
-        google_calendar_event_id: Optional[str] = None,
     ) -> Dict[str, Any]:
         """Update an existing recurring appointment."""
         try:
@@ -219,8 +212,6 @@ class SupabaseService:
                 update_data["max_occurrences"] = max_occurrences
             if is_active is not None:
                 update_data["is_active"] = is_active
-            if google_calendar_event_id is not None:
-                update_data["google_calendar_event_id"] = google_calendar_event_id
 
             # Always update updated_at timestamp
             from datetime import datetime
@@ -254,284 +245,4 @@ class SupabaseService:
             logger.error(
                 f"Error deleting recurring appointment {recurring_appointment_id}: {e}"
             )
-            raise
-    
-    def create_email_meeting_thread(
-        self,
-        thread_id: str,
-        owner_email: str,
-        participant_emails: List[str],
-        subject: Optional[str] = None,
-        status: str = "pending",
-        duration_minutes: int = 30,
-        meeting_description: Optional[str] = None,
-        meeting_title: Optional[str] = None,
-    ) -> Dict[str, Any]:
-        """Create a new email meeting thread record.
-        
-        Args:
-            thread_id: Gmail thread ID (unique)
-            owner_email: Email of the Centi account owner
-            participant_emails: List of participant email addresses
-            subject: Email subject
-            status: Initial status (default: 'pending')
-            duration_minutes: Meeting duration in minutes
-            meeting_description: Description of the meeting
-            meeting_title: Optional meeting title/name
-            
-        Returns:
-            Created thread record
-        """
-        try:
-            data = {
-                "thread_id": thread_id,
-                "owner_email": owner_email,
-                "participant_emails": participant_emails,
-                "status": status,
-                "duration_minutes": duration_minutes,
-            }
-            
-            if subject is not None:
-                data["subject"] = subject
-            if meeting_description is not None:
-                data["meeting_description"] = meeting_description
-            if meeting_title is not None:
-                data["meeting_title"] = meeting_title
-                
-            response = (
-                self.client.table("email_meeting_threads").insert(data).execute()
-            )
-            return response.data[0] if response.data else {}
-        except Exception as e:
-            logger.error(f"Error creating email meeting thread: {e}")
-            raise
-
-    def get_email_meeting_thread_by_thread_id(
-        self, thread_id: str
-    ) -> Optional[Dict[str, Any]]:
-        """Get email meeting thread by Gmail thread ID.
-        
-        Args:
-            thread_id: Gmail thread ID
-            
-        Returns:
-            Thread record if found, None otherwise
-        """
-        try:
-            response = (
-                self.client.table("email_meeting_threads")
-                .select("*")
-                .eq("thread_id", thread_id)
-                .execute()
-            )
-            return response.data[0] if response.data else None
-        except Exception as e:
-            logger.error(f"Error fetching email meeting thread {thread_id}: {e}")
-            raise
-
-    def update_email_meeting_thread(
-        self,
-        thread_id: str,
-        status: Optional[str] = None,
-        suggested_times: Optional[List[Dict[str, Any]]] = None,
-        confirmed_time: Optional[str] = None,
-        last_email_id: Optional[str] = None,
-        last_processed_at: Optional[str] = None,
-        meeting_description: Optional[str] = None,
-        meeting_title: Optional[str] = None,
-        duration_minutes: Optional[int] = None,
-    ) -> Dict[str, Any]:
-        """Update an existing email meeting thread.
-        
-        Args:
-            thread_id: Gmail thread ID
-            status: New status ('pending', 'suggestions_sent', 'confirmed', 'cancelled')
-            suggested_times: List of suggested time slots (JSONB)
-            confirmed_time: Confirmed meeting time (ISO format string)
-            last_email_id: ID of last processed email in thread
-            last_processed_at: Timestamp of last processing (ISO format string)
-            meeting_description: Updated meeting description
-            meeting_title: Updated meeting title
-            duration_minutes: Updated duration
-            
-        Returns:
-            Updated thread record
-        """
-        try:
-            update_data = {}
-            
-            if status is not None:
-                update_data["status"] = status
-            if suggested_times is not None:
-                update_data["suggested_times"] = suggested_times
-            if confirmed_time is not None:
-                update_data["confirmed_time"] = confirmed_time
-            if last_email_id is not None:
-                update_data["last_email_id"] = last_email_id
-            if last_processed_at is not None:
-                update_data["last_processed_at"] = last_processed_at
-            if meeting_description is not None:
-                update_data["meeting_description"] = meeting_description
-            if meeting_title is not None:
-                update_data["meeting_title"] = meeting_title
-            if duration_minutes is not None:
-                update_data["duration_minutes"] = duration_minutes
-                
-            # Always update updated_at timestamp
-            from datetime import datetime
-            update_data["updated_at"] = datetime.now().isoformat()
-            
-            # Execute the update
-            self.client.table("email_meeting_threads").update(update_data).eq(
-                "thread_id", thread_id
-            ).execute()
-            
-            # Fetch and return the updated thread
-            return self.get_email_meeting_thread_by_thread_id(thread_id) or {}
-        except Exception as e:
-            logger.error(f"Error updating email meeting thread {thread_id}: {e}")
-            raise
-
-    def get_pending_email_threads(
-        self, status: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
-        """Get email meeting threads by status.
-        
-        Args:
-            status: Filter by status ('pending', 'suggestions_sent', etc.)
-                   If None, returns all threads
-                   
-        Returns:
-            List of thread records
-        """
-        try:
-            query = self.client.table("email_meeting_threads").select("*")
-            
-            if status is not None:
-                query = query.eq("status", status)
-                
-            response = query.order("created_at", desc=True).execute()
-            return response.data or []
-        except Exception as e:
-            logger.error(f"Error fetching pending email threads: {e}")
-            raise
-
-    # User management methods for multi-user OAuth support
-    
-    def create_user(
-        self,
-        user_email: str,
-        calendar_access_token: Dict[str, Any],
-        listen_address: str,
-    ) -> Dict[str, Any]:
-        """Create a new user with OAuth token.
-        
-        Args:
-            user_email: User's email address (from Google identity token)
-            calendar_access_token: OAuth token JSON (dict)
-            listen_address: Email address for the agent to monitor
-            
-        Returns:
-            Created user record
-        """
-        try:
-            data = {
-                "user_email": user_email.lower(),
-                "calendar_access_token": calendar_access_token,
-                "listen_address": listen_address.lower(),
-            }
-            response = self.client.table("users").insert(data).execute()
-            return response.data[0] if response.data else {}
-        except Exception as e:
-            logger.error(f"Error creating user {user_email}: {e}")
-            raise
-
-    def get_user_by_email(self, user_email: str) -> Optional[Dict[str, Any]]:
-        """Get user by email address.
-        
-        Args:
-            user_email: User's email address
-            
-        Returns:
-            User record if found, None otherwise
-        """
-        try:
-            response = (
-                self.client.table("users")
-                .select("*")
-                .eq("user_email", user_email.lower())
-                .execute()
-            )
-            return response.data[0] if response.data else None
-        except Exception as e:
-            logger.error(f"Error fetching user {user_email}: {e}")
-            raise
-
-    def update_user_token(
-        self, user_email: str, calendar_access_token: Dict[str, Any]
-    ) -> Dict[str, Any]:
-        """Update user's calendar access token.
-        
-        Args:
-            user_email: User's email address
-            calendar_access_token: Updated OAuth token JSON (dict)
-            
-        Returns:
-            Updated user record
-        """
-        try:
-            from datetime import datetime
-            
-            update_data = {
-                "calendar_access_token": calendar_access_token,
-                "updated_at": datetime.now().isoformat(),
-            }
-            
-            response = (
-                self.client.table("users")
-                .update(update_data)
-                .eq("user_email", user_email.lower())
-                .execute()
-            )
-            return response.data[0] if response.data else {}
-        except Exception as e:
-            logger.error(f"Error updating user token {user_email}: {e}")
-            raise
-
-    def get_all_users(self) -> List[Dict[str, Any]]:
-        """Get all registered users.
-        
-        Returns:
-            List of all user records
-        """
-        try:
-            response = (
-                self.client.table("users")
-                .select("*")
-                .execute()
-            )
-            return response.data or []
-        except Exception as e:
-            logger.error(f"Error fetching all users: {e}")
-            raise
-
-    def get_user_by_listen_address(self, listen_address: str) -> Optional[Dict[str, Any]]:
-        """Get user by listen address (agent email).
-        
-        Args:
-            listen_address: Agent email address to monitor
-            
-        Returns:
-            User record if found, None otherwise
-        """
-        try:
-            response = (
-                self.client.table("users")
-                .select("*")
-                .eq("listen_address", listen_address.lower())
-                .execute()
-            )
-            return response.data[0] if response.data else None
-        except Exception as e:
-            logger.error(f"Error fetching user by listen_address {listen_address}: {e}")
             raise

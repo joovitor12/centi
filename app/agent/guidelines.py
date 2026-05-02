@@ -59,7 +59,7 @@ from .prompts.delete_recurring_appointment.action import (
 
 
 async def setup_guidelines(
-    agent: p.Agent, tools: list, recurring_tools: list = None
+    agent: p.Agent, tools: list, recurring_tools: list = None, newsletter_tools: list = None
 ) -> None:
     """Setup agent guidelines.
 
@@ -69,6 +69,8 @@ async def setup_guidelines(
             Expected order: [find_appointments, add_appointment, delete_appointment, edit_appointment]
         recurring_tools: List of recurring appointment tools (optional)
             Expected order: [create_recurring_appointment, list_recurring_appointments, ...]
+        newsletter_tools: List of newsletter tools (optional)
+            Expected order: [list_newsletters, create_newsletter, update_newsletter, ...]
     """
     # Tools are returned in order from create_appointment_tools:
     # [find_appointments, add_appointment, delete_appointment, edit_appointment]
@@ -83,6 +85,36 @@ async def setup_guidelines(
         add_appointment = tools[1] if len(tools) > 1 else None
         delete_appointment = tools[2] if len(tools) > 2 else None
         edit_appointment = tools[3] if len(tools) > 3 else None
+
+    # Guideline: Multilingual behavior (PT-BR / EN)
+    await agent.create_guideline(
+        condition=(
+            "User communicates in Portuguese or English, or switches language during conversation."
+        ),
+        action=(
+            "Always reply in the language used by the user's latest message. "
+            "If user writes in Portuguese, reply in Portuguese (pt-BR). "
+            "If user writes in English, reply in English. "
+            "If language is mixed or unclear, ask one short language preference question."
+        ),
+    )
+
+    # Guideline: Adding appointments (NON-RECURRING only)
+    await agent.create_guideline(
+        condition=(
+            "User asks what the assistant can do, asks for available features/tools, "
+            "or asks for a precise capabilities list."
+        ),
+        action=(
+            "Answer only with currently supported Centi features and use the user's language. Mention: "
+            "create/list/edit/delete one-time appointments, create/list/edit/pause/"
+            "resume/delete recurring appointments, and newsletter builder "
+            "(create/list/update/delete newsletter configs, up to 5 themes with defaults "
+            "videogames/tecnologia/esportes, generate newsletter content, send now, "
+            "and scheduled delivery daily/weekly/every N days). "
+            "Do not claim unrelated generic abilities."
+        ),
+    )
 
     # Guideline: Adding appointments (NON-RECURRING only)
     if add_appointment:
@@ -213,4 +245,74 @@ async def setup_guidelines(
             condition=delete_recurring_appointment_condition.compile(),
             action=delete_recurring_appointment_action.compile(),
             tools=[list_recurring_appointments, delete_recurring_appointment],
+        )
+
+    # ============================================================
+    # Newsletter Builder Guidelines
+    # ============================================================
+    if newsletter_tools and len(newsletter_tools) >= 6:
+        list_newsletters = newsletter_tools[0]
+        create_newsletter = newsletter_tools[1]
+        update_newsletter = newsletter_tools[2]
+        delete_newsletter = newsletter_tools[3]
+        generate_newsletter_content = newsletter_tools[4]
+        send_newsletter_now = newsletter_tools[5]
+
+        await agent.create_guideline(
+            condition=(
+                "User asks to create/configure a newsletter with title, themes, or frequency."
+            ),
+            action=(
+                "Use authenticated session context for user_id/email whenever available. "
+                "Only ask the user for user_id/email if tool feedback says they were not found in context. "
+                "Enforce max 5 themes, suggest defaults (videogames, tecnologia, esportes), "
+                "then call create_newsletter."
+            ),
+            tools=[create_newsletter],
+        )
+
+        await agent.create_guideline(
+            condition=(
+                "User asks to see, list, manage, or review their newsletter configurations."
+            ),
+            action=(
+                "Call list_newsletters first to show available newsletter IDs and current settings."
+            ),
+            tools=[list_newsletters],
+        )
+
+        await agent.create_guideline(
+            condition=(
+                "User asks to edit newsletter title/themes/email/frequency or pause/resume delivery."
+            ),
+            action=(
+                "Call update_newsletter with the newsletter ID and only requested fields."
+            ),
+            tools=[update_newsletter],
+        )
+
+        await agent.create_guideline(
+            condition="User asks to delete a newsletter.",
+            action="Call delete_newsletter using the newsletter ID.",
+            tools=[delete_newsletter],
+        )
+
+        await agent.create_guideline(
+            condition=(
+                "User asks to generate the newsletter content or preview the next edition."
+            ),
+            action=(
+                "Call generate_newsletter_content using newsletter_id and user_id."
+            ),
+            tools=[generate_newsletter_content],
+        )
+
+        await agent.create_guideline(
+            condition=(
+                "User asks to send newsletter now or test immediate delivery by email."
+            ),
+            action=(
+                "Call send_newsletter_now using newsletter_id and user_id."
+            ),
+            tools=[send_newsletter_now],
         )
