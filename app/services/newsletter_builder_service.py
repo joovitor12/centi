@@ -2,8 +2,10 @@
 
 import json
 import logging
+import html
 from dataclasses import dataclass
 from typing import Any, Dict, List, Optional
+from urllib.parse import urlparse
 
 from app.agent.prompts import get_langfuse_client
 from app.config.settings import settings
@@ -69,9 +71,12 @@ class NewsletterBuilderService:
             markdown=False,
         )
 
-        prompt = self._build_prompt(title=title, themes=themes, language=language)
+        source_urls = self._collect_source_urls(themes)
+        prompt = self._build_prompt(
+            title=title, themes=themes, language=language, source_urls=source_urls
+        )
         run_result = agent.run(prompt)
-        payload = self._extract_payload(run_result)
+        payload = self._extract_payload(run_result, source_urls=source_urls, language=language)
 
         return NewsletterDraft(
             title=payload["title"],
@@ -79,11 +84,19 @@ class NewsletterBuilderService:
             text_content=payload["text_content"],
         )
 
-    def _build_prompt(self, title: str, themes: List[str], language: str) -> str:
+    def _build_prompt(
+        self, title: str, themes: List[str], language: str, source_urls: List[str]
+    ) -> str:
         base_prompt = self._newsletter_prompt.compile(
             language=language,
             title=title,
             themes=", ".join(themes),
+        )
+        sources_block = (
+            "Candidate sources gathered for this newsletter:\n"
+            + "\n".join(f"- {url}" for url in source_urls)
+            if source_urls
+            else "No candidate sources were pre-fetched."
         )
         source_requirements = (
             "\n\nHard requirements:\n"
@@ -95,9 +108,11 @@ class NewsletterBuilderService:
             "6) In text_content, include the same URLs in plain text.\n"
             "7) Output must remain valid JSON with exactly: title, html_content, text_content.\n"
         )
-        return f"{base_prompt}{source_requirements}"
+        return f"{base_prompt}\n\n{sources_block}{source_requirements}"
 
-    def _extract_payload(self, run_result: Any) -> Dict[str, str]:
+    def _extract_payload(
+        self, run_result: Any, source_urls: List[str], language: str
+    ) -> Dict[str, str]:
         """Handle Agno response object formats safely."""
         raw_output: Optional[str] = None
 
@@ -131,8 +146,74 @@ class NewsletterBuilderService:
             if not payload.get(key):
                 raise RuntimeError(f"Agno response is missing required key: {key}")
 
+        html_content = str(payload["html_content"])
+        text_content = str(payload["text_content"])
+        has_link_in_html = "<a " in html_content and "href=" in html_content
+        has_link_in_text = "http://" in text_content or "https://" in text_content
+
+        if source_urls and (not has_link_in_html or not has_link_in_text):
+            html_content, text_content = self._append_sources_section(
+                html_content=html_content,
+                text_content=text_content,
+                source_urls=source_urls,
+                language=language,
+            )
+
         return {
             "title": str(payload["title"]),
-            "html_content": str(payload["html_content"]),
-            "text_content": str(payload["text_content"]),
+            "html_content": html_content,
+            "text_content": text_content,
         }
+
+    def _collect_source_urls(self, themes: List[str]) -> List[str]:
+        """Collect source URLs from DuckDuckGo before generation."""
+        unique_urls: List[str] = []
+        seen = set()
+
+        try:
+            from ddgs import DDGS
+        except ImportError:
+            logger.warning("ddgs not installed; skipping explicit source prefetch.")
+            return unique_urls
+
+        def _add_url(url: Optional[str]) -> None:
+            if not url or not isinstance(url, str):
+                return
+            parsed = urlparse(url)
+            if parsed.scheme not in ("http", "https"):
+                return
+            normalized = url.strip()
+            if normalized in seen:
+                return
+            seen.add(normalized)
+            unique_urls.append(normalized)
+
+        try:
+            with DDGS() as ddgs:
+                for theme in themes:
+                    query = f"{theme} latest news"
+                    for item in ddgs.news(query, max_results=3):
+                        _add_url(item.get("url") or item.get("href"))
+                    for item in ddgs.text(query, max_results=2):
+                        _add_url(item.get("href") or item.get("url"))
+                    if len(unique_urls) >= 8:
+                        break
+        except Exception as exc:
+            logger.warning("Failed to prefetch newsletter sources: %s", exc)
+
+        return unique_urls[:8]
+
+    def _append_sources_section(
+        self, html_content: str, text_content: str, source_urls: List[str], language: str
+    ) -> tuple[str, str]:
+        section_title = "Fontes" if language.lower().startswith("pt") else "Sources"
+        html_links = "".join(
+            f"<li><a href=\"{html.escape(url)}\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(url)}</a></li>"
+            for url in source_urls
+        )
+        html_section = f"<h2>{section_title}</h2><ul>{html_links}</ul>"
+        text_section = f"{section_title}\n" + "\n".join(f"- {url}" for url in source_urls)
+
+        merged_html = f"{html_content.rstrip()}\n{html_section}"
+        merged_text = f"{text_content.rstrip()}\n\n{text_section}"
+        return merged_html, merged_text
