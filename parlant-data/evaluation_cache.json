@@ -1675,6 +1675,36 @@
         "agent_intention_condition": "You are likely to schedule, add, or create a recurring, repeating, daily, weekly, monthly, or repeating appointment, meeting, reminder, or task",
         "internal_action": null
       }
+    },
+    {
+      "id": "59d6a7c4f18bd76f4c27233a755c118e",
+      "creation_utc": "2026-05-02T18:35:18.666207+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": false,
+          "customer_action": "",
+          "agent_action": ""
+        },
+        "agent_intention_condition": "You are likely to schedule, add, or create an appointment, meeting, reminder, or task, and the user does NOT mention recurring, repeating, daily, weekly, monthly, or 'every' patterns",
+        "internal_action": null
+      }
+    },
+    {
+      "id": "98d28d40fd39801e670caee430ed7d11",
+      "creation_utc": "2026-05-02T18:35:22.694990+00:00",
+      "version": "3.3.2",
+      "properties": {
+        "continuous": false,
+        "customer_dependent_action_data": {
+          "is_customer_dependent": true,
+          "customer_action": "The customer provides details about the recurring pattern, start time, and duration or end date.",
+          "agent_action": "The agent detects recurring patterns and creates recurring appointments based on the customer's input."
+        },
+        "agent_intention_condition": "You are likely to schedule, add, or create a recurring, repeating, daily, weekly, monthly, or repeating appointment, meeting, reminder, or task",
+        "internal_action": null
+      }
     }
   ],
   "journey_evaluations_3.3.2": []

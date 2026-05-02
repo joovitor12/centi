@@ -1,0 +1,58 @@
+services:
+  - type: web
+    name: centi-frontend
+    runtime: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_BASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_URL
+        sync: false
+      - key: NEXT_PUBLIC_SUPABASE_ANON_KEY
+        sync: false
+      - key: NEXT_PUBLIC_PARLANT_SERVER_URL
+        sync: false
+      - key: NEXT_PUBLIC_PARLANT_AGENT_ID
+        sync: false
+
+  - type: web
+    name: centi-api
+    runtime: python
+    buildCommand: uv sync --frozen
+    startCommand: uv run python run_api.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.16
+      - key: CORS_ALLOW_ORIGINS
+        sync: false
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: RESEND_API_KEY
+        sync: false
+      - key: RESEND_FROM_EMAIL
+        sync: false
+
+  - type: web
+    name: centi-parlant
+    runtime: python
+    buildCommand: uv sync --frozen
+    startCommand: uv run python run_production.py
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.10.16
+      - key: SUPABASE_URL
+        sync: false
+      - key: SUPABASE_KEY
+        sync: false
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: AGNO_MODEL_ID
+        value: gpt-5.4-mini

@@ -62,6 +62,40 @@ uv run python run_api.py
 
 ```bash
 uv run python run_newsletter_worker.py
+
+## Deploy no Render
+
+O repositório inclui `render.yaml` com 3 serviços:
+
+- `centi-frontend` (Web Service Next.js)
+- `centi-api` (Web Service FastAPI com `run_api.py`)
+- `centi-parlant` (Web Service com `run_production.py`)
+
+### Como subir
+
+1. No Render, crie um **Blueprint** apontando para este repositório.
+2. O Render vai ler o `render.yaml` e criar os 3 serviços.
+3. Configure as variáveis `sync: false` no painel do Render.
+
+### Variáveis principais
+
+- No `centi-api`:
+  - `CORS_ALLOW_ORIGINS=https://<frontend>.onrender.com`
+  - `SUPABASE_URL`, `SUPABASE_KEY`, `OPENAI_API_KEY`
+  - `RESEND_API_KEY`, `RESEND_FROM_EMAIL`
+- No `centi-parlant`:
+  - `SUPABASE_URL`, `SUPABASE_KEY`, `OPENAI_API_KEY`
+  - `AGNO_MODEL_ID` (opcional)
+- No `centi-frontend`:
+  - `NEXT_PUBLIC_API_BASE_URL=https://<api>.onrender.com`
+  - `NEXT_PUBLIC_PARLANT_SERVER_URL=https://<parlant>.onrender.com` (ou URL interna, se aplicável)
+  - `NEXT_PUBLIC_PARLANT_AGENT_ID=<agent-id>`
+  - `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+
+### Comandos de runtime usados
+
+- API: `uv run python run_api.py`
+- Parlant: `uv run python run_production.py`
 ```
 
 ## Project Structure

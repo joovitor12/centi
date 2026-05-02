@@ -6364,3 +6364,14 @@ Recommended actions:
 [2m2026-05-02T03:16:52.279542Z[0m [[32m[1minfo     [0m] [1m[<main>] Session not found (id='FBgy8dXNsA')[0m
 [2m2026-05-02T03:19:53.621329Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Cancelling all remaining tasks (2)[0m
 [2m2026-05-02T03:19:53.622833Z[0m [[32m[1minfo     [0m] [1m[<main>] BackgroundTaskService: Shutting down[0m
+[2m2026-05-02T18:35:07.524250Z[0m [[32m[1minfo     [0m] [1m[<main>] Parlant server version 3.3.2[0m
+[2m2026-05-02T18:35:07.526254Z[0m [[32m[1minfo     [0m] [1m[<main>] Using home directory 'C:\Users\joao\personal\centi\parlant-data'[0m
+[2m2026-05-02T18:35:07.528257Z[0m [[32m[1minfo     [0m] [1m[<main>] No external modules selected[0m
+[2m2026-05-02T18:35:08.768841Z[0m [[32m[1minfo     [0m] [1m[<main>] Initialized OpenAIService[0m
+[2m2026-05-02T18:35:22.800257Z[0m [[32m[1minfo     [0m] [1m[<main>] .-----------------------------------------.[0m
+[2m2026-05-02T18:35:22.801257Z[0m [[32m[1minfo     [0m] [1m[<main>] | Server is ready for some serious action |[0m
+[2m2026-05-02T18:35:22.801621Z[0m [[32m[1minfo     [0m] [1m[<main>] '-----------------------------------------'[0m
+[2m2026-05-02T18:35:22.801621Z[0m [[32m[1minfo     [0m] [1m[<main>] Server authorization policy: development[0m
+[2m2026-05-02T18:35:22.801621Z[0m [[32m[1minfo     [0m] [1m[<main>] Try the Sandbox UI at http://localhost:8800[0m
+[2m2026-05-02T18:35:23.077216Z[0m [[32m[1minfo     [0m] [1m[<main>] Server is ready to accept requests.[0m
+[2m2026-05-02T18:36:14.278654Z[0m [[32m[1minfo     [0m] [1m[<main>] Session not found (id='WpUjRxlEH9')[0m

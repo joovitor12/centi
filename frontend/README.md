@@ -36,6 +36,20 @@ npm run dev
 
 App runs at `http://localhost:3000`.
 
+## Deploy (Render)
+
+Este frontend esta preparado para o servico `centi-frontend` definido no `render.yaml` da raiz.
+
+Variaveis obrigatorias em producao:
+
+```env
+NEXT_PUBLIC_API_BASE_URL=https://<api>.onrender.com
+NEXT_PUBLIC_SUPABASE_URL=https://<your-project>.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-anon-key>
+NEXT_PUBLIC_PARLANT_SERVER_URL=https://<parlant>.onrender.com
+NEXT_PUBLIC_PARLANT_AGENT_ID=<centi-agent-id>
+```
+
 ## Main Screen Features
 
 - List newsletters by `user_id`

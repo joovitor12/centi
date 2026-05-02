@@ -224,7 +224,7 @@ function parseThemes(value: string): string[] {
 export default function Home() {
   const { resolvedTheme, setTheme } = useTheme();
   const supabase = getSupabaseClient();
-  const [locale, setLocale] = useState<Locale>("pt");
+  const [locale, setLocale] = useState<Locale>("en");
   const [activeTab, setActiveTab] = useState<AppTab>("chat");
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [isAuthLoading, setIsAuthLoading] = useState(Boolean(supabase));
@@ -521,13 +521,8 @@ export default function Home() {
 
         <section className="flex flex-1 flex-col">
           <header className="flex items-center justify-between border-b px-5 py-4">
-            <div>
-              <p className="text-xs uppercase tracking-[0.16em] text-muted-foreground">
-                {locale === "pt" ? "Painel" : "Workspace"}
-              </p>
-              <div className="font-medium">
-              {activeTab === "chat" ? t.chatCardTitle : t.tabNewsletter}
-              </div>
+            <div className="font-medium">
+              {activeTab === "chat" ? t.tabChat : t.tabNewsletter}
             </div>
             <div className="flex flex-wrap items-center gap-2">
               <Button
@@ -562,7 +557,7 @@ export default function Home() {
             </div>
           </header>
 
-          <div className="flex-1 overflow-y-auto p-5">
+          <div className="flex-1 overflow-hidden p-5">
             {!supabase ? (
               <Card className="border-dashed">
                 <CardHeader>
@@ -631,20 +626,14 @@ export default function Home() {
             ) : null}
 
             {currentUser && activeTab === "chat" ? (
-              <Card className="rounded-2xl">
-                <CardHeader className="border-b">
-                  <CardTitle>{t.chatCardTitle}</CardTitle>
-                  <CardDescription>{t.chatCardDescription}</CardDescription>
-                </CardHeader>
-                <CardContent className="pt-6">
-                  <ParlantChatPanel
-                    key={currentUser.id}
-                    customerId={currentUser.id}
-                    customerEmail={currentUser.email}
-                    locale={locale}
-                  />
-                </CardContent>
-              </Card>
+              <div className="h-full min-h-0">
+                <ParlantChatPanel
+                  key={currentUser.id}
+                  customerId={currentUser.id}
+                  customerEmail={currentUser.email}
+                  locale={locale}
+                />
+              </div>
             ) : null}
 
             {currentUser && activeTab === "newsletter" ? (

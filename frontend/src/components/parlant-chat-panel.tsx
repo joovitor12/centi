@@ -4,7 +4,6 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, SendHorizonal } from "lucide-react";
 import { toast } from "sonner";
 
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
@@ -22,7 +21,6 @@ type ParlantEvent = {
   data?: unknown;
 };
 const POLL_SECONDS = 25;
-type StreamMode = "connecting" | "sse" | "polling";
 
 function extractMessageText(event: ParlantEvent): string {
   const payload = event.data;
@@ -64,8 +62,6 @@ export function ParlantChatPanel({
   const [events, setEvents] = useState<ParlantEvent[]>([]);
   const [draft, setDraft] = useState("");
   const [isSending, setIsSending] = useState(false);
-  const [streamMode, setStreamMode] = useState<StreamMode>("connecting");
-  const [pendingCustomerOffset, setPendingCustomerOffset] = useState<number | null>(null);
   const pendingCustomerOffsetRef = useRef<number | null>(null);
   const endRef = useRef<HTMLDivElement | null>(null);
   const isInitializing = sessionId === null;
@@ -82,11 +78,6 @@ export function ParlantChatPanel({
     streamError: locale === "pt" ? "Erro no stream." : "Streaming connection error.",
     sendError: locale === "pt" ? "Erro ao enviar mensagem." : "Could not send message.",
     sessionUnavailable: locale === "pt" ? "Sessao indisponivel." : "Session unavailable.",
-    assistant: locale === "pt" ? "Assistente Centi" : "Centi Assistant",
-    connecting: locale === "pt" ? "Conectando" : "Connecting",
-    online: locale === "pt" ? "Online" : "Online",
-    typing: locale === "pt" ? "Centi digitando..." : "Centi is typing...",
-    streaming: locale === "pt" ? "Centi respondendo..." : "Centi is streaming...",
     emptyState:
       locale === "pt"
         ? "Envie a primeira mensagem para iniciar a conversa."
@@ -122,7 +113,6 @@ export function ParlantChatPanel({
       incoming.some((event) => event.source === "ai_agent" && event.offset > pendingOffset)
     ) {
       pendingCustomerOffsetRef.current = null;
-      setPendingCustomerOffset(null);
     }
 
     setEvents((previous) => {
@@ -268,7 +258,6 @@ export function ParlantChatPanel({
         return;
       }
       pollingStarted = true;
-      setStreamMode("polling");
 
       while (!cancelled) {
         try {
@@ -288,13 +277,6 @@ export function ParlantChatPanel({
         `${server}/sessions/${encodeURIComponent(sessionId)}/events` +
         `?min_offset=${nextOffset}&kinds=message,status&sse=true`;
       eventSource = new EventSource(sseUrl);
-      setStreamMode("connecting");
-
-      eventSource.onopen = () => {
-        if (!cancelled) {
-          setStreamMode("sse");
-        }
-      };
 
       eventSource.onmessage = (messageEvent) => {
         if (cancelled || !messageEvent.data) {
@@ -377,7 +359,6 @@ export function ParlantChatPanel({
       const created = (await response.json()) as ParlantEvent;
       setDraft("");
       pendingCustomerOffsetRef.current = created.offset;
-      setPendingCustomerOffset(created.offset);
       setEvents((previous) => {
         const merged = new Map(previous.map((event) => [event.id, event]));
         merged.set(created.id, created);
@@ -399,25 +380,8 @@ export function ParlantChatPanel({
   }
 
   return (
-    <div className="rounded-lg border bg-card">
-      <div className="flex items-center justify-between border-b px-4 py-2">
-        <span className="text-sm font-medium">{text.assistant}</span>
-        <div className="flex items-center gap-2">
-          {isInitializing ? (
-            <Badge variant="secondary" className="gap-1">
-              <Loader2 className="size-3 animate-spin" />
-              {text.connecting}
-            </Badge>
-          ) : (
-            <Badge variant="secondary">{text.online}</Badge>
-          )}
-          {pendingCustomerOffset !== null ? (
-            <Badge>{streamMode === "sse" ? text.streaming : text.typing}</Badge>
-          ) : null}
-        </div>
-      </div>
-
-      <div className="h-[420px] space-y-3 overflow-y-auto p-4">
+    <div className="flex h-full min-h-0 flex-col">
+      <div className="min-h-0 flex-1 space-y-3 overflow-y-auto px-4 pt-4 pb-4">
         {messages.length === 0 ? (
           <p className="text-sm text-muted-foreground">{text.emptyState}</p>
         ) : (
@@ -453,19 +417,24 @@ export function ParlantChatPanel({
       </div>
 
       <form
-        className="flex gap-2 border-t p-3"
+        className="mt-2 flex items-center gap-2 border-t px-4 pt-3 pb-4"
         onSubmit={(event) => {
           event.preventDefault();
           void onSend();
         }}
       >
         <Input
+          className="h-11"
           value={draft}
           onChange={(event) => setDraft(event.target.value)}
           placeholder={text.placeholder}
           disabled={isInitializing || !sessionId || isSending}
         />
-        <Button type="submit" disabled={isInitializing || !sessionId || isSending}>
+        <Button
+          type="submit"
+          className="h-11 w-11 shrink-0"
+          disabled={isInitializing || !sessionId || isSending}
+        >
           {isSending ? (
             <Loader2 className="size-4 animate-spin" />
           ) : (

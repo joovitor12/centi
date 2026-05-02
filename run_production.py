@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 import parlant.sdk as p
 
 from app.config.settings import settings
@@ -35,7 +36,21 @@ async def run_parlant_app():
     )
 
     try:
-        async with p.Server(nlp_service=p.NLPServices.openai) as server:
+        port = int(os.environ.get("PORT", "8800"))
+        tool_service_port = int(
+            os.environ.get("PARLANT_TOOL_SERVICE_PORT", str(port + 18))
+        )
+        logger.info(
+            "Starting Parlant server on port=%s tool_service_port=%s",
+            port,
+            tool_service_port,
+        )
+        async with p.Server(
+            host="0.0.0.0",
+            port=port,
+            tool_service_port=tool_service_port,
+            nlp_service=p.NLPServices.openai,
+        ) as server:
             # Create agent
             agent = await server.create_agent(
                 name="Centi",
