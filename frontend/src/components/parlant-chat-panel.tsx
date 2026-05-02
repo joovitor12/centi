@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Loader2, SendHorizonal } from "lucide-react";
 import { toast } from "sonner";
 
@@ -89,6 +89,13 @@ export function ParlantChatPanel({
   };
   const { initError, streamError, sendError, sessionUnavailable, sessionTitle } = text;
 
+  const resetSession = useCallback(() => {
+    window.localStorage.removeItem(sessionStorageKey);
+    pendingCustomerOffsetRef.current = null;
+    setEvents([]);
+    setSessionId(null);
+  }, [sessionStorageKey]);
+
   const messages = useMemo(
     () =>
       events.filter(
@@ -127,7 +134,7 @@ export function ParlantChatPanel({
   }, [messages.length]);
 
   useEffect(() => {
-    if (!server || !agentId || !customerId) {
+    if (!server || !agentId || !customerId || sessionId) {
       return;
     }
 
@@ -217,7 +224,16 @@ export function ParlantChatPanel({
     return () => {
       cancelled = true;
     };
-  }, [agentId, customerEmail, customerId, initError, server, sessionStorageKey, sessionTitle]);
+  }, [
+    agentId,
+    customerEmail,
+    customerId,
+    initError,
+    server,
+    sessionId,
+    sessionStorageKey,
+    sessionTitle,
+  ]);
 
   useEffect(() => {
     if (!server || !sessionId) {
@@ -237,6 +253,9 @@ export function ParlantChatPanel({
 
       if (response.status === 504) {
         return [];
+      }
+      if (response.status === 404) {
+        throw new Error("SESSION_NOT_FOUND");
       }
       if (!response.ok) {
         throw new Error(`Falha no stream (${response.status}).`);
@@ -265,6 +284,10 @@ export function ParlantChatPanel({
           consumeIncoming(incoming);
         } catch (error) {
           if (!cancelled) {
+            if (error instanceof Error && error.message === "SESSION_NOT_FOUND") {
+              resetSession();
+              return;
+            }
             toast.error(error instanceof Error ? error.message : streamError);
             await new Promise((resolve) => setTimeout(resolve, 1500));
           }
@@ -311,8 +334,12 @@ export function ParlantChatPanel({
         if (!cancelled) {
           startSse();
         }
-      } catch {
+      } catch (error) {
         if (!cancelled) {
+          if (error instanceof Error && error.message === "SESSION_NOT_FOUND") {
+            resetSession();
+            return;
+          }
           void startPolling();
         }
       }
@@ -326,7 +353,7 @@ export function ParlantChatPanel({
         eventSource.close();
       }
     };
-  }, [server, sessionId, streamError]);
+  }, [resetSession, server, sessionId, streamError]);
 
   const onSend = async () => {
     if (!server || !sessionId) {

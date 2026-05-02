@@ -28,14 +28,33 @@ def create_newsletter_tools(
         if provided_user_id:
             return provided_user_id
 
-        if getattr(context, "customer_id", None):
-            return str(context.customer_id)
-
         plugin_data = getattr(context, "plugin_data", {}) or {}
         for key in ("user_id", "supabase_user_id", "customer_id"):
             value = plugin_data.get(key)
             if value:
                 return str(value)
+
+        customer = getattr(context, "customer", None)
+        if customer:
+            metadata = getattr(customer, "metadata", None) or {}
+            if isinstance(metadata, dict):
+                for key in ("user_id", "supabase_user_id"):
+                    value = metadata.get(key)
+                    if value:
+                        return str(value)
+
+        session = getattr(context, "session", None)
+        session_customer = getattr(session, "customer", None) if session else None
+        if session_customer:
+            metadata = getattr(session_customer, "metadata", None) or {}
+            if isinstance(metadata, dict):
+                for key in ("user_id", "supabase_user_id"):
+                    value = metadata.get(key)
+                    if value:
+                        return str(value)
+
+        if getattr(context, "customer_id", None):
+            return str(context.customer_id)
         return None
 
     def _resolve_email(
@@ -49,6 +68,31 @@ def create_newsletter_tools(
             value = plugin_data.get(key)
             if value:
                 return str(value)
+
+        customer = getattr(context, "customer", None)
+        if customer:
+            direct_email = getattr(customer, "email", None)
+            if direct_email:
+                return str(direct_email)
+            metadata = getattr(customer, "metadata", None) or {}
+            if isinstance(metadata, dict):
+                for key in ("email", "user_email", "customer_email"):
+                    value = metadata.get(key)
+                    if value:
+                        return str(value)
+
+        session = getattr(context, "session", None)
+        session_customer = getattr(session, "customer", None) if session else None
+        if session_customer:
+            direct_email = getattr(session_customer, "email", None)
+            if direct_email:
+                return str(direct_email)
+            metadata = getattr(session_customer, "metadata", None) or {}
+            if isinstance(metadata, dict):
+                for key in ("email", "user_email", "customer_email"):
+                    value = metadata.get(key)
+                    if value:
+                        return str(value)
         return None
 
     @p.tool
